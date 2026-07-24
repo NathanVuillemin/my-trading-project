@@ -1,0 +1,10 @@
+node_modules/
+*.log
+
+# .claude/agents is a Windows directory symlink into the Omni AI system folder.
+# Committing it would store a dead absolute path that breaks on Linux CI.
+.claude/agents
+
+# Local secrets — connectors read API keys from the environment, never from files.
+.env
+.env.*

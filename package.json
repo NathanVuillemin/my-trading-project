@@ -1,0 +1,17 @@
+{
+  "name": "my-trading-project",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agentic Pine Script v6 strategy workspace: research, build, review, cache.",
+  "scripts": {
+    "sanity:pine": "node scripts/pinets-sanity-check.mjs",
+    "whale:flow": "node scripts/whale-flow.mjs",
+    "smart:money": "node scripts/smart-money.mjs",
+    "smart:contrarian": "node scripts/smart-money.mjs --invert-crowd",
+    "dashboard": "node scripts/build-dashboard.mjs",
+    "refresh": "node scripts/whale-flow.mjs && node scripts/smart-money.mjs && node scripts/build-dashboard.mjs"
+  },
+  "devDependencies": {
+    "pinets": "^0.9.29"
+  }
+}
