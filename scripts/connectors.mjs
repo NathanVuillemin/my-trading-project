@@ -65,6 +65,23 @@ async function jget(url, opts = {}) {
   } finally { clearTimeout(t); }
 }
 const clamp = (n, lo = -1, hi = 1) => Math.max(lo, Math.min(hi, n));
+
+// Per-asset loops must not swallow errors. A venue that is entirely unreachable
+// (geo-block, outage, DNS) otherwise looks identical to "this asset isn't listed here",
+// and the composite quietly drops a source without telling anyone.
+// Tracks outcomes and returns a warning when a venue produced nothing.
+function tally(id) {
+  let ok = 0, failed = 0, firstErr = null;
+  return {
+    hit() { ok++; },
+    miss(e) { failed++; if (!firstErr && e) firstErr = e.message || String(e); },
+    warn() {
+      if (ok > 0) return null;
+      if (failed === 0) return null;
+      return `${id}: NO DATA — all ${failed} requests failed (${firstErr || 'unknown'})`;
+    },
+  };
+}
 // long/short RATIO (e.g. 1.55) -> -1..+1
 const ratioToScore = (r) => (!isFinite(r) || r <= 0) ? 0 : clamp((r - 1) / (r + 1));
 
@@ -103,12 +120,17 @@ export async function hyperliquidFlow() {
 // =====================================================================
 
 // Binance publishes the long/short split of TOP traders by position size. No auth.
+// NOTE: Binance geo-blocks some datacentre IP ranges (GitHub Actions US runners get
+// HTTP 451). When that happens this returns zero signals plus a loud warning rather
+// than pretending the source simply had nothing to say.
 export async function binanceTopTraders(assets = DEFAULT_ASSETS) {
   const signals = [];
+  const t = tally('binance-top');
   for (const a of assets) {
     try {
       const rows = await jget(`https://fapi.binance.com/futures/data/topLongShortPositionRatio?symbol=${a}USDT&period=1d&limit=2`);
-      if (!rows?.length) continue;
+      if (!rows?.length) { t.hit(); continue; }   // reachable, asset just not listed
+      t.hit();
       const last = rows[rows.length - 1];
       const prev = rows.length > 1 ? rows[0] : null;
       const score = clamp(+last.longAccount - +last.shortAccount);
@@ -119,17 +141,19 @@ export async function binanceTopTraders(assets = DEFAULT_ASSETS) {
         detail: `top traders ${(100 * +last.longAccount).toFixed(1)}% long`
           + (delta == null ? '' : ` (${delta >= 0 ? '+' : ''}${(100 * delta).toFixed(1)}pt d/d)`),
       });
-    } catch { /* asset not listed on this venue */ }
+    } catch (e) { t.miss(e); }
   }
-  return { signals };
+  return { signals, warn: t.warn() };
 }
 
 // OKX equivalent: long/short account ratio restricted to top traders.
 export async function okxTopTraders(assets = DEFAULT_ASSETS) {
   const signals = [];
+  const t = tally('okx-top');
   for (const a of assets) {
     try {
       const j = await jget(`https://www.okx.com/api/v5/rubik/stat/contracts/long-short-account-ratio-contract-top-trader?instId=${a}-USDT-SWAP&period=1D`);
+      t.hit();
       const d = j?.data;
       if (!d?.length) continue;
       const latest = +d[0][1];                       // newest first
@@ -139,9 +163,9 @@ export async function okxTopTraders(assets = DEFAULT_ASSETS) {
         asset: a, cls: classOf(a), score, sizeUsd: null,
         detail: `top-trader L/S ratio ${latest.toFixed(2)}`,
       });
-    } catch { /* not listed */ }
+    } catch (e) { t.miss(e); }
   }
-  return { signals };
+  return { signals, warn: t.warn() };
 }
 
 // =====================================================================
@@ -174,12 +198,14 @@ export async function dydxMarkets() {
 
 export async function asterMarkets(assets = DEFAULT_ASSETS) {
   const signals = [];
+  const t = tally('aster');
   for (const a of assets) {
     try {
       const [oiR, pR] = await Promise.all([
         jget(`https://fapi.asterdex.com/fapi/v1/openInterest?symbol=${a}USDT`),
         jget(`https://fapi.asterdex.com/fapi/v1/premiumIndex?symbol=${a}USDT`),
       ]);
+      t.hit();
       const oi = +oiR.openInterest * +pR.markPrice;
       const f = +pR.lastFundingRate;
       if (!isFinite(oi)) continue;
@@ -189,9 +215,9 @@ export async function asterMarkets(assets = DEFAULT_ASSETS) {
         score: clamp(f * FUNDING_SCALE), sizeUsd: Math.round(oi),
         detail: `OI $${(oi / 1e6).toFixed(1)}M, funding ${(f * 100).toFixed(4)}%`,
       });
-    } catch { /* not listed */ }
+    } catch (e) { t.miss(e); }
   }
-  return { signals };
+  return { signals, warn: t.warn() };
 }
 
 export async function paradexMarkets() {
@@ -248,9 +274,11 @@ export async function lighterMarkets() {
 // Binance taker buy/sell volume — aggressive-flow direction, distinct from resting positioning.
 export async function binanceTakerFlow(assets = DEFAULT_ASSETS) {
   const signals = [];
+  const t = tally('binance-taker');
   for (const a of assets) {
     try {
       const rows = await jget(`https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=${a}USDT&period=1d&limit=1`);
+      t.hit();
       if (!rows?.length) continue;
       const r = +rows[0].buySellRatio;
       signals.push({
@@ -258,9 +286,34 @@ export async function binanceTakerFlow(assets = DEFAULT_ASSETS) {
         asset: a, cls: classOf(a), score: ratioToScore(r), sizeUsd: null,
         detail: `taker buy/sell ${r.toFixed(3)}`,
       });
-    } catch { /* not listed */ }
+    } catch (e) { t.miss(e); }
   }
-  return { signals };
+  return { signals, warn: t.warn() };
+}
+
+// Bybit's account long/short ratio. Added because Binance geo-blocks the CI runners,
+// and this endpoint answers from everywhere — it keeps a venue in the mix when Binance
+// drops out. NOTE: this is ALL accounts, not top traders, so it is a crowd signal and
+// is NOT a substitute for binance-top's smart signal. Labelled accordingly.
+export async function bybitAccountRatio(assets = DEFAULT_ASSETS) {
+  const signals = [];
+  const t = tally('bybit');
+  for (const a of assets) {
+    try {
+      const j = await jget(`https://api.bybit.com/v5/market/account-ratio?category=linear&symbol=${a}USDT&period=1d&limit=1`);
+      t.hit();
+      const row = j?.result?.list?.[0];
+      if (!row) continue;
+      const buy = +row.buyRatio, sell = +row.sellRatio;
+      if (!isFinite(buy) || !isFinite(sell)) continue;
+      signals.push({
+        source: 'bybit', kind: 'crowd', tier: 'C',
+        asset: a, cls: classOf(a), score: clamp(buy - sell), sizeUsd: null,
+        detail: `accounts ${(100 * buy).toFixed(1)}% long`,
+      });
+    } catch (e) { t.miss(e); }
+  }
+  return { signals, warn: t.warn() };
 }
 
 // =====================================================================
@@ -322,27 +375,68 @@ export async function dune() {
 // =====================================================================
 // registry
 // =====================================================================
+// ACTIVE registry — what actually feeds the composite.
+//
+// `kind` is declared here as well as on each signal so coverage can be measured without
+// waiting for results: if the smart-tier sources drop out (Binance geo-block in CI, say),
+// the composite is still computable but means something different, and the report must say so.
 export const CONNECTORS = [
-  { id: 'hyperliquid', fn: hyperliquidFlow, weight: 3.0, note: 'per-wallet whale flow (Tier A)' },
-  { id: 'binance-top', fn: binanceTopTraders, weight: 2.0, note: 'top-trader position ratio' },
-  { id: 'okx-top', fn: okxTopTraders, weight: 1.5, note: 'top-trader account ratio' },
-  { id: 'dune', fn: dune, weight: 2.0, note: 'on-chain smart money (key)' },
-  { id: 'dydx', fn: dydxMarkets, weight: 0.8, note: 'OI + funding' },
-  { id: 'aster', fn: asterMarkets, weight: 0.6, note: 'OI + funding' },
-  { id: 'paradex', fn: paradexMarkets, weight: 0.6, note: 'OI' },
-  { id: 'lighter', fn: lighterMarkets, weight: 0.6, note: 'funding (has FX perps)' },
-  { id: 'binance-taker', fn: binanceTakerFlow, weight: 0.7, note: 'aggressive taker flow' },
-  { id: 'coinglass', fn: coinglass, weight: 0.8, note: 'global L/S (key)' },
+  { id: 'hyperliquid', fn: hyperliquidFlow, weight: 3.0, kind: 'smart', note: 'per-wallet whale flow (Tier A)' },
+  { id: 'binance-top', fn: binanceTopTraders, weight: 2.0, kind: 'smart', note: 'top-trader position ratio (geo-blocked on CI runners)' },
+  { id: 'okx-top', fn: okxTopTraders, weight: 1.5, kind: 'smart', note: 'top-trader account ratio' },
+  { id: 'dune', fn: dune, weight: 2.0, kind: 'smart', note: 'on-chain smart money (key)' },
+  { id: 'dydx', fn: dydxMarkets, weight: 0.8, kind: 'crowd', note: 'OI + funding' },
+  { id: 'bybit', fn: bybitAccountRatio, weight: 0.7, kind: 'crowd', note: 'account L/S, answers from CI' },
+  { id: 'coinglass', fn: coinglass, weight: 0.8, kind: 'crowd', note: 'global L/S (key)' },
+];
+
+// PARKED — working connectors deliberately kept out of the composite.
+//
+// aster / paradex / lighter / binance-taker all measure much the same thing as dydx:
+// crowd lean via funding, premium or taker imbalance. They are not independent signals, so
+// averaging all five just multiplied the weight of "crowd funding" without adding information.
+// dydx is kept as the single representative (it carries real OI *and* funding).
+// Re-enable by moving an entry into CONNECTORS above — the code is unchanged and still tested.
+export const PARKED_CONNECTORS = [
+  { id: 'aster', fn: asterMarkets, weight: 0.6, kind: 'crowd', note: 'OI + funding — correlated with dydx' },
+  { id: 'paradex', fn: paradexMarkets, weight: 0.6, kind: 'crowd', note: 'OI — correlated with dydx' },
+  { id: 'lighter', fn: lighterMarkets, weight: 0.6, kind: 'crowd', note: 'premium — correlated; has FX perps if ever needed' },
+  { id: 'binance-taker', fn: binanceTakerFlow, weight: 0.7, kind: 'crowd', note: 'taker flow — also geo-blocked on CI' },
 ];
 
 export async function runAll(assets = DEFAULT_ASSETS) {
   const out = [], warns = [];
+  const live = [];   // connectors that actually contributed
   await Promise.all(CONNECTORS.map(async (c) => {
     try {
       const r = await c.fn(assets);
+      const n = (r.signals || []).length;
       for (const s of (r.signals || [])) out.push({ ...s, weight: c.weight });
+      if (n > 0) live.push(c.id);
       if (r.warn) warns.push(r.warn);
+      // Safety net: a source contributing nothing must always say why. Silence here
+      // means a connector dropped out of the composite unnoticed.
+      else if (n === 0) warns.push(`${c.id}: returned 0 signals with no error — check the connector`);
     } catch (e) { warns.push(`${c.id}: ${e.message}`); }
   }));
-  return { signals: out, warns };
+
+  // Coverage: how much of the intended weight actually showed up, split by kind.
+  // A composite built on 40% of its smart-tier weight is not the same measurement as
+  // one built on all of it, so this travels with the data instead of being inferred.
+  const totals = (pred) => CONNECTORS.filter(pred).reduce((s, c) => s + c.weight, 0);
+  const got = (pred) => CONNECTORS.filter(c => pred(c) && live.includes(c.id)).reduce((s, c) => s + c.weight, 0);
+  const smartExpected = totals(c => c.kind === 'smart');
+  const smartPresent = got(c => c.kind === 'smart');
+  const coverage = {
+    live,
+    missing: CONNECTORS.filter(c => !live.includes(c.id)).map(c => c.id),
+    smartExpected, smartPresent,
+    smartPct: smartExpected ? Math.round(smartPresent / smartExpected * 100) : 0,
+    crowdExpected: totals(c => c.kind === 'crowd'),
+    crowdPresent: got(c => c.kind === 'crowd'),
+  };
+  if (coverage.smartPct < 60) {
+    warns.push(`DEGRADED: only ${coverage.smartPct}% of smart-tier weight present (missing: ${coverage.missing.join(', ') || 'none'}) — composite leans on crowd data`);
+  }
+  return { signals: out, warns, coverage };
 }

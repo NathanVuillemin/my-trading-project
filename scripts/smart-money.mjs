@@ -54,7 +54,7 @@ const label = (s) => s > 0.35 ? 'BULLISH' : s < -0.35 ? 'BEARISH' : 'NEUTRAL';
   const log = (...a) => { if (!asJson) console.log(...a); };
 
   log(`Querying ${CONNECTORS.length} connectors for ${assets.length} assets...`);
-  const { signals, warns } = await runAll(assets);
+  const { signals, warns, coverage } = await runAll(assets);
 
   // ---- group by asset ----
   const byAsset = {};
@@ -92,7 +92,8 @@ const label = (s) => s > 0.35 ? 'BULLISH' : s < -0.35 ? 'BEARISH' : 'NEUTRAL';
   const payload = {
     generatedAt: new Date().toISOString(),
     invertCrowd, minSources,
-    connectors: CONNECTORS.map(c => ({ id: c.id, weight: c.weight, note: c.note })),
+    connectors: CONNECTORS.map(c => ({ id: c.id, weight: c.weight, kind: c.kind, note: c.note })),
+    coverage,
     warns,
     composite: composite.map(({ sigs, ...rest }) => ({
       ...rest,
@@ -111,7 +112,11 @@ const label = (s) => s > 0.35 ? 'BULLISH' : s < -0.35 ? 'BEARISH' : 'NEUTRAL';
 
   // ---- report ----
   const line = '─'.repeat(74);
-  console.log(`\n${line}\nSMART MONEY COMPOSITE${invertCrowd ? '  (crowd inverted = contrarian)' : ''}\n${line}`);
+  const cov = coverage.smartPct >= 60 ? '' : `  ⚠ DEGRADED — ${coverage.smartPct}% smart coverage`;
+  console.log(`\n${line}\nSMART MONEY COMPOSITE${invertCrowd ? '  (crowd inverted = contrarian)' : ''}${cov}\n${line}`);
+  console.log(`Sources live: ${coverage.live.join(', ') || 'none'}`
+    + (coverage.missing.length ? `   |   MISSING: ${coverage.missing.join(', ')}` : '')
+    + `\nSmart-tier weight present: ${coverage.smartPresent.toFixed(1)}/${coverage.smartExpected.toFixed(1)} (${coverage.smartPct}%)`);
   console.log('asset      composite            smart-only  sources  agree');
   for (const a of composite) {
     console.log(
