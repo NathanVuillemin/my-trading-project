@@ -113,18 +113,28 @@ async function collect() {
     .map(x => x.a);
 
   log(`Pulling ${hours}h fills for ${addrs.length} wallets...`);
-  // coin -> { net, opened, bulls:Set, bears:Set, wallets: Map(addr->signed) }
+  // coin -> aggregate. Two very different quantities are tracked deliberately:
+  //   net    = all signed flow (opens AND closes)
+  //   opened = signed flow from OPENING fills only — i.e. genuinely new risk
+  // These routinely point in OPPOSITE directions: a market rallying on whales closing
+  // shorts shows net BUYING while the fresh risk being put on is new SHORTS. Flagging on
+  // `net` therefore reports the direction of new positioning backwards. Flags use `opened`.
   const agg = {};
   const bump = (coin, signed, isOpen, addr) => {
     const k = cleanCoin(coin);
     const e = agg[k] || (agg[k] = {
       coin: k, cls: classOf(coin), net: 0, opened: 0,
-      bulls: new Set(), bears: new Set(), wallets: new Map(),
+      bulls: new Set(), bears: new Set(),
+      wallets: new Map(), walletsOpened: new Map(),
     });
     e.net += signed;
-    if (isOpen) e.opened += signed;
-    (signed >= 0 ? e.bulls : e.bears).add(addr);
     e.wallets.set(addr, (e.wallets.get(addr) || 0) + signed);
+    if (isOpen) {
+      e.opened += signed;
+      // Bull/bear wallet counts describe NEW risk, so they follow opening fills too.
+      (signed >= 0 ? e.bulls : e.bears).add(addr);
+      e.walletsOpened.set(addr, (e.walletsOpened.get(addr) || 0) + signed);
+    }
   };
 
   let ok = 0;
@@ -145,28 +155,36 @@ async function collect() {
   });
   log(`Got fills for ${ok}/${addrs.length} wallets.`);
 
-  // per-coin shape, with top wallet drivers (attribution)
+  // per-coin shape. Drivers are attributed on OPENING flow, matching what flags fire on.
   const coins = Object.values(agg).map(e => {
-    const drivers = [...e.wallets.entries()]
+    const drivers = [...e.walletsOpened.entries()]
       .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
       .slice(0, CFG.topDriversPerCoin)
       .map(([a, usd]) => ({ w: short(a), addr: a, usd: Math.round(usd) }));
+    const net = Math.round(e.net), opened = Math.round(e.opened);
     return {
       coin: e.coin, cls: e.cls,
-      net: Math.round(e.net), opened: Math.round(e.opened),
+      net, opened,
+      closing: net - opened,                 // net closing flow, the remainder
+      // True when closes dominate and drag `net` opposite to actual new risk.
+      divergent: opened !== 0 && Math.sign(net) !== Math.sign(opened),
       bulls: e.bulls.size, bears: e.bears.size,
       drivers,
     };
-  }).sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+  }).sort((a, b) => Math.abs(b.opened) - Math.abs(a.opened));
 
-  // asset-class rollup
-  const rollup = Object.fromEntries(CLASSES.map(c => [c, { net: 0, buy: 0, sell: 0, coins: 0 }]));
+  // asset-class rollup — carries both measures for the same reason.
+  const rollup = Object.fromEntries(CLASSES.map(c => [c, { net: 0, opened: 0, buy: 0, sell: 0, coins: 0 }]));
   for (const c of coins) {
     const r = rollup[c.cls];
-    r.net += c.net; r.coins++;
-    if (c.net >= 0) r.buy += c.net; else r.sell += c.net;
+    r.net += c.net; r.opened += c.opened; r.coins++;
+    if (c.opened >= 0) r.buy += c.opened; else r.sell += c.opened;
   }
-  for (const c of CLASSES) { rollup[c].net = Math.round(rollup[c].net); rollup[c].buy = Math.round(rollup[c].buy); rollup[c].sell = Math.round(rollup[c].sell); }
+  for (const c of CLASSES) {
+    const r = rollup[c];
+    r.net = Math.round(r.net); r.opened = Math.round(r.opened);
+    r.buy = Math.round(r.buy); r.sell = Math.round(r.sell);
+  }
 
   return {
     date: String(arg('date', new Date().toISOString().slice(0, 10))),
@@ -186,10 +204,13 @@ function baselineSeries(todayDate) {
   const recent = files.slice(-CFG.lookbackDays).map(f => {
     try { return JSON.parse(readFileSync(join(DATA_DIR, f), 'utf8')); } catch { return null; }
   }).filter(Boolean);
+  // Baselines are built on `opened` (new risk) to match what the flags test.
+  // Snapshots written before that change may lack `opened`; fall back to `net` for those
+  // so old history still contributes rather than silently reading as zero.
   const coin = {}, cls = {};
   for (const snap of recent) {
-    for (const c of (snap.coins || [])) (coin[c.coin] ||= []).push(c.net);
-    for (const [k, v] of Object.entries(snap.rollup || {})) (cls[k] ||= []).push(v.net);
+    for (const c of (snap.coins || [])) (coin[c.coin] ||= []).push(c.opened ?? c.net);
+    for (const [k, v] of Object.entries(snap.rollup || {})) (cls[k] ||= []).push(v.opened ?? v.net);
   }
   return { coin, cls };
 }
@@ -197,50 +218,61 @@ function baselineSeries(todayDate) {
 function flag(today) {
   const base = baselineSeries(today.date);
 
-  // per-coin flags
+  // per-coin flags — tested on `opened` (new risk), not `net`.
   const coinFlags = [];
   for (const c of today.coins) {
     const series = base.coin[c.coin] || [];
-    const passFloor = Math.abs(c.net) >= CFG.floorUsd;
+    const value = c.opened;
+    const passFloor = Math.abs(value) >= CFG.floorUsd;
     let z = null, passZ = false;
     if (series.length >= 5) {
       const m = mean(series), s = std(series) || 1;
-      z = (c.net - m) / s;
+      z = (value - m) / s;
       passZ = Math.abs(z) >= CFG.k;
     } else {
       passZ = passFloor; // cold start: floor only
     }
     if (passFloor && passZ) {
       coinFlags.push({
-        coin: c.coin, cls: c.cls, net: c.net,
-        dir: c.net >= 0 ? 'BULLISH' : 'BEARISH',
+        coin: c.coin, cls: c.cls,
+        opened: value, net: c.net, closing: c.closing,
+        dir: value >= 0 ? 'BULLISH' : 'BEARISH',
+        // Loud marker for the case that motivated this: headline flow says one thing,
+        // new risk says the other.
+        divergent: c.divergent,
         z: z == null ? null : +z.toFixed(1),
         baselineDays: series.length,
-        consensus: (c.net >= 0 ? c.bulls : c.bears) >= CFG.minTradersForConsensus,
+        consensus: (value >= 0 ? c.bulls : c.bears) >= CFG.minTradersForConsensus,
         drivers: c.drivers,
       });
     }
   }
-  coinFlags.sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+  coinFlags.sort((a, b) => Math.abs(b.opened) - Math.abs(a.opened));
 
   // asset-class rollup flags
   const classFlags = [];
   for (const [k, v] of Object.entries(today.rollup)) {
     const series = base.cls[k] || [];
-    const passFloor = Math.abs(v.net) >= CFG.classFloorUsd;
+    const value = v.opened;
+    const passFloor = Math.abs(value) >= CFG.classFloorUsd;
     let z = null, passZ = false;
     if (series.length >= 5) {
       const m = mean(series), s = std(series) || 1;
-      z = (v.net - m) / s;
+      z = (value - m) / s;
       passZ = Math.abs(z) >= CFG.k;
     } else {
       passZ = passFloor;
     }
     if (passFloor && passZ) {
-      classFlags.push({ cls: k, net: v.net, dir: v.net >= 0 ? 'BULLISH' : 'BEARISH', z: z == null ? null : +z.toFixed(1), baselineDays: series.length });
+      classFlags.push({
+        cls: k, opened: value, net: v.net,
+        dir: value >= 0 ? 'BULLISH' : 'BEARISH',
+        divergent: value !== 0 && Math.sign(v.net) !== Math.sign(value),
+        z: z == null ? null : +z.toFixed(1), baselineDays: series.length,
+      });
     }
   }
-  classFlags.sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+  classFlags.sort((a, b) => Math.abs(b.opened) - Math.abs(a.opened));
 
   return { coinFlags, classFlags };
 }
@@ -250,32 +282,36 @@ function report(today, flags) {
   const line = '─'.repeat(64);
   console.log(`\n${line}\nWHALE FLOW — ${today.date}  (${today.window_hours}h, ${today.wallets_with_fills} wallets)\n${line}`);
 
-  // asset-class rollup
-  console.log('\nASSET-CLASS FLOW (net = buy pressure − sell pressure):');
+  // asset-class rollup — new risk leads, headline flow shown alongside
+  console.log('\nASSET-CLASS FLOW  (new risk = opening fills only; headline = all flow):');
   for (const c of CLASSES) {
     const r = today.rollup[c];
     const fl = flags.classFlags.find(f => f.cls === c);
-    console.log(`  ${c.padEnd(6)} ${fmt(r.net).padStart(11)}  (${r.coins} mkts)${fl ? `  🚩 ${fl.dir} z=${fl.z ?? 'n/a'}` : ''}`);
+    const div = (r.opened !== 0 && Math.sign(r.net) !== Math.sign(r.opened)) ? '  ⇄ diverges' : '';
+    console.log(`  ${c.padEnd(6)} new risk ${fmt(r.opened).padStart(11)}   headline ${fmt(r.net).padStart(11)}  (${r.coins} mkts)${div}${fl ? `  🚩 ${fl.dir} z=${fl.z ?? 'n/a'}` : ''}`);
   }
 
   // coin outliers
   if (!flags.coinFlags.length) {
     console.log('\nNo per-coin outliers flagged (need history + a move past the $ floor).');
   } else {
-    console.log('\n🚩 COIN OUTLIERS (broke baseline AND $ floor):');
+    console.log('\n🚩 COIN OUTLIERS — direction is NEW RISK (opening fills):');
     for (const f of flags.coinFlags) {
       const tag = f.consensus ? ' [CONSENSUS]' : '';
       const zs = f.z == null ? '(cold start, floor only)' : `z=${f.z}, ${f.baselineDays}d base`;
-      console.log(`  ${f.dir.padEnd(7)} ${f.coin.padEnd(9)} ${fmt(f.net).padStart(11)}  ${f.cls.padEnd(6)} ${zs}${tag}`);
-      const drv = f.drivers.map(d => `${d.w} ${fmt(d.usd)}`).join(', ');
-      console.log(`          drivers: ${drv}`);
+      console.log(`  ${f.dir.padEnd(7)} ${f.coin.padEnd(9)} ${fmt(f.opened).padStart(11)}  ${f.cls.padEnd(6)} ${zs}${tag}`);
+      if (f.divergent) {
+        console.log(`          ⇄ headline flow is ${fmt(f.net)} — opposite sign. That is ${fmt(f.closing)} of CLOSING, not new risk.`);
+      }
+      console.log(`          drivers: ${f.drivers.map(d => `${d.w} ${fmt(d.usd)}`).join(', ')}`);
     }
   }
 
   // context
-  console.log('\nTop net flows today (context):');
+  console.log('\nTop NEW RISK today (opening fills):');
   for (const c of today.coins.slice(0, 12)) {
-    console.log(`  ${(c.net >= 0 ? 'buy ' : 'sell').padEnd(4)} ${c.coin.padEnd(9)} ${fmt(c.net).padStart(11)}  ${c.cls.padEnd(6)} (${c.bulls}L/${c.bears}S)`);
+    const div = c.divergent ? `  ⇄ headline ${fmt(c.net)}` : '';
+    console.log(`  ${(c.opened >= 0 ? 'long ' : 'short').padEnd(5)} ${c.coin.padEnd(9)} ${fmt(c.opened).padStart(11)}  ${c.cls.padEnd(6)} (${c.bulls}L/${c.bears}S)${div}`);
   }
   console.log(line);
 }
