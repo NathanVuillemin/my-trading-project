@@ -1,0 +1,41 @@
+{
+  "_README": "Your cockpit config. Edit this file, commit, and the next build picks it up. PUBLIC ADDRESSES ONLY — never put a private key or seed phrase in this file, or in any file in this repo.",
+
+  "addresses": {
+    "_note": "Hyperliquid uses EVM (0x...) addresses. Positions, PnL, funding and trade stats are all read from these. PLACEHOLDER below is a public leaderboard whale so the panels render with real data — replace with your own.",
+    "hyperliquid": [
+      { "label": "PLACEHOLDER (leaderboard whale)", "address": "0xb83de012dba672c76a7dbbbf3e459cb59d7d6e36" }
+    ]
+  },
+
+  "manualPositions": {
+    "_note": "Positions held anywhere the APIs can't see — another venue, spot bags, TradFi. sizeUsd is the position's notional value; entry is optional and only used to show unrealised PnL when a live price is available.",
+    "items": [
+      {
+        "asset": "BTC",
+        "class": "CRYPTO",
+        "side": "long",
+        "sizeUsd": 0,
+        "entry": null,
+        "venue": "example - delete me",
+        "opened": "2026-07-25",
+        "note": "Template row. Set sizeUsd to 0 or delete to hide."
+      }
+    ]
+  },
+
+  "cash": {
+    "_note": "Idle balances that aren't positions, so net worth isn't understated.",
+    "items": [
+      { "label": "example - delete me", "usd": 0 }
+    ]
+  },
+
+  "risk": {
+    "_note": "Thresholds for the risk panel. liqWarnPct: flag a position when price is within this % of its liquidation. concentrationWarnPct: flag when one asset exceeds this share of gross exposure.",
+    "liqWarnPct": 15,
+    "liqCriticalPct": 7,
+    "concentrationWarnPct": 40,
+    "accountLeverageWarn": 5
+  }
+}
