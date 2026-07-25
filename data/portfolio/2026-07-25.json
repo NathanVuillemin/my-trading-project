@@ -1,17 +1,17 @@
 {
   "date": "2026-07-25",
-  "generatedAt": "2026-07-25T14:17:12.696Z",
+  "generatedAt": "2026-07-25T14:23:37.400Z",
   "usingPlaceholder": false,
   "account": {
-    "equity": 50.679895,
-    "grossNotional": 1696.44328,
-    "marginUsed": 50.679895,
+    "equity": 51.790375,
+    "grossNotional": 1695.3328,
+    "marginUsed": 51.790375,
     "maintenanceMargin": 0,
     "withdrawable": 0,
-    "accountLeverage": 33.47369366096753,
+    "accountLeverage": 32.73451485917992,
     "cashTotal": 0,
     "manualTotal": 0,
-    "netWorth": 50.679895
+    "netWorth": 51.790375
   },
   "positions": [
     {
@@ -19,15 +19,15 @@
       "cls": "CRYPTO",
       "side": "short",
       "size": 0.02644,
-      "notional": 1696.44328,
+      "notional": 1695.3328,
       "entry": 63990,
-      "mark": 64161.99999999999,
-      "uPnl": -4.54768,
-      "roe": -8.06375996,
+      "mark": 64119.99999999999,
+      "uPnl": -3.4372,
+      "roe": -6.094702300000001,
       "leverage": 30,
-      "marginUsed": 50.679895,
+      "marginUsed": 51.790375,
       "liqPx": 65263.0012513774,
-      "distToLiqPct": 1.7159709039266318,
+      "distToLiqPct": 1.782597085741431,
       "fundingSinceOpen": 0.4079,
       "fundingAllTime": 0.593643,
       "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
@@ -37,21 +37,21 @@
   "manual": [],
   "cash": [],
   "risk": {
-    "gross": 1696.44328,
-    "net": -1696.44328,
+    "gross": 1695.3328,
+    "net": -1695.3328,
     "longUsd": 0,
-    "shortUsd": 1696.44328,
+    "shortUsd": 1695.3328,
     "byAsset": [
       {
         "key": "BTC",
-        "usd": 1696.44328,
+        "usd": 1695.3328,
         "pct": 100
       }
     ],
     "byClass": [
       {
         "key": "CRYPTO",
-        "usd": 1696.44328,
+        "usd": 1695.3328,
         "pct": 100
       }
     ],
@@ -59,15 +59,15 @@
       {
         "coin": "BTC",
         "side": "short",
-        "distPct": 1.7159709039266318,
+        "distPct": 1.782597085741431,
         "liqPx": 65263.0012513774,
-        "mark": 64161.99999999999
+        "mark": 64119.99999999999
       }
     ],
     "alerts": [
       {
         "level": "critical",
-        "msg": "BTC short is 1.7% from liquidation"
+        "msg": "BTC short is 1.8% from liquidation"
       },
       {
         "level": "warning",
@@ -75,7 +75,7 @@
       },
       {
         "level": "warning",
-        "msg": "Account leverage 33.5x"
+        "msg": "Account leverage 32.7x"
       }
     ]
   },
@@ -112,7 +112,7 @@
   },
   "equityHistory": [
     [
-      1782397032355,
+      1782397411728,
       0
     ],
     [
@@ -148,13 +148,13 @@
       57.834658
     ],
     [
-      1784989032355,
-      52.666534
+      1784989411728,
+      53.777014
     ]
   ],
   "pnlHistory": [
     [
-      1782397032355,
+      1782397411728,
       0
     ],
     [
@@ -190,8 +190,8 @@
       9.064658
     ],
     [
-      1784989032355,
-      3.896534
+      1784989411728,
+      5.007014
     ]
   ]
 }
