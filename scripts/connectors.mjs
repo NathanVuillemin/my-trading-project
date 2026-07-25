@@ -324,7 +324,12 @@ export async function bybitAccountRatio(assets = DEFAULT_ASSETS) {
 // KEY-GATED — self-skip unless the env var is present
 // =====================================================================
 
-// Free tier at coinglass.com; export COINGLASS_API_KEY before running.
+// CoinGlass V4. NOTE: there is NO free API tier — verified 2026-07-25, every endpoint
+// (even the coin list) returns HTTP 200 with body {"code":"401","msg":"Upgrade plan"} on
+// a free key. The cheapest plan that unlocks the API is $29/month. This connector is
+// therefore PARKED, not active. It works if a paid key is supplied; it fails honestly
+// otherwise. CoinGlass is crowd-tier (weight 0.8) and OKX already covers top-trader data
+// for free, so paying for this is low value.
 export async function coinglass(assets = DEFAULT_ASSETS) {
   const key = process.env.COINGLASS_API_KEY;
   if (!key) return { signals: [], warn: 'coinglass: skipped (set COINGLASS_API_KEY)' };
@@ -332,8 +337,13 @@ export async function coinglass(assets = DEFAULT_ASSETS) {
   for (const a of assets) {
     try {
       const j = await jget(
-        `https://open-api-v4.coinglass.com/api/futures/global-long-short-account-ratio/history?symbol=${a}&interval=1d&limit=1`,
+        `https://open-api-v4.coinglass.com/api/futures/global-long-short-account-ratio/history?symbol=${a}USDT&exchange=Binance&interval=1d&limit=1`,
         { headers: { 'CG-API-KEY': key } });
+      // CoinGlass signals plan/auth failures IN THE BODY with HTTP 200, so a bare fetch
+      // check misses them. Surface the message instead of returning a silent zero.
+      if (j && String(j.code) !== '0' && j.code !== undefined) {
+        return { signals, warn: `coinglass: ${j.msg || 'code ' + j.code} (paid plan required — no free API tier)` };
+      }
       const row = j?.data?.[0];
       if (!row) continue;
       const r = +(row.global_account_long_short_ratio ?? row.longShortRatio);
@@ -390,8 +400,7 @@ export const CONNECTORS = [
   { id: 'okx-top', fn: okxTopTraders, weight: 1.5, kind: 'smart', note: 'top-trader account ratio' },
   { id: 'dune', fn: dune, weight: 2.0, kind: 'smart', note: 'on-chain smart money (key)' },
   { id: 'dydx', fn: dydxMarkets, weight: 0.8, kind: 'crowd', note: 'OI + funding' },
-  { id: 'bybit', fn: bybitAccountRatio, weight: 0.7, kind: 'crowd', note: 'account L/S, answers from CI' },
-  { id: 'coinglass', fn: coinglass, weight: 0.8, kind: 'crowd', note: 'global L/S (key)' },
+  { id: 'bybit', fn: bybitAccountRatio, weight: 0.7, kind: 'crowd', note: 'account L/S (works locally, 403 on CI)' },
 ];
 
 // PARKED — working connectors deliberately kept out of the composite.
@@ -406,6 +415,7 @@ export const PARKED_CONNECTORS = [
   { id: 'paradex', fn: paradexMarkets, weight: 0.6, kind: 'crowd', note: 'OI — correlated with dydx' },
   { id: 'lighter', fn: lighterMarkets, weight: 0.6, kind: 'crowd', note: 'premium — correlated; has FX perps if ever needed' },
   { id: 'binance-taker', fn: binanceTakerFlow, weight: 0.7, kind: 'crowd', note: 'taker flow — also geo-blocked on CI' },
+  { id: 'coinglass', fn: coinglass, weight: 0.8, kind: 'crowd', note: 'no free API tier — every endpoint 401 "Upgrade plan" ($29/mo)' },
 ];
 
 export async function runAll(assets = DEFAULT_ASSETS) {
