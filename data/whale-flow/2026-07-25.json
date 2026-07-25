@@ -1,53 +1,53 @@
 {
   "date": "2026-07-25",
-  "generatedAt": "2026-07-25T06:55:17.412Z",
+  "generatedAt": "2026-07-25T12:08:42.471Z",
   "window_hours": 24,
   "wallets_scanned": 150,
-  "wallets_with_fills": 125,
+  "wallets_with_fills": 131,
   "rollup": {
     "CRYPTO": {
-      "net": 21085502,
-      "opened": 14636343,
-      "buy": 15956939,
-      "sell": -1320596,
-      "coins": 58
+      "net": -6713198,
+      "opened": 6680642,
+      "buy": 11105460,
+      "sell": -4424818,
+      "coins": 59
     },
     "STOCK": {
-      "net": 9584210,
-      "opened": 10660690,
-      "buy": 19262971,
-      "sell": -8602281,
-      "coins": 43
+      "net": 10694668,
+      "opened": 988119,
+      "buy": 16726124,
+      "sell": -15738005,
+      "coins": 49
     },
     "INDEX": {
-      "net": 15444461,
-      "opened": -10838807,
-      "buy": 413782,
-      "sell": -11252589,
-      "coins": 5
+      "net": 24043320,
+      "opened": -2401702,
+      "buy": 873341,
+      "sell": -3275043,
+      "coins": 6
     },
     "COMMOD": {
-      "net": 3576812,
-      "opened": 4649138,
-      "buy": 6081934,
-      "sell": -1432796,
-      "coins": 7
+      "net": 2724031,
+      "opened": 3010925,
+      "buy": 4366660,
+      "sell": -1355735,
+      "coins": 6
     },
     "FX": {
-      "net": 23671,
-      "opened": 11730,
-      "buy": 11730,
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
       "sell": 0,
-      "coins": 1
+      "coins": 0
     }
   },
   "coins": [
     {
       "coin": "ETH",
       "cls": "CRYPTO",
-      "net": -8008365,
-      "opened": 9663789,
-      "closing": -17672154,
+      "net": -7447458,
+      "opened": 10067706,
+      "closing": -17515164,
       "divergent": true,
       "bulls": 5,
       "bears": 4,
@@ -60,12 +60,12 @@
         {
           "w": "0x5b5d…c060",
           "addr": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
-          "usd": -4331860
+          "usd": -3501851
         },
         {
           "w": "0xf822…e01a",
           "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
-          "usd": -1529083
+          "usd": -1679808
         },
         {
           "w": "0x6ea4…0ea7",
@@ -78,58 +78,90 @@
           "usd": -730611
         },
         {
-          "w": "0xc179…e0c8",
-          "addr": "0xc179e03922afe8fa9533d3f896338b9fb87ce0c8",
-          "usd": 294746
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -332228
         }
       ]
     },
     {
-      "coin": "SP500",
-      "cls": "INDEX",
-      "net": 6399774,
-      "opened": -8317206,
-      "closing": 14716980,
-      "divergent": true,
-      "bulls": 2,
-      "bears": 1,
+      "coin": "AMD",
+      "cls": "STOCK",
+      "net": 2585148,
+      "opened": 5041883,
+      "closing": -2456735,
+      "divergent": false,
+      "bulls": 3,
+      "bears": 2,
       "drivers": [
         {
-          "w": "0x469e…58a5",
-          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
-          "usd": -8785792
+          "w": "0x4e23…20c3",
+          "addr": "0x4e23288cee4960f9f962195c22948e4bc7ae20c3",
+          "usd": 2978983
         },
         {
-          "w": "0xd8c5…99b0",
-          "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
-          "usd": 331157
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 2088452
         },
         {
-          "w": "0x9dea…d617",
-          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-          "usd": 137429
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -25552
+        }
+      ]
+    },
+    {
+      "coin": "SNDK",
+      "cls": "STOCK",
+      "net": -652786,
+      "opened": -4812717,
+      "closing": 4159931,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 5,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -1723946
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -1540889
+        },
+        {
+          "w": "0x42bc…3946",
+          "addr": "0x42bc06d636e9a9a93edb1ddf781ee97821a73946",
+          "usd": -1477998
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -56407
+        },
+        {
+          "w": "0x9751…a97e",
+          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
+          "usd": -13477
         }
       ]
     },
     {
       "coin": "CL",
       "cls": "COMMOD",
-      "net": 4232919,
-      "opened": 6081934,
-      "closing": -1849015,
+      "net": 4006697,
+      "opened": 4366660,
+      "closing": -359963,
       "divergent": false,
-      "bulls": 4,
+      "bulls": 3,
       "bears": 0,
       "drivers": [
         {
           "w": "0x0000…e24d",
           "addr": "0x00004808a6df8de77c891dc13826ff33cb17e24d",
           "usd": 3981839
-        },
-        {
-          "w": "0xec4a…cf62",
-          "addr": "0xec4a6f59960fb55a7fa49262e2628687b322cf62",
-          "usd": 1670733
         },
         {
           "w": "0x49e9…e1d0",
@@ -139,83 +171,93 @@
         {
           "w": "0x9dea…d617",
           "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-          "usd": 79759
+          "usd": 35219
         }
       ]
     },
     {
-      "coin": "INTC",
+      "coin": "SKHY",
       "cls": "STOCK",
-      "net": 5738678,
-      "opened": 5192394,
-      "closing": 546284,
+      "net": 1677065,
+      "opened": 4091652,
+      "closing": -2414587,
       "divergent": false,
-      "bulls": 1,
+      "bulls": 4,
       "bears": 3,
       "drivers": [
         {
-          "w": "0x4e23…20c3",
-          "addr": "0x4e23288cee4960f9f962195c22948e4bc7ae20c3",
-          "usd": 6138890
+          "w": "0x84ab…4d37",
+          "addr": "0x84abc08c0ea62e687c370154de1f38ea462f4d37",
+          "usd": 3318370
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 788706
+        },
+        {
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": -18536
         },
         {
           "w": "0x49e9…e1d0",
           "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -787579
-        },
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -151071
+          "usd": 11824
         },
         {
           "w": "0x9751…a97e",
           "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-          "usd": -7846
+          "usd": -8711
         }
       ]
     },
     {
-      "coin": "AMD",
+      "coin": "MU",
       "cls": "STOCK",
-      "net": 4207882,
-      "opened": 4822339,
-      "closing": -614457,
+      "net": -835615,
+      "opened": -4019723,
+      "closing": 3184108,
       "divergent": false,
-      "bulls": 1,
-      "bears": 2,
+      "bulls": 0,
+      "bears": 4,
       "drivers": [
         {
-          "w": "0x4e23…20c3",
-          "addr": "0x4e23288cee4960f9f962195c22948e4bc7ae20c3",
-          "usd": 4964248
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -3451134
         },
         {
-          "w": "0xfe7c…b7ae",
-          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
-          "usd": -120497
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -411885
         },
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -21412
+          "usd": -145036
+        },
+        {
+          "w": "0x9751…a97e",
+          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
+          "usd": -11668
         }
       ]
     },
     {
       "coin": "BTC",
       "cls": "CRYPTO",
-      "net": 28169047,
-      "opened": 4414706,
-      "closing": 23754341,
-      "divergent": false,
-      "bulls": 6,
-      "bears": 3,
+      "net": 608922,
+      "opened": -3389258,
+      "closing": 3998180,
+      "divergent": true,
+      "bulls": 5,
+      "bears": 4,
       "drivers": [
         {
-          "w": "0xefee…e361",
-          "addr": "0xefeedf4de241d141d9726e20dae19beefcc5e361",
-          "usd": 3976096
+          "w": "0xf822…e01a",
+          "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
+          "usd": -3271636
         },
         {
           "w": "0x1ee7…edf5",
@@ -225,7 +267,7 @@
         {
           "w": "0x023a…2355",
           "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -3053050
+          "usd": -3095714
         },
         {
           "w": "0xb83d…6e36",
@@ -233,100 +275,56 @@
           "usd": -1884879
         },
         {
+          "w": "0x5b5d…c060",
+          "addr": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+          "usd": -1442460
+        },
+        {
           "w": "0x469e…58a5",
           "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
           "usd": 1315897
-        },
-        {
-          "w": "0x6646…6de5",
-          "addr": "0x66466428990e0f42a4c54f64bee0db6bf2336de5",
-          "usd": 1285840
         }
       ]
     },
     {
-      "coin": "MU",
+      "coin": "INTC",
       "cls": "STOCK",
-      "net": -3396368,
-      "opened": -3485520,
-      "closing": 89152,
+      "net": 6259917,
+      "opened": 3173701,
+      "closing": 3086216,
       "divergent": false,
-      "bulls": 0,
-      "bears": 3,
+      "bulls": 2,
+      "bears": 5,
       "drivers": [
+        {
+          "w": "0x4e23…20c3",
+          "addr": "0x4e23288cee4960f9f962195c22948e4bc7ae20c3",
+          "usd": 9357019
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -3022318
+        },
         {
           "w": "0x49e9…e1d0",
           "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -3173028
+          "usd": -2884670
+        },
+        {
+          "w": "0xfe7c…b7ae",
+          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
+          "usd": -173672
         },
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -292142
+          "usd": -94813
         },
         {
           "w": "0x9751…a97e",
           "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-          "usd": -20349
-        }
-      ]
-    },
-    {
-      "coin": "SKHY",
-      "cls": "STOCK",
-      "net": -1025523,
-      "opened": 3301784,
-      "closing": -4327307,
-      "divergent": true,
-      "bulls": 1,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x84ab…4d37",
-          "addr": "0x84abc08c0ea62e687c370154de1f38ea462f4d37",
-          "usd": 3318370
-        },
-        {
-          "w": "0x9751…a97e",
-          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-          "usd": -16587
-        }
-      ]
-    },
-    {
-      "coin": "SKHX",
-      "cls": "STOCK",
-      "net": 2520837,
-      "opened": 2936965,
-      "closing": -416128,
-      "divergent": false,
-      "bulls": 4,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0xe6c7…b921",
-          "addr": "0xe6c7b3e0d89dd56a0677bc23a023bd47d39fb921",
-          "usd": 1902965
-        },
-        {
-          "w": "0xd1dd…9e85",
-          "addr": "0xd1dd6d99c5fb5d31ff52eacce5046c7158859e85",
-          "usd": 1132968
-        },
-        {
-          "w": "0xebe1…4070",
-          "addr": "0xebe126adabe1a8f08d3ce53b45e7cc994ca14070",
-          "usd": -386056
-        },
-        {
-          "w": "0x469e…58a5",
-          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
-          "usd": 194718
-        },
-        {
-          "w": "0x9dea…d617",
-          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-          "usd": 92369
+          "usd": -7846
         }
       ]
     },
@@ -348,75 +346,80 @@
       ]
     },
     {
-      "coin": "SNDK",
+      "coin": "SKHX",
       "cls": "STOCK",
-      "net": -29680,
-      "opened": -1950850,
-      "closing": 1921170,
+      "net": 2091636,
+      "opened": 2505259,
+      "closing": -413623,
       "divergent": false,
-      "bulls": 0,
-      "bears": 4,
+      "bulls": 5,
+      "bears": 1,
       "drivers": [
         {
-          "w": "0x42bc…3946",
-          "addr": "0x42bc06d636e9a9a93edb1ddf781ee97821a73946",
-          "usd": -1477998
+          "w": "0xe6c7…b921",
+          "addr": "0xe6c7b3e0d89dd56a0677bc23a023bd47d39fb921",
+          "usd": 1801525
         },
         {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -396806
+          "w": "0xd1dd…9e85",
+          "addr": "0xd1dd6d99c5fb5d31ff52eacce5046c7158859e85",
+          "usd": 416359
         },
         {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -51450
+          "w": "0x469e…58a5",
+          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+          "usd": 194718
         },
         {
-          "w": "0x9751…a97e",
-          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-          "usd": -24595
+          "w": "0x9dea…d617",
+          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
+          "usd": 92369
+        },
+        {
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": 287
         }
       ]
     },
     {
-      "coin": "CRCL",
+      "coin": "AAPL",
       "cls": "STOCK",
-      "net": 198874,
-      "opened": 1927487,
-      "closing": -1728613,
+      "net": 926302,
+      "opened": 1370731,
+      "closing": -444429,
       "divergent": false,
-      "bulls": 2,
-      "bears": 2,
+      "bulls": 3,
+      "bears": 1,
       "drivers": [
         {
-          "w": "0x0911…129a",
-          "addr": "0x091159a8106b077c13e89bc09701117e8b5f129a",
-          "usd": 1881133
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 825201
         },
         {
-          "w": "0xe097…d0fe",
-          "addr": "0xe09726ff25f5001f37b15049f54116cb83d7d0fe",
-          "usd": 119833
-        },
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -59508
+          "w": "0xd8c5…99b0",
+          "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
+          "usd": 514658
         },
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -13971
+          "usd": 31943
+        },
+        {
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": -1071
         }
       ]
     },
     {
       "coin": "BRENTOIL",
       "cls": "COMMOD",
-      "net": -707163,
+      "net": -1343998,
       "opened": -1343998,
-      "closing": 636835,
+      "closing": 0,
       "divergent": false,
       "bulls": 0,
       "bears": 1,
@@ -429,85 +432,134 @@
       ]
     },
     {
-      "coin": "SOL",
-      "cls": "CRYPTO",
-      "net": 55876,
-      "opened": -1208272,
-      "closing": 1264148,
+      "coin": "NBIS",
+      "cls": "STOCK",
+      "net": 760387,
+      "opened": -1094303,
+      "closing": 1854690,
       "divergent": true,
       "bulls": 0,
       "bears": 2,
       "drivers": [
         {
-          "w": "0xa8cd…7275",
-          "addr": "0xa8cde6a19789e4d7964ce0e3da14aa29291d7275",
-          "usd": -1097590
-        },
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -110683
-        }
-      ]
-    },
-    {
-      "coin": "META",
-      "cls": "STOCK",
-      "net": -103107,
-      "opened": -781183,
-      "closing": 678076,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 3,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -388548
-        },
-        {
-          "w": "0x48d8…37a2",
-          "addr": "0x48d826da83e69844f2f84b2db50703a933d137a2",
-          "usd": -231652
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -994130
         },
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -160984
+          "usd": -100173
         }
       ]
     },
     {
-      "coin": "LIT",
-      "cls": "CRYPTO",
-      "net": 584878,
-      "opened": 675251,
-      "closing": -90373,
+      "coin": "DRAM",
+      "cls": "STOCK",
+      "net": -760852,
+      "opened": -915240,
+      "closing": 154388,
       "divergent": false,
-      "bulls": 2,
-      "bears": 0,
+      "bulls": 0,
+      "bears": 2,
       "drivers": [
         {
-          "w": "0x0911…129a",
-          "addr": "0x091159a8106b077c13e89bc09701117e8b5f129a",
-          "usd": 639286
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -524719
         },
         {
-          "w": "0x0cc7…9a7b",
-          "addr": "0x0cc7cedb0935ceab0b4a6b38ee7dcfd403b19a7b",
-          "usd": 35965
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -390520
+        }
+      ]
+    },
+    {
+      "coin": "SPCX",
+      "cls": "STOCK",
+      "net": -272613,
+      "opened": -903668,
+      "closing": 631055,
+      "divergent": false,
+      "bulls": 2,
+      "bears": 5,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -916253
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 72851
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -45648
+        },
+        {
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": -10609
+        },
+        {
+          "w": "0x9dea…d617",
+          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
+          "usd": -4009
+        }
+      ]
+    },
+    {
+      "coin": "SOL",
+      "cls": "CRYPTO",
+      "net": 271080,
+      "opened": -729326,
+      "closing": 1000406,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xa8cd…7275",
+          "addr": "0xa8cde6a19789e4d7964ce0e3da14aa29291d7275",
+          "usd": -729326
+        }
+      ]
+    },
+    {
+      "coin": "TSLA",
+      "cls": "STOCK",
+      "net": -665366,
+      "opened": -712945,
+      "closing": 47579,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -448993
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -263952
         }
       ]
     },
     {
       "coin": "GOOGL",
       "cls": "STOCK",
-      "net": -651744,
-      "opened": -651744,
-      "closing": 0,
+      "net": -89872,
+      "opened": -664079,
+      "closing": 574207,
       "divergent": false,
       "bulls": 0,
-      "bears": 2,
+      "bears": 3,
       "drivers": [
         {
           "w": "0xd8c5…99b0",
@@ -515,45 +567,67 @@
           "usd": -411513
         },
         {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -221451
+        },
+        {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -240230
+          "usd": -31115
         }
       ]
     },
     {
-      "coin": "AAPL",
+      "coin": "MSTR",
       "cls": "STOCK",
-      "net": 461787,
-      "opened": 534602,
-      "closing": -72815,
+      "net": -482980,
+      "opened": -509803,
+      "closing": 26823,
       "divergent": false,
-      "bulls": 3,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x9751…a97e",
+          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
+          "usd": -438561
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -71242
+        }
+      ]
+    },
+    {
+      "coin": "SP500",
+      "cls": "INDEX",
+      "net": 15406120,
+      "opened": 468587,
+      "closing": 14937533,
+      "divergent": false,
+      "bulls": 2,
       "bears": 0,
       "drivers": [
         {
           "w": "0xd8c5…99b0",
           "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
-          "usd": 514658
+          "usd": 331157
         },
         {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": 14917
-        },
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": 5027
+          "w": "0x9dea…d617",
+          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
+          "usd": 137429
         }
       ]
     },
     {
       "coin": "NEAR",
       "cls": "CRYPTO",
-      "net": 459734,
-      "opened": 453112,
-      "closing": 6622,
+      "net": 436604,
+      "opened": 428532,
+      "closing": 8072,
       "divergent": false,
       "bulls": 1,
       "bears": 1,
@@ -566,80 +640,19 @@
         {
           "w": "0x023a…2355",
           "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -4377
-        }
-      ]
-    },
-    {
-      "coin": "MSTR",
-      "cls": "STOCK",
-      "net": -420896,
-      "opened": -420896,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 2,
-      "drivers": [
-        {
-          "w": "0x9751…a97e",
-          "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-          "usd": -405246
-        },
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -15650
-        }
-      ]
-    },
-    {
-      "coin": "ORCL",
-      "cls": "STOCK",
-      "net": -264999,
-      "opened": -364178,
-      "closing": 99179,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 2,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -184483
-        },
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -179694
-        }
-      ]
-    },
-    {
-      "coin": "MRVL",
-      "cls": "STOCK",
-      "net": 343933,
-      "opened": 343933,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0x5c26…25c2",
-          "addr": "0x5c26dfc723e7a1da7b6c3bd5cbd72716d09425c2",
-          "usd": 343933
+          "usd": -28957
         }
       ]
     },
     {
       "coin": "HYPE",
       "cls": "CRYPTO",
-      "net": 1014080,
-      "opened": 314379,
-      "closing": 699701,
+      "net": 799559,
+      "opened": 387733,
+      "closing": 411826,
       "divergent": false,
-      "bulls": 2,
-      "bears": 3,
+      "bulls": 3,
+      "bears": 1,
       "drivers": [
         {
           "w": "0x1ee7…edf5",
@@ -649,31 +662,112 @@
         {
           "w": "0x4f76…ad5a",
           "addr": "0x4f7634c03ec4e87e14725c84913ade523c6fad5a",
-          "usd": -237352
+          "usd": -224891
+        },
+        {
+          "w": "0xc619…10f5",
+          "addr": "0xc619b01f1a4f894c5e83338c42f98dcb82b710f5",
+          "usd": 53361
         },
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
           "usd": 11834
+        }
+      ]
+    },
+    {
+      "coin": "EWY",
+      "cls": "INDEX",
+      "net": -367788,
+      "opened": -356299,
+      "closing": -11489,
+      "divergent": false,
+      "bulls": 2,
+      "bears": 3,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -200031
         },
         {
-          "w": "0xf822…e01a",
-          "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
-          "usd": -5570
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -169164
         },
         {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -1962
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": 11752
+        },
+        {
+          "w": "0x9dea…d617",
+          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
+          "usd": 1143
+        }
+      ]
+    },
+    {
+      "coin": "MRVL",
+      "cls": "STOCK",
+      "net": 313131,
+      "opened": 277356,
+      "closing": 35775,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x5c26…25c2",
+          "addr": "0x5c26dfc723e7a1da7b6c3bd5cbd72716d09425c2",
+          "usd": 343933
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -54716
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -11862
+        }
+      ]
+    },
+    {
+      "coin": "META",
+      "cls": "STOCK",
+      "net": -50975,
+      "opened": -277327,
+      "closing": 226352,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 3,
+      "drivers": [
+        {
+          "w": "0x48d8…37a2",
+          "addr": "0x48d826da83e69844f2f84b2db50703a933d137a2",
+          "usd": -231652
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -37380
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -8296
         }
       ]
     },
     {
       "coin": "JP225",
       "cls": "INDEX",
-      "net": 21635,
+      "net": 27068,
       "opened": 249189,
-      "closing": -227554,
+      "closing": -222121,
       "divergent": false,
       "bulls": 1,
       "bears": 0,
@@ -686,67 +780,60 @@
       ]
     },
     {
-      "coin": "SAGA",
-      "cls": "CRYPTO",
-      "net": 227274,
-      "opened": 227274,
-      "closing": 0,
+      "coin": "CRCL",
+      "cls": "STOCK",
+      "net": -204431,
+      "opened": -236285,
+      "closing": 31854,
       "divergent": false,
-      "bulls": 1,
-      "bears": 0,
+      "bulls": 0,
+      "bears": 3,
       "drivers": [
         {
-          "w": "0x0911…129a",
-          "addr": "0x091159a8106b077c13e89bc09701117e8b5f129a",
-          "usd": 227274
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -164500
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -36559
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -35226
         }
       ]
     },
     {
-      "coin": "ARM",
+      "coin": "HOOD",
       "cls": "STOCK",
-      "net": -18347,
-      "opened": -191135,
-      "closing": 172788,
+      "net": -119888,
+      "opened": -157344,
+      "closing": 37456,
       "divergent": false,
       "bulls": 0,
       "bears": 2,
       "drivers": [
         {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -189784
-        },
-        {
           "w": "0x49e9…e1d0",
           "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -1351
-        }
-      ]
-    },
-    {
-      "coin": "NBIS",
-      "cls": "STOCK",
-      "net": 859741,
-      "opened": -172350,
-      "closing": 1032091,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
+          "usd": -120562
+        },
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -172350
+          "usd": -36782
         }
       ]
     },
     {
       "coin": "EWT",
       "cls": "INDEX",
-      "net": 92797,
-      "opened": 164593,
-      "closing": -71796,
+      "net": 79900,
+      "opened": 155565,
+      "closing": -75665,
       "divergent": false,
       "bulls": 1,
       "bears": 1,
@@ -759,68 +846,244 @@
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -2580
+          "usd": -11608
+        }
+      ]
+    },
+    {
+      "coin": "CBRS",
+      "cls": "STOCK",
+      "net": -77647,
+      "opened": 143003,
+      "closing": -220650,
+      "divergent": true,
+      "bulls": 3,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": 106784
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 19078
+        },
+        {
+          "w": "0xfe7c…b7ae",
+          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
+          "usd": 17141
+        }
+      ]
+    },
+    {
+      "coin": "NVDA",
+      "cls": "STOCK",
+      "net": -334787,
+      "opened": -142376,
+      "closing": -192411,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -79716
+        },
+        {
+          "w": "0xd8c5…99b0",
+          "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
+          "usd": -62660
+        }
+      ]
+    },
+    {
+      "coin": "BE",
+      "cls": "STOCK",
+      "net": -136120,
+      "opened": -136120,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -125083
+        },
+        {
+          "w": "0xfe7c…b7ae",
+          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
+          "usd": -11037
+        }
+      ]
+    },
+    {
+      "coin": "LITE",
+      "cls": "STOCK",
+      "net": -46603,
+      "opened": -129407,
+      "closing": 82804,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -111513
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -17894
+        }
+      ]
+    },
+    {
+      "coin": "HIMS",
+      "cls": "STOCK",
+      "net": -58183,
+      "opened": -117618,
+      "closing": 59435,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -120328
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": 2710
         }
       ]
     },
     {
       "coin": "COIN",
       "cls": "STOCK",
-      "net": -93235,
-      "opened": -109736,
-      "closing": 16501,
+      "net": -45308,
+      "opened": -109253,
+      "closing": 63945,
       "divergent": false,
       "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -109736
-        }
-      ]
-    },
-    {
-      "coin": "AMAT",
-      "cls": "STOCK",
-      "net": -63517,
-      "opened": -104730,
-      "closing": 41213,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -104730
-        }
-      ]
-    },
-    {
-      "coin": "SPCX",
-      "cls": "STOCK",
-      "net": 654473,
-      "opened": 94581,
-      "closing": 559892,
-      "divergent": false,
-      "bulls": 1,
       "bears": 2,
       "drivers": [
         {
-          "w": "0x9ffd…ce40",
-          "addr": "0x9ffdf919da72213588f7517598394cc5535bce40",
-          "usd": 157640
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -85721
         },
         {
           "w": "0x49e9…e1d0",
           "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -59223
-        },
+          "usd": -23532
+        }
+      ]
+    },
+    {
+      "coin": "ORCL",
+      "cls": "STOCK",
+      "net": 172320,
+      "opened": -103196,
+      "closing": 275516,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 3,
+      "drivers": [
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -3835
+          "usd": -82150
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -11864
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -9182
+        }
+      ]
+    },
+    {
+      "coin": "NFLX",
+      "cls": "STOCK",
+      "net": -68274,
+      "opened": -98583,
+      "closing": 30309,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -98583
+        }
+      ]
+    },
+    {
+      "coin": "PURRDAT",
+      "cls": "STOCK",
+      "net": -91359,
+      "opened": -92606,
+      "closing": 1247,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -81030
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -11576
+        }
+      ]
+    },
+    {
+      "coin": "STRK",
+      "cls": "CRYPTO",
+      "net": -24202,
+      "opened": -78812,
+      "closing": 54610,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x07fd…689d",
+          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
+          "usd": -78812
+        }
+      ]
+    },
+    {
+      "coin": "PUMP",
+      "cls": "CRYPTO",
+      "net": -10430,
+      "opened": -75353,
+      "closing": 64923,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -75353
         }
       ]
     },
@@ -842,33 +1105,11 @@
       ]
     },
     {
-      "coin": "NVDA",
-      "cls": "STOCK",
-      "net": 117858,
-      "opened": -67218,
-      "closing": 185076,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 2,
-      "drivers": [
-        {
-          "w": "0xd8c5…99b0",
-          "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
-          "usd": -62660
-        },
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -4558
-        }
-      ]
-    },
-    {
       "coin": "AAVE",
       "cls": "CRYPTO",
-      "net": 49430,
-      "opened": 59882,
-      "closing": -10452,
+      "net": 74035,
+      "opened": 69531,
+      "closing": 4504,
       "divergent": false,
       "bulls": 1,
       "bears": 0,
@@ -876,16 +1117,126 @@
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": 59882
+          "usd": 69531
+        }
+      ]
+    },
+    {
+      "coin": "BB",
+      "cls": "STOCK",
+      "net": 104975,
+      "opened": -68982,
+      "closing": 173957,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -68982
+        }
+      ]
+    },
+    {
+      "coin": "ARM",
+      "cls": "STOCK",
+      "net": 52724,
+      "opened": -63204,
+      "closing": 115928,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 3,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -36025
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -13684
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -13495
+        }
+      ]
+    },
+    {
+      "coin": "LLY",
+      "cls": "STOCK",
+      "net": -40671,
+      "opened": -58430,
+      "closing": 17759,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -60542
+        },
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": 4306
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -2194
+        }
+      ]
+    },
+    {
+      "coin": "TSM",
+      "cls": "STOCK",
+      "net": -45829,
+      "opened": -54103,
+      "closing": 8274,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -54103
+        }
+      ]
+    },
+    {
+      "coin": "DELL",
+      "cls": "STOCK",
+      "net": 47390,
+      "opened": 52726,
+      "closing": -5336,
+      "divergent": false,
+      "bulls": 2,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": 30375
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": 22351
         }
       ]
     },
     {
       "coin": "LDO",
       "cls": "CRYPTO",
-      "net": 33255,
-      "opened": 53146,
-      "closing": -19891,
+      "net": 31199,
+      "opened": 44380,
+      "closing": -13181,
       "divergent": false,
       "bulls": 1,
       "bears": 0,
@@ -893,16 +1244,33 @@
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": 53146
+          "usd": 44380
+        }
+      ]
+    },
+    {
+      "coin": "ZEC",
+      "cls": "CRYPTO",
+      "net": -1799495,
+      "opened": -42809,
+      "closing": -1756686,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -42809
         }
       ]
     },
     {
       "coin": "MSFT",
       "cls": "STOCK",
-      "net": -40822,
+      "net": -41834,
       "opened": -41834,
-      "closing": 1012,
+      "closing": 0,
       "divergent": false,
       "bulls": 0,
       "bears": 1,
@@ -911,23 +1279,6 @@
           "w": "0xd8c5…99b0",
           "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
           "usd": -41834
-        }
-      ]
-    },
-    {
-      "coin": "TSLA",
-      "cls": "STOCK",
-      "net": -40415,
-      "opened": -40415,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -40415
         }
       ]
     },
@@ -949,45 +1300,11 @@
       ]
     },
     {
-      "coin": "COPPER",
-      "cls": "COMMOD",
-      "net": 106446,
-      "opened": -40037,
-      "closing": 146483,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -40037
-        }
-      ]
-    },
-    {
-      "coin": "LITE",
-      "cls": "STOCK",
-      "net": -39900,
-      "opened": -39900,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -39900
-        }
-      ]
-    },
-    {
       "coin": "PENDLE",
       "cls": "CRYPTO",
-      "net": 39790,
-      "opened": 39790,
-      "closing": 0,
+      "net": 34078,
+      "opened": 33066,
+      "closing": 1012,
       "divergent": false,
       "bulls": 1,
       "bears": 0,
@@ -995,46 +1312,7 @@
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": 39790
-        }
-      ]
-    },
-    {
-      "coin": "DRAM",
-      "cls": "STOCK",
-      "net": 128188,
-      "opened": -37028,
-      "closing": 165216,
-      "divergent": true,
-      "bulls": 1,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -37028
-        }
-      ]
-    },
-    {
-      "coin": "AMZN",
-      "cls": "STOCK",
-      "net": -28644,
-      "opened": -29793,
-      "closing": 1149,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -31363
-        },
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": 1569
+          "usd": 33066
         }
       ]
     },
@@ -1056,79 +1334,11 @@
       ]
     },
     {
-      "coin": "KIOXIA",
-      "cls": "STOCK",
-      "net": 58156,
-      "opened": 27053,
-      "closing": 31103,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0xfe7c…b7ae",
-          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
-          "usd": 27053
-        }
-      ]
-    },
-    {
-      "coin": "ONDO",
-      "cls": "CRYPTO",
-      "net": -1047,
-      "opened": -25966,
-      "closing": 24919,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -25966
-        }
-      ]
-    },
-    {
-      "coin": "HOOD",
-      "cls": "STOCK",
-      "net": 15911,
-      "opened": -25406,
-      "closing": 41317,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -25406
-        }
-      ]
-    },
-    {
-      "coin": "SILVER",
-      "cls": "COMMOD",
-      "net": 31433,
-      "opened": -20089,
-      "closing": 51522,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -20089
-        }
-      ]
-    },
-    {
       "coin": "ENA",
       "cls": "CRYPTO",
-      "net": -17238,
-      "opened": -19594,
-      "closing": 2356,
+      "net": -28726,
+      "opened": -28726,
+      "closing": 0,
       "divergent": false,
       "bulls": 0,
       "bears": 1,
@@ -1136,33 +1346,55 @@
         {
           "w": "0x023a…2355",
           "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -19594
-        }
-      ]
-    },
-    {
-      "coin": "PLATINUM",
-      "cls": "COMMOD",
-      "net": 11294,
-      "opened": -16935,
-      "closing": 28229,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -16935
+          "usd": -28726
         }
       ]
     },
     {
       "coin": "CRWV",
       "cls": "STOCK",
-      "net": 53701,
-      "opened": -16919,
-      "closing": 70620,
+      "net": -35623,
+      "opened": -27960,
+      "closing": -7663,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -27960
+        }
+      ]
+    },
+    {
+      "coin": "RKLB",
+      "cls": "STOCK",
+      "net": 322887,
+      "opened": -25385,
+      "closing": 348272,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -17708
+        },
+        {
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -7677
+        }
+      ]
+    },
+    {
+      "coin": "AMAT",
+      "cls": "STOCK",
+      "net": 22576,
+      "opened": -22613,
+      "closing": 45189,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
@@ -1170,73 +1402,131 @@
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -16919
+          "usd": -22613
         }
       ]
     },
     {
-      "coin": "EWY",
-      "cls": "INDEX",
-      "net": 44979,
-      "opened": -16639,
-      "closing": 61618,
-      "divergent": true,
-      "bulls": 2,
+      "coin": "AMZN",
+      "cls": "STOCK",
+      "net": -22599,
+      "opened": -22599,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
       "bears": 1,
       "drivers": [
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -19352
-        },
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": 1570
-        },
-        {
-          "w": "0x9dea…d617",
-          "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-          "usd": 1143
+          "usd": -22599
         }
       ]
     },
     {
-      "coin": "DELL",
+      "coin": "SHAZ",
       "cls": "STOCK",
-      "net": 12020,
-      "opened": 12020,
+      "net": -19092,
+      "opened": -19092,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xfe7c…b7ae",
+          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
+          "usd": -19092
+        }
+      ]
+    },
+    {
+      "coin": "ADA",
+      "cls": "CRYPTO",
+      "net": 16921,
+      "opened": 16921,
       "closing": 0,
       "divergent": false,
       "bulls": 1,
       "bears": 0,
       "drivers": [
         {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": 12020
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": 16921
         }
       ]
     },
     {
-      "coin": "XMR",
+      "coin": "AVGO",
+      "cls": "STOCK",
+      "net": -629,
+      "opened": -16157,
+      "closing": 15528,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 2,
+      "drivers": [
+        {
+          "w": "0x49e9…e1d0",
+          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
+          "usd": -12422
+        },
+        {
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -3735
+        }
+      ]
+    },
+    {
+      "coin": "BOT",
+      "cls": "STOCK",
+      "net": -13965,
+      "opened": -13965,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0xfe7c…b7ae",
+          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
+          "usd": -13965
+        }
+      ]
+    },
+    {
+      "coin": "MORPHO",
       "cls": "CRYPTO",
-      "net": -219281,
-      "opened": 11881,
-      "closing": -231162,
-      "divergent": true,
-      "bulls": 2,
-      "bears": 0,
+      "net": -7527,
+      "opened": -12440,
+      "closing": 4913,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
       "drivers": [
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": 7990
-        },
+          "usd": -12440
+        }
+      ]
+    },
+    {
+      "coin": "PLTR",
+      "cls": "STOCK",
+      "net": 92701,
+      "opened": -12205,
+      "closing": 104906,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
         {
-          "w": "0x4c6d…5ee9",
-          "addr": "0x4c6d679eac539bf7c5a0b7ebd8949ae93b1e5ee9",
-          "usd": 3891
+          "w": "0x3eb6…5470",
+          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
+          "usd": -12205
         }
       ]
     },
@@ -1258,158 +1548,136 @@
       ]
     },
     {
-      "coin": "NOK",
-      "cls": "FX",
-      "net": 23671,
-      "opened": 11730,
-      "closing": 11941,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0xfe7c…b7ae",
-          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
-          "usd": 11730
-        }
-      ]
-    },
-    {
-      "coin": "LLY",
+      "coin": "ASML",
       "cls": "STOCK",
-      "net": -6049,
-      "opened": -10437,
-      "closing": 4388,
+      "net": -9616,
+      "opened": -9616,
+      "closing": 0,
       "divergent": false,
-      "bulls": 1,
+      "bulls": 0,
       "bears": 1,
       "drivers": [
         {
           "w": "0x3eb6…5470",
           "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -13631
-        },
+          "usd": -9616
+        }
+      ]
+    },
+    {
+      "coin": "IBM",
+      "cls": "STOCK",
+      "net": 358702,
+      "opened": -9197,
+      "closing": 367899,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
         {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": 3194
+          "w": "0xb078…de15",
+          "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+          "usd": -9197
+        }
+      ]
+    },
+    {
+      "coin": "XRP",
+      "cls": "CRYPTO",
+      "net": 3373,
+      "opened": 8955,
+      "closing": -5582,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": 8955
+        }
+      ]
+    },
+    {
+      "coin": "ONDO",
+      "cls": "CRYPTO",
+      "net": 9196,
+      "opened": -7619,
+      "closing": 16815,
+      "divergent": true,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -7619
+        }
+      ]
+    },
+    {
+      "coin": "SUI",
+      "cls": "CRYPTO",
+      "net": 10069,
+      "opened": 7198,
+      "closing": 2871,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": 7198
         }
       ]
     },
     {
       "coin": "UNI",
       "cls": "CRYPTO",
-      "net": 8205,
-      "opened": 8205,
+      "net": 7081,
+      "opened": 7081,
       "closing": 0,
       "divergent": false,
       "bulls": 1,
-      "bears": 0,
+      "bears": 1,
       "drivers": [
         {
           "w": "0x07fd…689d",
           "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
           "usd": 8205
-        }
-      ]
-    },
-    {
-      "coin": "TSM",
-      "cls": "STOCK",
-      "net": -7807,
-      "opened": -7807,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -7807
-        }
-      ]
-    },
-    {
-      "coin": "PURR",
-      "cls": "CRYPTO",
-      "net": 517,
-      "opened": 7799,
-      "closing": -7282,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0x07fd…689d",
-          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": 7799
-        }
-      ]
-    },
-    {
-      "coin": "ADA",
-      "cls": "CRYPTO",
-      "net": 3838,
-      "opened": 6877,
-      "closing": -3039,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": 6877
-        }
-      ]
-    },
-    {
-      "coin": "W",
-      "cls": "CRYPTO",
-      "net": -2303,
-      "opened": -6239,
-      "closing": 3936,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 2,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -3206
         },
         {
-          "w": "0x07fd…689d",
-          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": -3033
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -1124
         }
       ]
     },
     {
-      "coin": "ZRO",
+      "coin": "hyna:BTC",
       "cls": "CRYPTO",
-      "net": -5879,
-      "opened": -5879,
+      "net": 6368,
+      "opened": 6368,
       "closing": 0,
       "divergent": false,
-      "bulls": 0,
-      "bears": 1,
+      "bulls": 1,
+      "bears": 0,
       "drivers": [
         {
-          "w": "0x07fd…689d",
-          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": -5879
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": 6368
         }
       ]
     },
     {
       "coin": "POL",
       "cls": "CRYPTO",
-      "net": -5714,
+      "net": 5753,
       "opened": 5753,
-      "closing": -11467,
-      "divergent": true,
+      "closing": 0,
+      "divergent": false,
       "bulls": 1,
       "bears": 0,
       "drivers": [
@@ -1421,11 +1689,28 @@
       ]
     },
     {
+      "coin": "PURR",
+      "cls": "CRYPTO",
+      "net": -3554,
+      "opened": 5387,
+      "closing": -8941,
+      "divergent": true,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x07fd…689d",
+          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
+          "usd": 5387
+        }
+      ]
+    },
+    {
       "coin": "WLD",
       "cls": "CRYPTO",
-      "net": 530695,
+      "net": 570065,
       "opened": -5322,
-      "closing": 536017,
+      "closing": 575387,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
@@ -1438,19 +1723,24 @@
       ]
     },
     {
-      "coin": "ASML",
-      "cls": "STOCK",
-      "net": 17495,
-      "opened": -4822,
-      "closing": 22317,
-      "divergent": true,
+      "coin": "W",
+      "cls": "CRYPTO",
+      "net": -2551,
+      "opened": -5064,
+      "closing": 2513,
+      "divergent": false,
       "bulls": 0,
-      "bears": 1,
+      "bears": 2,
       "drivers": [
         {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -4822
+          "w": "0x07fd…689d",
+          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
+          "usd": -3033
+        },
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -2031
         }
       ]
     },
@@ -1472,23 +1762,6 @@
       ]
     },
     {
-      "coin": "XRP",
-      "cls": "CRYPTO",
-      "net": 4650,
-      "opened": 4650,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": 4650
-        }
-      ]
-    },
-    {
       "coin": "XLM",
       "cls": "CRYPTO",
       "net": 4613,
@@ -1506,62 +1779,62 @@
       ]
     },
     {
-      "coin": "BE",
-      "cls": "STOCK",
-      "net": -3869,
-      "opened": -3869,
-      "closing": 0,
+      "coin": "ZRO",
+      "cls": "CRYPTO",
+      "net": -3055,
+      "opened": -4550,
+      "closing": 1495,
       "divergent": false,
       "bulls": 0,
       "bears": 1,
       "drivers": [
         {
-          "w": "0x3eb6…5470",
-          "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-          "usd": -3869
+          "w": "0x07fd…689d",
+          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
+          "usd": -4550
         }
       ]
     },
     {
-      "coin": "ZEC",
+      "coin": "XMR",
       "cls": "CRYPTO",
-      "net": -1794398,
-      "opened": -3767,
-      "closing": -1790631,
+      "net": -219768,
+      "opened": 3891,
+      "closing": -223659,
+      "divergent": true,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x4c6d…5ee9",
+          "addr": "0x4c6d679eac539bf7c5a0b7ebd8949ae93b1e5ee9",
+          "usd": 3891
+        }
+      ]
+    },
+    {
+      "coin": "STBL",
+      "cls": "CRYPTO",
+      "net": -296,
+      "opened": -3652,
+      "closing": 3356,
       "divergent": false,
       "bulls": 0,
       "bears": 1,
       "drivers": [
         {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -3767
+          "w": "0x07fd…689d",
+          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
+          "usd": -3652
         }
       ]
     },
     {
-      "coin": "XPL",
+      "coin": "FARTCOIN",
       "cls": "CRYPTO",
-      "net": -143,
-      "opened": -3556,
-      "closing": 3413,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -3556
-        }
-      ]
-    },
-    {
-      "coin": "PUMP",
-      "cls": "CRYPTO",
-      "net": 19613,
-      "opened": -3059,
-      "closing": 22672,
+      "net": 58567,
+      "opened": -3029,
+      "closing": 61596,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
@@ -1569,16 +1842,33 @@
         {
           "w": "0x023a…2355",
           "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -3059
+          "usd": -3029
+        }
+      ]
+    },
+    {
+      "coin": "hyna:ETH",
+      "cls": "CRYPTO",
+      "net": 2135,
+      "opened": 2135,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x3999…3336",
+          "addr": "0x399965e15d4e61ec3529cc98b7f7ebb93b733336",
+          "usd": 2135
         }
       ]
     },
     {
       "coin": "BERA",
       "cls": "CRYPTO",
-      "net": 14636,
+      "net": 12400,
       "opened": -2111,
-      "closing": 16747,
+      "closing": 14511,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
@@ -1591,45 +1881,11 @@
       ]
     },
     {
-      "coin": "FARTCOIN",
-      "cls": "CRYPTO",
-      "net": -997,
-      "opened": -2009,
-      "closing": 1012,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": -2009
-        }
-      ]
-    },
-    {
-      "coin": "BOT",
-      "cls": "STOCK",
-      "net": -1994,
-      "opened": -1994,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0xfe7c…b7ae",
-          "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
-          "usd": -1994
-        }
-      ]
-    },
-    {
       "coin": "AVAX",
       "cls": "CRYPTO",
-      "net": 28403,
+      "net": 1140,
       "opened": -1625,
-      "closing": 30028,
+      "closing": 2765,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
@@ -1642,19 +1898,36 @@
       ]
     },
     {
-      "coin": "PURRDAT",
-      "cls": "STOCK",
-      "net": 14758,
-      "opened": -1252,
-      "closing": 16010,
+      "coin": "ETC",
+      "cls": "CRYPTO",
+      "net": 1436,
+      "opened": 1436,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": 1436
+        }
+      ]
+    },
+    {
+      "coin": "kPEPE",
+      "cls": "CRYPTO",
+      "net": 13825,
+      "opened": -1226,
+      "closing": 15051,
       "divergent": true,
       "bulls": 0,
       "bears": 1,
       "drivers": [
         {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -1252
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -1226
         }
       ]
     },
@@ -1676,57 +1949,6 @@
       ]
     },
     {
-      "coin": "RKLB",
-      "cls": "STOCK",
-      "net": 11729,
-      "opened": -1195,
-      "closing": 12924,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x49e9…e1d0",
-          "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-          "usd": -1195
-        }
-      ]
-    },
-    {
-      "coin": "STBL",
-      "cls": "CRYPTO",
-      "net": 3506,
-      "opened": -1136,
-      "closing": 4642,
-      "divergent": true,
-      "bulls": 0,
-      "bears": 1,
-      "drivers": [
-        {
-          "w": "0x07fd…689d",
-          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": -1136
-        }
-      ]
-    },
-    {
-      "coin": "DOT",
-      "cls": "CRYPTO",
-      "net": 1058,
-      "opened": 1058,
-      "closing": 0,
-      "divergent": false,
-      "bulls": 1,
-      "bears": 0,
-      "drivers": [
-        {
-          "w": "0x023a…2355",
-          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": 1058
-        }
-      ]
-    },
-    {
       "coin": "APE",
       "cls": "CRYPTO",
       "net": 995,
@@ -1744,33 +1966,56 @@
       ]
     },
     {
-      "coin": "APT",
+      "coin": "MOODENG",
       "cls": "CRYPTO",
-      "net": -74,
-      "opened": -170,
-      "closing": 96,
+      "net": -1003,
+      "opened": -1003,
+      "closing": 0,
       "divergent": false,
-      "bulls": 1,
+      "bulls": 0,
       "bears": 1,
       "drivers": [
         {
-          "w": "0x07fd…689d",
-          "addr": "0x07fd993f0fa3a185f7207adccd29f7a87404689d",
-          "usd": -1206
-        },
-        {
           "w": "0x023a…2355",
           "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
-          "usd": 1036
+          "usd": -1003
         }
       ]
     },
     {
-      "coin": "SMSN",
-      "cls": "STOCK",
-      "net": 40191,
+      "coin": "STX",
+      "cls": "CRYPTO",
+      "net": -1002,
+      "opened": -1002,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x023a…2355",
+          "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+          "usd": -1002
+        }
+      ]
+    },
+    {
+      "coin": "SMH",
+      "cls": "INDEX",
+      "net": 12744,
       "opened": 0,
-      "closing": 40191,
+      "closing": 12744,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "QNT",
+      "cls": "STOCK",
+      "net": -37353,
+      "opened": 0,
+      "closing": -37353,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1779,20 +2024,9 @@
     {
       "coin": "CXMT",
       "cls": "STOCK",
-      "net": 266944,
+      "net": 112935,
       "opened": 0,
-      "closing": 266944,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "CBRS",
-      "cls": "STOCK",
-      "net": -96916,
-      "opened": 0,
-      "closing": -96916,
+      "closing": 112935,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1810,22 +2044,11 @@
       "drivers": []
     },
     {
-      "coin": "HIMS",
-      "cls": "STOCK",
-      "net": 32261,
+      "coin": "COPPER",
+      "cls": "COMMOD",
+      "net": 75112,
       "opened": 0,
-      "closing": 32261,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "PLTR",
-      "cls": "STOCK",
-      "net": 112121,
-      "opened": 0,
-      "closing": 112121,
+      "closing": 75112,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1843,55 +2066,88 @@
       "drivers": []
     },
     {
+      "coin": "RIVN",
+      "cls": "STOCK",
+      "net": 5824,
+      "opened": 0,
+      "closing": 5824,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "#5111",
+      "cls": "CRYPTO",
+      "net": -7670,
+      "opened": 0,
+      "closing": -7670,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "STABLE",
+      "cls": "CRYPTO",
+      "net": 2500,
+      "opened": 0,
+      "closing": 2500,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "XPL",
+      "cls": "CRYPTO",
+      "net": 3544,
+      "opened": 0,
+      "closing": 3544,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "LINK",
+      "cls": "CRYPTO",
+      "net": 3055,
+      "opened": 0,
+      "closing": 3055,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
       "coin": "TRX",
       "cls": "CRYPTO",
-      "net": -1174,
+      "net": -1832,
       "opened": 0,
-      "closing": -1174,
+      "closing": -1832,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
       "drivers": []
     },
     {
-      "coin": "ARB",
+      "coin": "HBAR",
       "cls": "CRYPTO",
-      "net": 1631,
+      "net": -9019,
       "opened": 0,
-      "closing": 1631,
+      "closing": -9019,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
       "drivers": []
     },
     {
-      "coin": "SUI",
+      "coin": "DASH",
       "cls": "CRYPTO",
-      "net": 4329,
+      "net": -2640,
       "opened": 0,
-      "closing": 4329,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "BCH",
-      "cls": "CRYPTO",
-      "net": -2589,
-      "opened": 0,
-      "closing": -2589,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "STX",
-      "cls": "CRYPTO",
-      "net": 1011,
-      "opened": 0,
-      "closing": 1011,
+      "closing": -2640,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1900,42 +2156,9 @@
     {
       "coin": "PAXG",
       "cls": "CRYPTO",
-      "net": -22042,
+      "net": -15751,
       "opened": 0,
-      "closing": -22042,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "ASTER",
-      "cls": "CRYPTO",
-      "net": 2980,
-      "opened": 0,
-      "closing": 2980,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "kPEPE",
-      "cls": "CRYPTO",
-      "net": 7383,
-      "opened": 0,
-      "closing": 7383,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "WIF",
-      "cls": "CRYPTO",
-      "net": 4604,
-      "opened": 0,
-      "closing": 4604,
+      "closing": -15751,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1944,9 +2167,9 @@
     {
       "coin": "ATOM",
       "cls": "CRYPTO",
-      "net": 4455,
+      "net": 2266,
       "opened": 0,
-      "closing": 4455,
+      "closing": 2266,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1955,20 +2178,9 @@
     {
       "coin": "CRV",
       "cls": "CRYPTO",
-      "net": 3580,
+      "net": 2374,
       "opened": 0,
-      "closing": 3580,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
-      "coin": "TRUMP",
-      "cls": "CRYPTO",
-      "net": 3505,
-      "opened": 0,
-      "closing": 3505,
+      "closing": 2374,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -1997,22 +2209,22 @@
       "drivers": []
     },
     {
-      "coin": "ALT",
+      "coin": "TRUMP",
       "cls": "CRYPTO",
-      "net": 2086,
+      "net": 2324,
       "opened": 0,
-      "closing": 2086,
+      "closing": 2324,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
       "drivers": []
     },
     {
-      "coin": "STRK",
+      "coin": "ALT",
       "cls": "CRYPTO",
-      "net": 2331,
+      "net": 2086,
       "opened": 0,
-      "closing": 2331,
+      "closing": 2086,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -2043,9 +2255,9 @@
     {
       "coin": "ETHFI",
       "cls": "CRYPTO",
-      "net": 11307,
+      "net": 12960,
       "opened": 0,
-      "closing": 11307,
+      "closing": 12960,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -2063,17 +2275,6 @@
       "drivers": []
     },
     {
-      "coin": "MORPHO",
-      "cls": "CRYPTO",
-      "net": 1193,
-      "opened": 0,
-      "closing": 1193,
-      "divergent": false,
-      "bulls": 0,
-      "bears": 0,
-      "drivers": []
-    },
-    {
       "coin": "CASHCAT",
       "cls": "CRYPTO",
       "net": -138246,
@@ -2085,11 +2286,33 @@
       "drivers": []
     },
     {
+      "coin": "WDC",
+      "cls": "STOCK",
+      "net": -1586,
+      "opened": 0,
+      "closing": -1586,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
       "coin": "GOLD",
       "cls": "COMMOD",
-      "net": -86380,
+      "net": -42410,
       "opened": 0,
-      "closing": -86380,
+      "closing": -42410,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "SILVER",
+      "cls": "COMMOD",
+      "net": 40367,
+      "opened": 0,
+      "closing": 40367,
       "divergent": false,
       "bulls": 0,
       "bears": 0,
@@ -2101,9 +2324,9 @@
       {
         "coin": "ETH",
         "cls": "CRYPTO",
-        "opened": 9663789,
-        "net": -8008365,
-        "closing": -17672154,
+        "opened": 10067706,
+        "net": -7447458,
+        "closing": -17515164,
         "dir": "BULLISH",
         "divergent": true,
         "z": null,
@@ -2118,12 +2341,12 @@
           {
             "w": "0x5b5d…c060",
             "addr": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
-            "usd": -4331860
+            "usd": -3501851
           },
           {
             "w": "0xf822…e01a",
             "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
-            "usd": -1529083
+            "usd": -1679808
           },
           {
             "w": "0x6ea4…0ea7",
@@ -2136,81 +2359,18 @@
             "usd": -730611
           },
           {
-            "w": "0xc179…e0c8",
-            "addr": "0xc179e03922afe8fa9533d3f896338b9fb87ce0c8",
-            "usd": 294746
+            "w": "0x023a…2355",
+            "addr": "0x023a3d058020fb76cca98f01b3c48c8938a22355",
+            "usd": -332228
           }
         ]
       },
       {
-        "coin": "SP500",
-        "cls": "INDEX",
-        "opened": -8317206,
-        "net": 6399774,
-        "closing": 14716980,
-        "dir": "BEARISH",
-        "divergent": true,
-        "z": null,
-        "baselineDays": 1,
-        "consensus": false,
-        "drivers": [
-          {
-            "w": "0x469e…58a5",
-            "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
-            "usd": -8785792
-          },
-          {
-            "w": "0xd8c5…99b0",
-            "addr": "0xd8c5228c515db3043dfa0c8cd6f22450ee9a99b0",
-            "usd": 331157
-          },
-          {
-            "w": "0x9dea…d617",
-            "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-            "usd": 137429
-          }
-        ]
-      },
-      {
-        "coin": "CL",
-        "cls": "COMMOD",
-        "opened": 6081934,
-        "net": 4232919,
-        "closing": -1849015,
-        "dir": "BULLISH",
-        "divergent": false,
-        "z": null,
-        "baselineDays": 1,
-        "consensus": true,
-        "drivers": [
-          {
-            "w": "0x0000…e24d",
-            "addr": "0x00004808a6df8de77c891dc13826ff33cb17e24d",
-            "usd": 3981839
-          },
-          {
-            "w": "0xec4a…cf62",
-            "addr": "0xec4a6f59960fb55a7fa49262e2628687b322cf62",
-            "usd": 1670733
-          },
-          {
-            "w": "0x49e9…e1d0",
-            "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-            "usd": 349602
-          },
-          {
-            "w": "0x9dea…d617",
-            "addr": "0x9dead8fffcbf130e7658f672d2c081d91178d617",
-            "usd": 79759
-          }
-        ]
-      },
-      {
-        "coin": "INTC",
+        "coin": "AMD",
         "cls": "STOCK",
-        "opened": 5192394,
-        "net": 5738678,
-        "closing": 546284,
+        "opened": 5041883,
+        "net": 2585148,
+        "closing": -2456735,
         "dir": "BULLISH",
         "divergent": false,
         "z": null,
@@ -2220,22 +2380,17 @@
           {
             "w": "0x4e23…20c3",
             "addr": "0x4e23288cee4960f9f962195c22948e4bc7ae20c3",
-            "usd": 6138890
+            "usd": 2978983
           },
           {
-            "w": "0x49e9…e1d0",
-            "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
-            "usd": -787579
+            "w": "0xb078…de15",
+            "addr": "0xb07856ebcb6b37967eaf7c4b4e64dcce28c6de15",
+            "usd": 2088452
           },
           {
             "w": "0x3eb6…5470",
             "addr": "0x3eb6bed67d046fbffb8ada21167e592f3fef5470",
-            "usd": -151071
-          },
-          {
-            "w": "0x9751…a97e",
-            "addr": "0x9751cec58be43e0e27d57ba49ac3d68ec269a97e",
-            "usd": -7846
+            "usd": -25552
           }
         ]
       }
