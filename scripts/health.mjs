@@ -112,6 +112,15 @@ const FEEDS = {
     out.push(['INFO', `${d.filingsParsed} filings, ${d.counts?.buys ?? 0} buys, ${(d.clusters || []).length} clusters`]);
     return out;
   }},
+  'macro-pulse': { staleWarn: 2, staleErr: 4, check: (d) => {
+    const out = [];
+    if (!d.stablecoins) out.push(['WARN', 'stablecoins section missing']);
+    if (!(d.options || []).length) out.push(['WARN', 'options section missing']);
+    if (!d.sentiment) out.push(['WARN', 'sentiment section missing']);
+    for (const w of (d.warns || [])) out.push(['WARN', w]);
+    if (d.stablecoins) out.push(['INFO', `stablecoins $${(d.stablecoins.totalUsd / 1e9).toFixed(0)}B, ${d.stablecoins.weekChangeUsd >= 0 ? 'expanding' : 'contracting'}; F&G ${d.sentiment?.fngValue ?? '?'}`]);
+    return out;
+  }},
   'macro-flows': { staleWarn: 8, staleErr: 15, check: (d) => {
     const out = [];
     if (!(d.cot || []).length) out.push(['ERROR', 'no COT markets']);
