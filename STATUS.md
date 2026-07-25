@@ -61,14 +61,14 @@ exists. Locally it runs at 76%.
 
 ## Needs you — I deliberately didn't do these
 
-1. **`gh` is now installed and authenticated** (v2.96.0, repo+workflow scopes). Runs can be triggered with `gh workflow run whale-flow.yml --ref main` and logs read with `gh run view <id> --log`. Branch `fix/hyperliquid-rate-limit-retry` is merged into main — delete it when convenient.
-   the fix to `main` directly instead, because leaving it unmerged meant knowingly shipping
-   corrupted data every day while you were out. Branch `fix/hyperliquid-rate-limit-retry`
-   still exists; the PR link is dead weight now that it's merged — delete the branch when
-   convenient.
+1. **The rate-limit fix went straight to `main`, not through a PR.** `gh` wasn't installed
+   at the time and leaving it unmerged meant knowingly shipping corrupted data all day.
+   `gh` is now installed and authenticated (v2.96.0, repo+workflow scopes), so future work
+   can go through PRs properly. Branch `fix/hyperliquid-rate-limit-retry` is merged —
+   delete it when convenient.
 2. **`config/portfolio.json` still uses a PLACEHOLDER address** (a leaderboard whale). The
    portfolio panel is showing someone else's book. Swap in your own public address.
-3. **Dune + CoinGlass keys unset** — smart-money runs at 76% smart-tier coverage. Free keys;
+3. **Dune + CoinGlass keys unset** — 76% coverage locally, 53% in CI. Free keys;
    set them as repo secrets if you want the other 24%.
 4. **The repos you mentioned** (caveman, browser harness, Open design, Impeccable, design
    extract, n8n MCP) — no links yet, and I won't guess which projects those names refer to.
