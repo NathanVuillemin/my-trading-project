@@ -38,11 +38,21 @@ const arg = (n, d) => {
 };
 const has = (n) => process.argv.includes(`--${n}`);
 
-const post = async (b) => {
+// This makes ~3 requests per wallet, so at --top 60 it is the heaviest caller in the
+// pipeline and will hit Hyperliquid's per-IP limit. A swallowed 429 is worse than a slow
+// run: userFills comes back empty, no round trips are found, and every wallet silently
+// drops to the weakest evidence basis while still reporting a score.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const post = async (b, attempt = 0) => {
   const r = await fetch(API, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(b), signal: AbortSignal.timeout(25000),
   });
+  if (r.status === 429 || r.status >= 500) {
+    if (attempt >= 5) throw new Error(`${b.type} HTTP ${r.status} after ${attempt} retries`);
+    await sleep(Math.min(16000, 800 * 2 ** attempt) + Math.random() * 400);
+    return post(b, attempt + 1);
+  }
   if (!r.ok) throw new Error(`${b.type} HTTP ${r.status}`);
   return r.json();
 };
