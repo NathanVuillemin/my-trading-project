@@ -94,12 +94,13 @@ const FEEDS = {
     return out;
   }},
   portfolio: { staleWarn: 2, staleErr: 4, check: (d) => {
+    // DATA-quality checks only. Trade risk (near-liquidation etc.) is real and important,
+    // but it is a different axis — it must not drive the data-health verdict, or a green
+    // pipeline reads ERROR simply because a leveraged position is open, and the ERROR
+    // stops meaning "the data broke". Position risk is surfaced separately (see the banner).
     const out = [];
     if (d.usingPlaceholder) out.push(['WARN', 'still tracking the PLACEHOLDER address — edit config/portfolio.json to use your own']);
     if (!(d.positions || []).length) out.push(['INFO', 'no open positions']);
-    const alerts = (d.risk?.alerts || []);
-    for (const a of alerts.filter(x => x.level === 'critical')) out.push(['ERROR', `risk: ${a.msg}`]);
-    for (const a of alerts.filter(x => x.level === 'warning')) out.push(['WARN', `risk: ${a.msg}`]);
     out.push(['INFO', `${(d.positions || []).length} positions, ${d.trades?.tradeCount ?? 0} completed round trips`]);
     return out;
   }},
@@ -139,6 +140,7 @@ const FEEDS = {
 };
 
 const results = [];
+let positionRisk = [];   // trade risk, tracked separately from the data verdict
 for (const [feed, spec] of Object.entries(FEEDS)) {
   const dir = join(DATA, feed);
   if (!existsSync(dir)) { results.push({ feed, level: 'ERROR', date: null, notes: [['ERROR', 'directory missing — collector never ran']] }); continue; }
@@ -151,6 +153,8 @@ for (const [feed, spec] of Object.entries(FEEDS)) {
   let data;
   try { data = JSON.parse(readFileSync(join(dir, latest), 'utf8')); }
   catch (e) { results.push({ feed, level: 'ERROR', date, notes: [['ERROR', `unparseable JSON: ${e.message}`]] }); continue; }
+
+  if (feed === 'portfolio') positionRisk = data.risk?.alerts || [];
 
   const notes = [];
   if (age >= spec.staleErr) notes.push(['ERROR', `stale: ${age}d old`]);
@@ -182,11 +186,17 @@ const worst = results.some(r => r.level === 'ERROR') || dashNote[0] === 'ERROR' 
   : results.some(r => r.level === 'WARN') || dashNote[0] === 'WARN' ? 'WARN' : 'OK';
 
 if (has('json')) {
-  process.stdout.write(JSON.stringify({ overall: worst, dashboard: dashNote, feeds: results }, null, 2));
+  process.stdout.write(JSON.stringify({ overall: worst, positionRisk, dashboard: dashNote, feeds: results }, null, 2));
 } else {
   const line = '─'.repeat(78);
   const mark = { OK: 'OK   ', WARN: 'WARN ', ERROR: 'ERROR', INFO: '     ' };
-  console.log(`\n${line}\nSYSTEM HEALTH — overall ${worst}\n${line}`);
+  console.log(`\n${line}\nSYSTEM HEALTH — overall ${worst}   (data quality only)\n${line}`);
+  // Position risk is your money, not the data — printed loud and first, but it never
+  // sets the data verdict above.
+  if (positionRisk.length) {
+    console.log('\n⚠ POSITION RISK (your own book — not a data problem):');
+    for (const a of positionRisk) console.log(`   ${a.level === 'critical' ? '‼ CRITICAL' : '! ' + a.level}  ${a.msg}`);
+  }
   for (const r of results) {
     console.log(`\n${mark[r.level]} ${r.feed.padEnd(14)} ${r.date || '—'}${r.age != null ? `  (${r.age}d old, ${r.snapshots} snapshots)` : ''}`);
     for (const [lvl, msg] of r.notes) console.log(`      ${lvl === 'INFO' ? '·' : lvl}  ${msg}`);
