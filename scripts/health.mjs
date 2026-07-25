@@ -44,12 +44,37 @@ const FEEDS = {
   'smart-money': { staleWarn: 2, staleErr: 4, check: (d) => {
     const out = [];
     const c = d.coverage;
-    if (!c) out.push(['WARN', 'no coverage block — older snapshot format']);
-    else {
-      if (c.smartPct < 60) out.push(['ERROR', `only ${c.smartPct}% of smart-tier weight present (missing: ${(c.missing || []).join(', ') || 'none'})`]);
-      else if (c.smartPct < 100) out.push(['WARN', `${c.smartPct}% smart-tier coverage (missing: ${(c.missing || []).join(', ') || 'none'})`]);
-      else out.push(['INFO', 'full smart-tier coverage']);
+    if (!c) { out.push(['WARN', 'no coverage block — older snapshot format']); return out; }
+
+    // Why a source is absent matters more than how many are absent. Three cases behave
+    // very differently, and collapsing them into one ERROR means the check screams daily
+    // about something unfixable and stops being read.
+    //
+    //   geo-blocked  — the venue refuses datacentre IPs (Binance 451, Bybit 403 from
+    //                  GitHub runners). Permanent for this environment, not a regression.
+    //   needs a key  — connector self-skipped. Actionable, but a choice, not a fault.
+    //   unexplained  — present yesterday, gone today with no reason given. THIS is the
+    //                  one worth an ERROR.
+    const warns = d.warns || [];
+    const reasonFor = (id) => warns.find(w => w.startsWith(id + ':')) || '';
+    const geo = [], keyed = [], unexplained = [];
+    for (const id of (c.missing || [])) {
+      const r = reasonFor(id);
+      if (/HTTP (451|403)/.test(r)) geo.push(id);
+      else if (/skipped \(set /.test(r)) keyed.push(id);
+      else unexplained.push(id);
     }
+
+    if (geo.length) out.push(['WARN', `geo-blocked in this environment (expected, not a regression): ${geo.join(', ')}`]);
+    if (keyed.length) out.push(['WARN', `awaiting API keys: ${keyed.join(', ')}`]);
+    if (unexplained.length) out.push(['ERROR', `source vanished with no reason given: ${unexplained.join(', ')}`]);
+
+    // Coverage still matters even when every absence is explained — the composite means
+    // something different at 53% than at 100%, and that has to stay visible.
+    if (c.smartPct < 40) out.push(['ERROR', `only ${c.smartPct}% of smart-tier weight present — composite is mostly crowd data`]);
+    else if (c.smartPct < 100) out.push(['INFO', `${c.smartPct}% smart-tier coverage — reads are directionally usable but thinner than designed`]);
+    else out.push(['INFO', 'full smart-tier coverage']);
+
     if (!(d.composite || []).length) out.push(['ERROR', 'empty composite']);
     return out;
   }},
