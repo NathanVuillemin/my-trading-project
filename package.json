@@ -9,13 +9,14 @@
     "smart:money": "node scripts/smart-money.mjs",
     "smart:contrarian": "node scripts/smart-money.mjs --invert-crowd",
     "dashboard": "node scripts/build-dashboard.mjs",
-    "refresh": "node scripts/whale-flow.mjs && node scripts/smart-money.mjs && node scripts/trust.mjs --top 60 && node scripts/portfolio.mjs && node scripts/insiders.mjs --days 3 --max 250 && node scripts/macro-flows.mjs && node scripts/macro-pulse.mjs && node scripts/build-dashboard.mjs",
+    "refresh": "node scripts/whale-flow.mjs && node scripts/smart-money.mjs && node scripts/trust.mjs --top 60 && node scripts/portfolio.mjs && node scripts/insiders.mjs --days 3 --max 250 && node scripts/macro-flows.mjs && node scripts/institutions.mjs && node scripts/macro-pulse.mjs && node scripts/build-dashboard.mjs",
     "portfolio": "node scripts/portfolio.mjs",
     "insiders": "node scripts/insiders.mjs",
     "macro:flows": "node scripts/macro-flows.mjs",
     "trust": "node scripts/trust.mjs",
     "health": "node scripts/health.mjs",
-    "macro:pulse": "node scripts/macro-pulse.mjs"
+    "macro:pulse": "node scripts/macro-pulse.mjs",
+    "institutions": "node scripts/institutions.mjs"
   },
   "devDependencies": {
     "pinets": "^0.9.29"

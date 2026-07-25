@@ -452,6 +452,36 @@ R['macro-flows']=function(d){
   return body;
 };
 
+R['institutions']=function(d){
+  var body='<p class="sub">13F holdings of notable managers. Lags up to 45 days — slow, long-horizon positioning. Consensus = held or newly bought across multiple funds.</p>';
+  body+=tiles([['Managers',d.managersReporting||0],['Latest quarter',d.latestQuarter||'—']]);
+  var ch=(d.consensusHeld||[]).slice(0,12).map(function(c){
+    return '<tr><td class="num"><b>'+c.count+'×</b></td><td><b>'+esc(c.name)+'</b></td>'
+      +'<td class="num">'+m(c.totalValue)+'</td><td>'+esc(c.funds.join(', '))+'</td></tr>';
+  });
+  body+='<div style="margin-top:12px"><b style="font-size:.85rem">Consensus holdings</b> <span class="sub">in the top book of 2+ funds</span></div>'
+    +table([{label:'Funds',num:true},{label:'Issuer'},{label:'Total value',num:true},{label:'Who'}],ch);
+  if((d.consensusBuys||[]).length){
+    var cb=d.consensusBuys.map(function(c){
+      return '<tr><td class="num bull"><b>'+c.count+'×</b></td><td><b>'+esc(c.name)+'</b></td>'
+        +'<td class="num">'+m(c.totalValue)+'</td><td>'+esc(c.funds.join(', '))+'</td></tr>';
+    });
+    body+='<div style="margin-top:12px"><b style="font-size:.85rem">Consensus new buys</b> <span class="sub">newly in 2+ funds\\' top book this quarter</span></div>'
+      +table([{label:'Funds',num:true},{label:'Issuer'},{label:'Total value',num:true},{label:'Who'}],cb);
+  }
+  var mr=(d.managers||[]).map(function(x){
+    var tb=(x.top||[])[0];
+    return '<tr><td><b>'+esc(x.who)+'</b></td><td>'+esc(x.name)+'</td><td>'+esc(x.reportDate)+'</td>'
+      +'<td class="num">'+m(x.portfolioValue)+'</td>'
+      +'<td>'+esc(tb?(tb.name+' ('+tb.pct+'%)'):'—')+'</td>'
+      +'<td>'+esc((x.newBuys||[]).slice(0,3).map(function(b){return b.name}).join(', '))+'</td></tr>';
+  });
+  body+='<details><summary>Per manager ('+(d.managers||[]).length+')</summary>'+table(
+    [{label:'Manager'},{label:'Firm'},{label:'Quarter'},{label:'Portfolio',num:true},{label:'Top holding'},{label:'New buys'}],mr)+'</details>';
+  if((d.warns||[]).length)body+='<div class="warn">'+d.warns.map(function(w){return '<code>'+esc(w)+'</code>'}).join(' · ')+'</div>';
+  return body;
+};
+
 R['macro-pulse']=function(d){
   var body='<p class="sub">Fast macro backdrop: where capital sits and how it is positioned. All free, no keys.</p>';
   var s=d.stablecoins, sent=d.sentiment;
@@ -553,9 +583,9 @@ function generic(d){
 
 // ---------------- assemble ----------------
 var TITLES={'whale-flow':'Whale flow','smart-money':'Cross-venue composite','portfolio':'My book',
-  'trust':'Trader trust','insiders':'Insider buying (Form 4)','macro-flows':'Macro & COT','macro-pulse':'Macro pulse','briefs':'Briefs',
+  'trust':'Trader trust','insiders':'Insider buying (Form 4)','institutions':'Institutional 13F','macro-flows':'Macro & COT','macro-pulse':'Macro pulse','briefs':'Briefs',
   'events':'Events','research':'Research'};
-var ORDER=['portfolio','trust','whale-flow','smart-money','macro-pulse','insiders','macro-flows'];
+var ORDER=['portfolio','trust','whale-flow','smart-money','macro-pulse','insiders','institutions','macro-flows'];
 var names=Object.keys(F).sort(function(a,b){
   var ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);
   return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);
@@ -586,7 +616,7 @@ el('nav').innerHTML=nav;
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(join(OUT_DIR, 'index.html'), html);
 console.log(`Dashboard built: ${join(OUT_DIR, 'index.html')}`);
-const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows', 'macro-pulse'];
+const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows', 'macro-pulse', 'institutions'];
 for (const [k, v] of Object.entries(feeds)) {
   console.log(`  ${k.padEnd(14)} ${v.date}  (${v.count} file${v.count === 1 ? '' : 's'})  ${known.includes(k) ? 'tailored panel' : 'generic panel'}`);
 }

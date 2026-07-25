@@ -113,6 +113,17 @@ const FEEDS = {
     out.push(['INFO', `${d.filingsParsed} filings, ${d.counts?.buys ?? 0} buys, ${(d.clusters || []).length} clusters`]);
     return out;
   }},
+  'institutions': { staleWarn: 40, staleErr: 100, check: (d) => {
+    // 13F is quarterly with a 45-day lag, so "stale" thresholds are wide by design.
+    const out = [];
+    if (!(d.managers || []).length) return [['ERROR', 'no managers parsed']];
+    if (d.managersReporting < 8) out.push(['WARN', `only ${d.managersReporting} managers reporting`]);
+    const zero = (d.managers || []).filter(m => !m.portfolioValue).length;
+    if (zero) out.push(['WARN', `${zero} managers parsed to $0 — check the info-table parser`]);
+    for (const w of (d.warns || [])) out.push(['WARN', w]);
+    out.push(['INFO', `${d.managersReporting} managers, quarter ${d.latestQuarter}, ${(d.consensusHeld || []).length} consensus holdings, ${(d.consensusBuys || []).length} consensus buys`]);
+    return out;
+  }},
   'macro-pulse': { staleWarn: 2, staleErr: 4, check: (d) => {
     const out = [];
     if (!d.stablecoins) out.push(['WARN', 'stablecoins section missing']);
