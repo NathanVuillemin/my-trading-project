@@ -51,10 +51,52 @@ if (existsSync(flowDir)) {
   }).filter(Boolean);
 }
 
+// ---------------------------------------------------------------- journal
+// Markdown files in journal/, newest first. Frontmatter is parsed with a deliberately
+// small hand-rolled reader (flat `key: value` between --- fences) so the build keeps its
+// zero-dependency property — pulling in a YAML parser would add an npm install to CI.
+function readJournal() {
+  const dir = join(ROOT, 'journal');
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter(f => f.endsWith('.md') && !f.startsWith('_') && f.toLowerCase() !== 'readme.md')
+    .sort().reverse()
+    .slice(0, 30)
+    .map(f => {
+      let raw;
+      try { raw = readFileSync(join(dir, f), 'utf8'); } catch { return null; }
+      const meta = {};
+      let body = raw;
+      const fm = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+      if (fm) {
+        for (const line of fm[1].split(/\r?\n/)) {
+          const kv = line.match(/^\s*([A-Za-z_][\w-]*)\s*:\s*(.*)$/);
+          if (kv) meta[kv[1].toLowerCase()] = kv[2].trim();
+        }
+        body = fm[2];
+      }
+      const title = (body.match(/^#{1,3}\s+(.+)$/m) || [])[1] || null;
+      return {
+        file: f,
+        date: meta.date || f.replace(/\.md$/, '').slice(0, 10),
+        tags: (meta.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+        result: (meta.result || '').toLowerCase() || null,
+        mood: meta.mood || null,
+        title,
+        // Plain-text excerpt; the dashboard renders no markdown, so strip the syntax.
+        excerpt: body.replace(/^#{1,6}\s+/gm, '').replace(/[*_`>]/g, '')
+          .split(/\r?\n/).map(s => s.trim()).filter(Boolean).join(' ').slice(0, 400),
+        words: body.split(/\s+/).filter(Boolean).length,
+      };
+    })
+    .filter(Boolean);
+}
+
 const payload = {
   builtAt: new Date().toISOString(),
   feeds: Object.fromEntries(Object.entries(feeds).map(([k, v]) => [k, { date: v.date, count: v.count, data: v.data }])),
   flowHistory,
+  journal: readJournal(),
 };
 
 // ---------------------------------------------------------------- page
@@ -257,6 +299,27 @@ R['portfolio']=function(d){
   });
   if(liq.length)body+='<div style="margin-top:12px"><b style="font-size:.85rem">Closest to liquidation</b></div>'
     +table([{label:'Market'},{label:'Side'},{label:'Distance',num:true},{label:'Mark',num:true},{label:'Liq',num:true}],liq);
+  // Manual positions and cash were being collected from config but never shown, so
+  // anything held off-venue was invisible in the exposure picture.
+  var man=d.manual||[];
+  if(man.length){
+    var mrows=man.map(function(x){
+      return '<tr><td><b>'+esc(x.asset)+'</b></td><td>'+esc(x.side||'')+'</td>'
+        +'<td class="num">'+m(x.sizeUsd||0)+'</td><td>'+esc(x.venue||'')+'</td>'
+        +'<td>'+esc(x.opened||'')+'</td><td>'+esc(x.note||'')+'</td></tr>';
+    });
+    body+='<div style="margin-top:12px"><b style="font-size:.85rem">Manual positions</b> '
+      +'<span class="sub">held off-venue, from config/portfolio.json</span></div>'
+      +table([{label:'Asset'},{label:'Side'},{label:'Size',num:true},{label:'Venue'},{label:'Opened'},{label:'Note'}],mrows);
+  }
+  var csh=d.cash||[];
+  if(csh.length){
+    body+='<div style="margin-top:10px"><b style="font-size:.85rem">Cash</b></div>'
+      +table([{label:'Label'},{label:'USD',num:true}],csh.map(function(c){
+        return '<tr><td>'+esc(c.label)+'</td><td class="num">'+m(c.usd||0)+'</td></tr>';
+      }));
+  }
+
   var pos=(d.positions||[]).slice(0,12).map(function(p){
     return '<tr><td><b>'+esc(p.coin)+'</b></td><td>'+esc(p.side)+'</td><td class="num">'+m(p.notional)+'</td>'
       +'<td class="num '+cls(p.uPnl)+'">'+m(p.uPnl)+'</td><td class="num '+cls(p.roe)+'">'+p.roe.toFixed(1)+'%</td>'
@@ -389,6 +452,32 @@ R['macro-flows']=function(d){
   return body;
 };
 
+// Journal is not a data feed — it comes from journal/*.md rather than data/*/ — so it is
+// rendered from its own slot on the payload rather than through the feed registry.
+function journalPanel(entries){
+  if(!entries.length){
+    return '<p class="empty">No entries yet. Copy <code>journal/_TEMPLATE.md</code> to '
+      +'<code>journal/'+new Date().toISOString().slice(0,10)+'.md</code> and write. '
+      +'Git versions every edit; the GitHub mobile app works for writing on the move.</p>';
+  }
+  var res={win:'good',loss:'critical',open:'warning',scratch:''};
+  var counts=entries.reduce(function(a,e){ if(e.result)a[e.result]=(a[e.result]||0)+1; return a },{});
+  var body='';
+  if(Object.keys(counts).length)body+=tiles(Object.entries(counts).map(function(e){return [e[0],e[1]]}));
+  body+=entries.slice(0,8).map(function(e){
+    return '<div class="alert" style="flex-wrap:wrap">'
+      +'<span class="lvl '+(res[e.result]||'')+'">'+esc(e.result||'note')+'</span>'
+      +'<b>'+esc(e.date)+'</b>'
+      +(e.title?'<span>'+esc(e.title)+'</span>':'')
+      +e.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('')
+      +(e.mood?'<span class="tag">mood: '+esc(e.mood)+'</span>':'')
+      +'<span class="drivers" style="flex-basis:100%;font-size:.76rem;color:var(--text-secondary);margin-top:3px">'
+      +esc(e.excerpt)+(e.words>60?'…':'')+'</span></div>';
+  }).join('');
+  if(entries.length>8)body+='<p class="sub" style="margin-top:8px">'+(entries.length-8)+' older entries in <code>journal/</code></p>';
+  return body;
+}
+
 // ---------------- generic fallback ----------------
 // Renders any feed that has no bespoke renderer, so new collectors show up immediately.
 function generic(d){
@@ -446,6 +535,12 @@ names.forEach(function(n){
   catch(e){ body='<p class="empty">Renderer error: '+esc(e.message)+'</p>'; }
   out+=card(n,title,sub,body);
   nav+='<a href="#p-'+n+'">'+esc(title)+'</a>';
+  // Journal sits directly after the book, where the day's trades are freshest in mind.
+  if(n==='portfolio'){
+    var J=D.journal||[];
+    out+=card('journal','Journal',J.length?J.length+' entries':'empty',journalPanel(J));
+    nav+='<a href="#p-journal">Journal</a>';
+  }
 });
 el('panels').innerHTML=out||'<div class="card"><p class="empty">No data yet. Run the collectors.</p></div>';
 el('nav').innerHTML=nav;
