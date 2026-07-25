@@ -4,8 +4,9 @@
   "addresses": {
     "_note": "Hyperliquid uses EVM (0x...) addresses. Positions, PnL, funding and trade stats are all read from these. PLACEHOLDER below is a public leaderboard whale so the panels render with real data — replace with your own.",
     "hyperliquid": [
-      { "label": "PLACEHOLDER (leaderboard whale)", "address": "0xb83de012dba672c76a7dbbbf3e459cb59d7d6e36" }
-    ]
+      { "label": "Main (Hyperliquid)", "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE" }
+    ],
+    "_bitcoin_note": "BTC taproot address held in Phantom: bc1pryefxmqhcdaxtq8mddl37gz6x9cvwjl6ugd4k2veqjdnhxlthndq602xak. Not read by any collector yet — Hyperliquid only understands 0x addresses. A future spot-balance panel could track this via a free BTC explorer API."
   },
 
   "manualPositions": {
