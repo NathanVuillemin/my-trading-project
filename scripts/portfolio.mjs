@@ -29,10 +29,23 @@ const CFG_PATH = join(ROOT, 'config', 'portfolio.json');
 const OUT_DIR = join(ROOT, 'data', 'portfolio');
 
 const API = 'https://api.hyperliquid.xyz/info';
-const post = async (body) => {
+
+// Hyperliquid rate-limits per IP, and this script usually runs straight after trust.mjs
+// has already spent the budget on ~180 requests. Without a retry the first 429 killed the
+// whole feed, and because the step is non-fatal in CI the run still went green while the
+// panel quietly went stale. Back off and retry instead.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const post = async (body, attempt = 0) => {
   const r = await fetch(API, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body), signal: AbortSignal.timeout(25000),
   });
+  if (r.status === 429 || r.status >= 500) {
+    if (attempt >= 5) throw new Error(`${body.type} -> HTTP ${r.status} after ${attempt} retries`);
+    // Exponential backoff with jitter so parallel callers don't retry in lockstep.
+    await sleep(Math.min(16000, 800 * 2 ** attempt) + Math.random() * 400);
+    return post(body, attempt + 1);
+  }
   if (!r.ok) throw new Error(`${body.type} -> HTTP ${r.status}`);
   return r.json();
 };
