@@ -1,7 +1,18 @@
 {
   "date": "2026-07-25",
-  "generatedAt": "2026-07-25T14:18:08.987Z",
+  "generatedAt": "2026-07-25T14:20:53.293Z",
   "indicators": [
+    {
+      "id": "GOLD",
+      "label": "Gold (PAXG)",
+      "unit": "",
+      "value": 4052,
+      "changeWeek": 40.2,
+      "changeMonth": -255.4,
+      "riskDir": null,
+      "note": "safe haven — rises on fear & debasement",
+      "asOf": "2026-07-25"
+    },
     {
       "id": "DGS2",
       "label": "2Y Treasury",
@@ -80,6 +91,13 @@
       "asOf": "2026-07-23"
     }
   ],
+  "gold": {
+    "priceUsd": 4051.5,
+    "changeWeekPct": 1,
+    "changeMonthPct": -5.93,
+    "source": "Hyperliquid PAXG",
+    "note": "haven bid on fear; debasement hedge; inverse to real yields"
+  },
   "netLiquidity": {
     "valueB": 5917,
     "changeWeekB": -70,

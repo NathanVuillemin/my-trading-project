@@ -457,7 +457,10 @@ R['rates']=function(d){
   var ind=d.indicators||[];
   var on=ind.filter(function(i){return i.riskDir==='risk-on'}).length;
   var off=ind.filter(function(i){return i.riskDir==='risk-off'}).length;
-  var t=[['Risk-on signals',on,'bull'],['Risk-off signals',off,'bear']];
+  var t=[];
+  if(d.gold)t.push(['Gold','$'+d.gold.priceUsd.toLocaleString(),cls(d.gold.changeWeekPct)],
+    ['Gold /wk',(d.gold.changeWeekPct>=0?'+':'')+d.gold.changeWeekPct+'%',cls(d.gold.changeWeekPct)]);
+  t.push(['Risk-on signals',on,'bull'],['Risk-off signals',off,'bear']);
   if(d.netLiquidity)t.push(['Net liquidity','$'+(d.netLiquidity.valueB/1000).toFixed(2)+'T'],
     ['Liquidity /wk',(d.netLiquidity.changeWeekB>=0?'+':'')+'$'+d.netLiquidity.changeWeekB+'B',cls(d.netLiquidity.changeWeekB)]);
   body+=tiles(t);

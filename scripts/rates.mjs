@@ -94,6 +94,40 @@ function summarize(rows) {
     } catch (e) { warns.push(`${s.id}: ${e.message}`); }
   }
 
+  // ---- gold ----
+  // Priced from Hyperliquid's PAXG (tokenized gold) perp — keyless, and the venue the user
+  // actually trades. Gold is a core macro asset here: a haven bid on fear and a debasement
+  // hedge against expanding liquidity / a falling real rate. Institutional gold positioning
+  // also lives in the COT feed; this adds the price and its trend up front.
+  try {
+    const now = Date.now();
+    const c = await fetch('https://api.hyperliquid.xyz/info', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'candleSnapshot', req: { coin: 'PAXG', interval: '1d', startTime: now - 40 * 864e5, endTime: now } }),
+      signal: AbortSignal.timeout(20000),
+    }).then(r => r.json());
+    if (Array.isArray(c) && c.length) {
+      const px = +c[c.length - 1].c;
+      const wk = +c[Math.max(0, c.length - 8)].c;
+      const mo = +c[0].c;
+      out.gold = {
+        priceUsd: +px.toFixed(1),
+        changeWeekPct: wk ? +((px - wk) / wk * 100).toFixed(2) : null,
+        changeMonthPct: mo ? +((px - mo) / mo * 100).toFixed(2) : null,
+        source: 'Hyperliquid PAXG',
+        note: 'haven bid on fear; debasement hedge; inverse to real yields',
+      };
+      // Also expose in the indicator table so it sits alongside the dollar and yields.
+      out.indicators.unshift({
+        id: 'GOLD', label: 'Gold (PAXG)', unit: '',
+        value: +px.toFixed(0),
+        changeWeek: wk ? +(px - wk).toFixed(1) : null,
+        changeMonth: mo ? +(px - mo).toFixed(1) : null,
+        riskDir: null, note: 'safe haven — rises on fear & debasement', asOf: new Date().toISOString().slice(0, 10),
+      });
+    }
+  } catch (e) { warns.push(`gold: ${e.message}`); }
+
   // ---- net liquidity ----
   try {
     const parts = {};
