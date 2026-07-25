@@ -452,6 +452,32 @@ R['macro-flows']=function(d){
   return body;
 };
 
+R['rates']=function(d){
+  var body='<p class="sub">The macro tide risk assets trade against — rates, the dollar, the curve, credit, and net liquidity. Free, keyless (FRED).</p>';
+  var ind=d.indicators||[];
+  var on=ind.filter(function(i){return i.riskDir==='risk-on'}).length;
+  var off=ind.filter(function(i){return i.riskDir==='risk-off'}).length;
+  var t=[['Risk-on signals',on,'bull'],['Risk-off signals',off,'bear']];
+  if(d.netLiquidity)t.push(['Net liquidity','$'+(d.netLiquidity.valueB/1000).toFixed(2)+'T'],
+    ['Liquidity /wk',(d.netLiquidity.changeWeekB>=0?'+':'')+'$'+d.netLiquidity.changeWeekB+'B',cls(d.netLiquidity.changeWeekB)]);
+  body+=tiles(t);
+  if(d.netLiquidity)body+='<div class="alert"><span class="lvl '+(d.netLiquidity.changeWeekB>=0?'good':'critical')+'">net liquidity</span><span>'+esc(d.netLiquidity.read)+'</span></div>';
+  var rows=ind.map(function(i){
+    return '<tr><td><b>'+esc(i.label)+'</b></td>'
+      +'<td class="num">'+i.value+esc(i.unit||'')+'</td>'
+      +'<td class="num '+cls(i.changeWeek)+'">'+(i.changeWeek>=0?'+':'')+i.changeWeek+'</td>'
+      +'<td>'+(i.riskDir?('<span class="'+(i.riskDir==='risk-on'?'bull':'bear')+'">'+i.riskDir+'</span>'):'')+'</td>'
+      +'<td class="sub">'+esc(i.note||'')+'</td></tr>';
+  });
+  body+=table([{label:'Indicator'},{label:'Level',num:true},{label:'Δ week',num:true},{label:'Risk'},{label:''}],rows);
+  if(d.netLiquidity&&d.netLiquidity.components){
+    var c=d.netLiquidity.components;
+    body+='<div class="sub" style="margin-top:8px">Net liquidity = Fed $'+(c.fedBalanceSheetB/1000).toFixed(2)+'T − reverse repo $'+c.reverseRepoB+'B − Treasury account $'+c.treasuryAccountB+'B</div>';
+  }
+  if((d.warns||[]).length)body+='<div class="warn">'+d.warns.map(function(w){return '<code>'+esc(w)+'</code>'}).join(' · ')+'</div>';
+  return body;
+};
+
 R['institutions']=function(d){
   var body='<p class="sub">13F holdings of notable managers. Lags up to 45 days — slow, long-horizon positioning. Consensus = held or newly bought across multiple funds.</p>';
   body+=tiles([['Managers',d.managersReporting||0],['Latest quarter',d.latestQuarter||'—']]);
@@ -583,9 +609,9 @@ function generic(d){
 
 // ---------------- assemble ----------------
 var TITLES={'whale-flow':'Whale flow','smart-money':'Cross-venue composite','portfolio':'My book',
-  'trust':'Trader trust','insiders':'Insider buying (Form 4)','institutions':'Institutional 13F','macro-flows':'Macro & COT','macro-pulse':'Macro pulse','briefs':'Briefs',
+  'trust':'Trader trust','insiders':'Insider buying (Form 4)','institutions':'Institutional 13F','macro-flows':'Macro & COT','rates':'Rates, dollar & liquidity','macro-pulse':'Macro pulse','briefs':'Briefs',
   'events':'Events','research':'Research'};
-var ORDER=['portfolio','trust','whale-flow','smart-money','macro-pulse','insiders','institutions','macro-flows'];
+var ORDER=['portfolio','trust','whale-flow','smart-money','rates','macro-pulse','insiders','institutions','macro-flows'];
 var names=Object.keys(F).sort(function(a,b){
   var ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);
   return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);
@@ -616,7 +642,7 @@ el('nav').innerHTML=nav;
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(join(OUT_DIR, 'index.html'), html);
 console.log(`Dashboard built: ${join(OUT_DIR, 'index.html')}`);
-const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows', 'macro-pulse', 'institutions'];
+const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows', 'macro-pulse', 'institutions', 'rates'];
 for (const [k, v] of Object.entries(feeds)) {
   console.log(`  ${k.padEnd(14)} ${v.date}  (${v.count} file${v.count === 1 ? '' : 's'})  ${known.includes(k) ? 'tailored panel' : 'generic panel'}`);
 }

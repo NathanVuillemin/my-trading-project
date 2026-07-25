@@ -86,6 +86,11 @@ jobs:
         continue-on-error: true
         run: node scripts/macro-pulse.mjs
 
+      - name: Collect rates & liquidity (FRED)
+        id: rates
+        continue-on-error: true
+        run: node scripts/rates.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -105,6 +110,7 @@ jobs:
             echo "| macro-flows | ${{ steps.macro.outcome }} |"
             echo "| institutions | ${{ steps.inst.outcome }} |"
             echo "| macro-pulse | ${{ steps.pulse.outcome }} |"
+            echo "| rates | ${{ steps.rates.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —
