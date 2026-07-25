@@ -124,6 +124,16 @@ const FEEDS = {
     out.push(['INFO', `${d.managersReporting} managers, quarter ${d.latestQuarter}, ${(d.consensusHeld || []).length} consensus holdings, ${(d.consensusBuys || []).length} consensus buys`]);
     return out;
   }},
+  'rates': { staleWarn: 4, staleErr: 8, check: (d) => {
+    const out = [];
+    if (!(d.indicators || []).length) return [['ERROR', 'no indicators — FRED unreachable?']];
+    if (!d.netLiquidity) out.push(['WARN', 'net liquidity missing a component']);
+    for (const w of (d.warns || [])) out.push(['WARN', w]);
+    const on = (d.indicators || []).filter(i => i.riskDir === 'risk-on').length;
+    const off = (d.indicators || []).filter(i => i.riskDir === 'risk-off').length;
+    out.push(['INFO', `${(d.indicators || []).length} indicators (${on} risk-on / ${off} risk-off)${d.netLiquidity ? `, net liquidity $${(d.netLiquidity.valueB / 1000).toFixed(1)}T ${d.netLiquidity.changeWeekB >= 0 ? 'expanding' : 'contracting'}` : ''}`]);
+    return out;
+  }},
   'macro-pulse': { staleWarn: 2, staleErr: 4, check: (d) => {
     const out = [];
     if (!d.stablecoins) out.push(['WARN', 'stablecoins section missing']);
