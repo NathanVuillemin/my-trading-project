@@ -12,7 +12,8 @@
     "refresh": "node scripts/whale-flow.mjs && node scripts/smart-money.mjs && node scripts/portfolio.mjs && node scripts/build-dashboard.mjs",
     "portfolio": "node scripts/portfolio.mjs",
     "insiders": "node scripts/insiders.mjs",
-    "macro:flows": "node scripts/macro-flows.mjs"
+    "macro:flows": "node scripts/macro-flows.mjs",
+    "trust": "node scripts/trust.mjs"
   },
   "devDependencies": {
     "pinets": "^0.9.29"
