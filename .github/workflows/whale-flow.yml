@@ -28,19 +28,70 @@ jobs:
 
       # No install step: the collectors use only Node's built-in fetch.
 
+      # Every collector is INDEPENDENT and non-fatal. One upstream API having a bad day
+      # must not cost us the other five feeds or block the deploy — the dashboard renders
+      # whatever snapshots exist, and a missing feed shows its last known date rather than
+      # vanishing. Failures stay visible in the step list and in the summary below.
+
       - name: Collect whale flow
+        id: whale
+        continue-on-error: true
         run: node scripts/whale-flow.mjs
 
       - name: Aggregate smart money
+        id: smart
+        continue-on-error: true
         # Optional keys — connectors self-skip when these are unset.
+        # NOTE: Binance geo-blocks GitHub's US runners (HTTP 451), so binance-top and
+        # binance-taker contribute nothing here. The coverage report in the snapshot
+        # records the resulting smart-tier shortfall instead of hiding it.
         env:
           COINGLASS_API_KEY: ${{ secrets.COINGLASS_API_KEY }}
           DUNE_API_KEY: ${{ secrets.DUNE_API_KEY }}
           DUNE_QUERY_ID: ${{ secrets.DUNE_QUERY_ID }}
         run: node scripts/smart-money.mjs
 
+      - name: Score trader trust
+        id: trust
+        continue-on-error: true
+        run: node scripts/trust.mjs --top 60
+
+      - name: Track own book
+        id: portfolio
+        continue-on-error: true
+        run: node scripts/portfolio.mjs
+
+      - name: Collect insider filings (SEC Form 4)
+        id: insiders
+        continue-on-error: true
+        # SEC fair-access requires a declaring User-Agent with a real contact.
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT || 'my-trading-project research nathan.vuillemin@gmail.com' }}
+        run: node scripts/insiders.mjs --days 3 --max 250
+
+      - name: Collect macro flows (CFTC COT + exchange flows)
+        id: macro
+        continue-on-error: true
+        run: node scripts/macro-flows.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
+
+      - name: Summarise collector outcomes
+        if: always()
+        run: |
+          {
+            echo "### Collector results"
+            echo ""
+            echo "| feed | result |"
+            echo "|---|---|"
+            echo "| whale-flow | ${{ steps.whale.outcome }} |"
+            echo "| smart-money | ${{ steps.smart.outcome }} |"
+            echo "| trust | ${{ steps.trust.outcome }} |"
+            echo "| portfolio | ${{ steps.portfolio.outcome }} |"
+            echo "| insiders | ${{ steps.insiders.outcome }} |"
+            echo "| macro-flows | ${{ steps.macro.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit snapshots
         run: |
@@ -49,10 +100,22 @@ jobs:
           git add data dashboard
           if git diff --staged --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "chore: whale-flow snapshot $(date -u +%Y-%m-%d)"
-            git push
+            exit 0
           fi
+          git commit -m "chore: data snapshot $(date -u +%Y-%m-%d)"
+          # Someone pushing while this ran would otherwise fail the push and lose the
+          # snapshot. Rebase onto whatever landed and retry; snapshots are additive files
+          # so a rebase is safe here.
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt) — rebasing onto origin/main."
+            git pull --rebase --autostash origin main || exit 1
+          done
+          echo "Could not push after 3 attempts." >&2
+          exit 1
 
       - name: Upload dashboard for Pages
         uses: actions/upload-pages-artifact@v5

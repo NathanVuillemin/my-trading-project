@@ -86,7 +86,8 @@ const html = `<title>Trading Cockpit</title>
   h1{font-size:1.5rem;margin:0 0 4px;font-weight:650;letter-spacing:-.01em}
   h2{font-size:1rem;margin:0;font-weight:620}
   .sub{color:var(--text-secondary);font-size:.8rem;margin:2px 0 0}
-  .card{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:16px}
+  .card{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:16px;
+    color:var(--text-primary)}
   .scroll{overflow-x:auto}
   .rows{margin-top:12px;display:flex;flex-direction:column;gap:2px}
   .row{display:grid;grid-template-columns:86px 1fr 132px;align-items:center;gap:10px;min-height:28px}
@@ -100,8 +101,13 @@ const html = `<title>Trading Cockpit</title>
   .val{font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--text-secondary);text-align:right}
   .val b{color:var(--text-primary)}
   .tag{font-size:.66rem;padding:1px 6px;border-radius:999px;border:1px solid var(--border);color:var(--text-secondary);white-space:nowrap}
-  table{border-collapse:collapse;width:100%;font-size:.8rem;margin-top:8px;min-width:460px}
-  th,td{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid var(--grid);white-space:nowrap}
+  /* Colour is set explicitly on every text element rather than inherited. A host page or
+     UA stylesheet that resets colour on tables would otherwise leave cells at default
+     black on the dark surface — measured at ~1.1:1, effectively invisible. */
+  table{border-collapse:collapse;width:100%;font-size:.8rem;margin-top:8px;min-width:460px;
+    color:var(--text-primary);background:transparent}
+  th,td{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid var(--grid);white-space:nowrap;
+    color:var(--text-primary)}
   th{color:var(--muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
   td.num{text-align:right;font-variant-numeric:tabular-nums}
   .bull{color:var(--bull);font-weight:620}.bear{color:var(--bear);font-weight:620}.flat{color:var(--muted)}
@@ -309,6 +315,80 @@ R['insiders']=function(d){
   return body;
 };
 
+R['macro-flows']=function(d){
+  var body='<p class="sub">COT index is each group\\'s net position percentile over '
+    +(d.cotLookbackYears||3)+'y — raw net positions are not comparable across markets. '
+    +'Commercials/dealers hedge (informed); large specs and leveraged funds chase (crowded).</p>';
+
+  // Conviction extremes: informed money at a percentile extreme. "opposed" means the fast
+  // money is positioned against them, which is the configuration that historically matters.
+  var ce=d.convictionExtremes||[];
+  if(ce.length){
+    var rows=ce.slice(0,12).map(function(c){
+      return '<tr><td><b>'+esc(c.label)+'</b></td><td>'+esc(c.cls)+'</td><td>'+esc(c.group)+'</td>'
+        +'<td class="'+(c.dir==='LONG'?'bull':'bear')+'">'+esc(c.dir)+'</td>'
+        +'<td class="num">'+c.index+'</td>'
+        +'<td class="num">'+(c.fastIndex==null?'—':c.fastIndex)+'</td>'
+        +'<td>'+(c.opposed?'<span class="tag">opposed</span>':'')+'</td></tr>';
+    });
+    body+='<div style="margin-top:12px"><b style="font-size:.85rem">Conviction extremes</b></div>'
+      +table([{label:'Market'},{label:'Class'},{label:'Informed group'},{label:'Direction'},
+        {label:'COT idx',num:true},{label:'Fast idx',num:true},{label:''}],rows);
+  }
+
+  // Crypto exchange flows — the one whale metric that needs no wallet labelling.
+  var fl=d.flows||[];
+  if(fl.length){
+    var frows=fl.map(function(f){
+      var acc=/ACCUM/i.test(f.read||'');
+      return '<tr><td><b>'+esc(f.asset)+'</b></td>'
+        +'<td class="'+(acc?'bull':'bear')+'">'+esc(f.read||'')+'</td>'
+        +'<td class="num '+cls(f.net1d)+'">'+m(f.net1d||0)+'</td>'
+        +'<td class="num '+cls(f.net7d)+'">'+m(f.net7d||0)+'</td>'
+        +'<td class="num '+cls(f.net30d)+'">'+m(f.net30d||0)+'</td>'
+        +'<td class="num">'+(f.mvrv==null?'—':f.mvrv.toFixed(2))+'</td>'
+        +'<td class="num '+cls(-(f.supplyChange30dPct||0))+'">'+(f.supplyChange30dPct==null?'—':f.supplyChange30dPct.toFixed(2)+'%')+'</td>'
+        +(f.flash?'<td><span class="tag">flash</span></td>':'<td></td>')+'</tr>';
+    });
+    body+='<div style="margin-top:14px"><b style="font-size:.85rem">Exchange flows</b> '
+      +'<span class="sub">negative net = leaving exchanges = accumulation</span></div>'
+      +table([{label:'Asset'},{label:'Read'},{label:'1d',num:true},{label:'7d',num:true},
+        {label:'30d',num:true},{label:'MVRV',num:true},{label:'Supply 30d',num:true},{label:''}],frows);
+  }
+
+  var hz=d.hedgingZones||[];
+  if(hz.length){
+    var hrows=hz.slice(0,12).map(function(h){
+      return '<tr><td><b>'+esc(h.label)+'</b></td><td>'+esc(h.cls)+'</td><td>'+esc(h.group)+'</td>'
+        +'<td class="num">'+h.index+'</td>'
+        +'<td class="num">'+(h.shareOfOi==null?'—':h.shareOfOi.toFixed(0)+'%')+'</td>'
+        +'<td>'+(h.building?'<span class="tag">building</span>':'')+'</td></tr>';
+    });
+    body+='<details><summary>Hedging zones ('+hz.length+')</summary>'+table(
+      [{label:'Market'},{label:'Class'},{label:'Group'},{label:'COT idx',num:true},
+       {label:'Share of OI',num:true},{label:''}],hrows)+'</details>';
+  }
+
+  var cot=d.cot||[];
+  if(cot.length){
+    var crows=[];
+    cot.slice(0,20).forEach(function(mkt){
+      (mkt.groups||[]).forEach(function(g,i){
+        crows.push('<tr><td>'+(i===0?'<b>'+esc(mkt.label)+'</b>':'')+'</td>'
+          +'<td>'+esc(g.name)+'</td><td>'+esc(g.role||'')+'</td>'
+          +'<td class="num '+cls(g.net)+'">'+(g.net||0).toLocaleString()+'</td>'
+          +'<td class="num '+cls(g.change)+'">'+sgn((g.change||0).toLocaleString())+'</td>'
+          +'<td class="num">'+g.index+'</td></tr>');
+      });
+    });
+    body+='<details><summary>Full COT breakdown ('+cot.length+' markets)</summary>'+table(
+      [{label:'Market'},{label:'Group'},{label:'Role'},{label:'Net',num:true},
+       {label:'Δ week',num:true},{label:'COT idx',num:true}],crows)+'</details>';
+  }
+  if((d.warns||[]).length)body+='<div class="warn">'+d.warns.map(function(w){return '<code>'+esc(w)+'</code>'}).join(' · ')+'</div>';
+  return body;
+};
+
 // ---------------- generic fallback ----------------
 // Renders any feed that has no bespoke renderer, so new collectors show up immediately.
 function generic(d){
@@ -375,7 +455,7 @@ el('nav').innerHTML=nav;
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(join(OUT_DIR, 'index.html'), html);
 console.log(`Dashboard built: ${join(OUT_DIR, 'index.html')}`);
-const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders'];
+const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows'];
 for (const [k, v] of Object.entries(feeds)) {
   console.log(`  ${k.padEnd(14)} ${v.date}  (${v.count} file${v.count === 1 ? '' : 's'})  ${known.includes(k) ? 'tailored panel' : 'generic panel'}`);
 }
