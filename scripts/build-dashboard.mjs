@@ -452,6 +452,42 @@ R['macro-flows']=function(d){
   return body;
 };
 
+R['macro-pulse']=function(d){
+  var body='<p class="sub">Fast macro backdrop: where capital sits and how it is positioned. All free, no keys.</p>';
+  var s=d.stablecoins, sent=d.sentiment;
+  var t=[];
+  if(s)t.push(['Stablecoin supply',m(s.totalUsd)],['Dry powder /wk',m(s.weekChangeUsd),cls(s.weekChangeUsd)]);
+  if(sent){
+    t.push(['Fear & Greed',sent.fngValue+' '+(sent.fngClass||'')]);
+    t.push(['BTC dominance',sent.btcDominance+'%']);
+    t.push(['Total mcap',m(sent.totalMcapUsd)+' ('+(sent.mcapChange24hPct>=0?'+':'')+sent.mcapChange24hPct+'%)',cls(sent.mcapChange24hPct)]);
+  }
+  if(t.length)body+=tiles(t);
+  if(s){
+    body+='<div class="alert"><span class="lvl '+(s.weekChangeUsd>=0?'good':'critical')+'">stablecoins</span><span>'+esc(s.read)+'</span></div>';
+  }
+  if((d.options||[]).length){
+    var orows=d.options.map(function(o){
+      return '<tr><td><b>'+esc(o.currency)+'</b></td>'
+        +'<td class="num '+(o.putCallOi>1?'bear':'bull')+'">'+o.putCallOi+'</td>'
+        +'<td class="num">'+m(o.totalOiUsd)+'</td>'
+        +'<td class="num">'+m(o.dayVolumeUsd)+'</td>'
+        +'<td>'+esc(o.read)+'</td></tr>';
+    });
+    body+='<div style="margin-top:12px"><b style="font-size:.85rem">Options positioning</b> '
+      +'<span class="sub">put/call OI &gt;1 = defensive/hedged, &lt;1 = risk-seeking</span></div>'
+      +table([{label:'Coin'},{label:'Put/Call OI',num:true},{label:'Open interest',num:true},{label:'Day volume',num:true},{label:'Read'}],orows);
+  }
+  if(s&&(s.top||[]).length){
+    body+='<details><summary>Stablecoins by size</summary>'+table(
+      [{label:'Coin'},{label:'Supply',num:true},{label:'Δ week',num:true}],
+      s.top.map(function(x){return '<tr><td><b>'+esc(x.sym)+'</b></td><td class="num">'+m(x.usd)+'</td>'
+        +'<td class="num '+cls(x.weekChange)+'">'+m(x.weekChange)+'</td></tr>'}))+'</details>';
+  }
+  if((d.warns||[]).length)body+='<div class="warn">'+d.warns.map(function(w){return '<code>'+esc(w)+'</code>'}).join(' · ')+'</div>';
+  return body;
+};
+
 // Journal is not a data feed — it comes from journal/*.md rather than data/*/ — so it is
 // rendered from its own slot on the payload rather than through the feed registry.
 function journalPanel(entries){
@@ -517,9 +553,9 @@ function generic(d){
 
 // ---------------- assemble ----------------
 var TITLES={'whale-flow':'Whale flow','smart-money':'Cross-venue composite','portfolio':'My book',
-  'trust':'Trader trust','insiders':'Insider buying (Form 4)','macro-flows':'Macro & COT','briefs':'Briefs',
+  'trust':'Trader trust','insiders':'Insider buying (Form 4)','macro-flows':'Macro & COT','macro-pulse':'Macro pulse','briefs':'Briefs',
   'events':'Events','research':'Research'};
-var ORDER=['portfolio','trust','whale-flow','smart-money','insiders','macro-flows'];
+var ORDER=['portfolio','trust','whale-flow','smart-money','macro-pulse','insiders','macro-flows'];
 var names=Object.keys(F).sort(function(a,b){
   var ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);
   return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);
@@ -550,7 +586,7 @@ el('nav').innerHTML=nav;
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(join(OUT_DIR, 'index.html'), html);
 console.log(`Dashboard built: ${join(OUT_DIR, 'index.html')}`);
-const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows'];
+const known = ['whale-flow', 'smart-money', 'portfolio', 'trust', 'insiders', 'macro-flows', 'macro-pulse'];
 for (const [k, v] of Object.entries(feeds)) {
   console.log(`  ${k.padEnd(14)} ${v.date}  (${v.count} file${v.count === 1 ? '' : 's'})  ${known.includes(k) ? 'tailored panel' : 'generic panel'}`);
 }

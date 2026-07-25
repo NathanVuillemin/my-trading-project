@@ -74,6 +74,11 @@ jobs:
         continue-on-error: true
         run: node scripts/macro-flows.mjs
 
+      - name: Collect macro pulse (stablecoins + options + sentiment)
+        id: pulse
+        continue-on-error: true
+        run: node scripts/macro-pulse.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -91,6 +96,7 @@ jobs:
             echo "| portfolio | ${{ steps.portfolio.outcome }} |"
             echo "| insiders | ${{ steps.insiders.outcome }} |"
             echo "| macro-flows | ${{ steps.macro.outcome }} |"
+            echo "| macro-pulse | ${{ steps.pulse.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —
