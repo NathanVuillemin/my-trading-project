@@ -1,17 +1,17 @@
 {
   "date": "2026-07-25",
-  "generatedAt": "2026-07-25T13:11:00.256Z",
+  "generatedAt": "2026-07-25T13:16:45.770Z",
   "usingPlaceholder": false,
   "account": {
-    "equity": 52.033566,
-    "grossNotional": 1695.0684,
-    "marginUsed": 52.033566,
+    "equity": 51.999194,
+    "grossNotional": 1695.102772,
+    "marginUsed": 51.999194,
     "maintenanceMargin": 0,
     "withdrawable": 0,
-    "accountLeverage": 32.576441138014644,
+    "accountLeverage": 32.598635509619626,
     "cashTotal": 0,
     "manualTotal": 0,
-    "netWorth": 52.033566
+    "netWorth": 51.999194
   },
   "positions": [
     {
@@ -19,15 +19,15 @@
       "cls": "CRYPTO",
       "side": "short",
       "size": 0.02644,
-      "notional": 1695.0684,
+      "notional": 1695.102772,
       "entry": 63990,
-      "mark": 64110,
-      "uPnl": -3.1728,
-      "roe": -5.62587904,
+      "mark": 64111.299999999996,
+      "uPnl": -3.207172,
+      "roe": -5.6868260699999995,
       "leverage": 30,
-      "marginUsed": 52.033566,
+      "marginUsed": 51.999194,
       "liqPx": 65262.2089987113,
-      "distToLiqPct": 1.797237558432849,
+      "distToLiqPct": 1.7951733917598052,
       "fundingSinceOpen": 0.386691,
       "fundingAllTime": 0.572434,
       "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
@@ -37,21 +37,21 @@
   "manual": [],
   "cash": [],
   "risk": {
-    "gross": 1695.0684,
-    "net": -1695.0684,
+    "gross": 1695.102772,
+    "net": -1695.102772,
     "longUsd": 0,
-    "shortUsd": 1695.0684,
+    "shortUsd": 1695.102772,
     "byAsset": [
       {
         "key": "BTC",
-        "usd": 1695.0684,
+        "usd": 1695.102772,
         "pct": 100
       }
     ],
     "byClass": [
       {
         "key": "CRYPTO",
-        "usd": 1695.0684,
+        "usd": 1695.102772,
         "pct": 100
       }
     ],
@@ -59,9 +59,9 @@
       {
         "coin": "BTC",
         "side": "short",
-        "distPct": 1.797237558432849,
+        "distPct": 1.7951733917598052,
         "liqPx": 65262.2089987113,
-        "mark": 64110
+        "mark": 64111.299999999996
       }
     ],
     "alerts": [
@@ -112,7 +112,7 @@
   },
   "equityHistory": [
     [
-      1782393059845,
+      1782393401768,
       0
     ],
     [
@@ -148,13 +148,13 @@
       57.834658
     ],
     [
-      1784985059845,
-      54.020205
+      1784985401768,
+      53.985833
     ]
   ],
   "pnlHistory": [
     [
-      1782393059845,
+      1782393401768,
       0
     ],
     [
@@ -190,8 +190,8 @@
       9.064658
     ],
     [
-      1784985059845,
-      5.250205
+      1784985401768,
+      5.215833
     ]
   ]
 }
