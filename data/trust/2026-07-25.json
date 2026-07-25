@@ -1,6 +1,6 @@
 {
   "date": "2026-07-25",
-  "generatedAt": "2026-07-25T13:16:38.422Z",
+  "generatedAt": "2026-07-25T13:36:43.613Z",
   "scored": 60,
   "weights": {
     "consistency": 0.2,
@@ -18,51 +18,6 @@
     "protocol": 1
   },
   "wallets": [
-    {
-      "addr": "0x42bc06d636e9a9a93edb1ddf781ee97821a73946",
-      "short": "0x42bc…3946",
-      "trustScore": 89.2,
-      "confidence": 0.85,
-      "flags": [],
-      "sampleBasis": "closingFills",
-      "closingFills": 1132,
-      "marketsTraded": 4,
-      "style": "directional",
-      "accountValue": 4117571,
-      "pnl": {
-        "day": 576031,
-        "week": 566375,
-        "month": 2544183,
-        "allTime": 2668262
-      },
-      "positiveWindows": 4,
-      "monthRoiPct": 172.8,
-      "roundTrips": 0,
-      "winRatePct": null,
-      "maxDrawdownPct": 12.9,
-      "sharpeish": 7.04,
-      "openPositions": 1,
-      "components": {
-        "consistency": 1,
-        "sample": 0.6,
-        "drawdown": 0.68,
-        "riskAdjusted": 1,
-        "efficiency": 1,
-        "directional": 1
-      },
-      "styleEvidence": {
-        "fillCount": 2000,
-        "medianFillUsd": 2826,
-        "grossPositionUsd": 5750,
-        "sliceRatio": 0.49154,
-        "avgFillsPerRoundTrip": null,
-        "netDirectionalBias": 1,
-        "medianHoldHours": null,
-        "neutralBook": false,
-        "fastTurnover": false
-      },
-      "algoScore": 0
-    },
     {
       "addr": "0x88560b720239179d7f3f9e49ca934a4861593d7f",
       "short": "0x8856…3d7f",
@@ -85,7 +40,7 @@
       "roundTrips": 6,
       "winRatePct": 66.7,
       "maxDrawdownPct": 16.5,
-      "sharpeish": 4.76,
+      "sharpeish": 4.75,
       "openPositions": 1,
       "components": {
         "consistency": 1,
@@ -98,7 +53,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 1500,
-        "grossPositionUsd": 7762260,
+        "grossPositionUsd": 7778866,
         "sliceRatio": 0.00019,
         "avgFillsPerRoundTrip": 143.2,
         "netDirectionalBias": 1,
@@ -143,7 +98,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 615,
-        "grossPositionUsd": 931411,
+        "grossPositionUsd": 931908,
         "sliceRatio": 0.00066,
         "avgFillsPerRoundTrip": 84.5,
         "netDirectionalBias": 1,
@@ -154,45 +109,45 @@
       "algoScore": 0
     },
     {
-      "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
-      "short": "0xf822…e01a",
-      "trustScore": 79.9,
-      "confidence": 0.85,
+      "addr": "0x0c4a3a7ac74d43732f9b5ea507f01ab72a381b19",
+      "short": "0x0c4a…1b19",
+      "trustScore": 79.6,
+      "confidence": 0.9,
       "flags": [],
-      "sampleBasis": "closingFills",
-      "closingFills": 1729,
-      "marketsTraded": 7,
+      "sampleBasis": "roundTrips",
+      "closingFills": 666,
+      "marketsTraded": 3,
       "style": "directional",
-      "accountValue": 63535277,
+      "accountValue": 3790554,
       "pnl": {
-        "day": 2319263,
-        "week": 1538055,
-        "month": 1709533,
-        "allTime": 13533985
+        "day": -225876,
+        "week": 16910,
+        "month": 1777556,
+        "allTime": 1777556
       },
-      "positiveWindows": 4,
-      "monthRoiPct": 2.8,
-      "roundTrips": 0,
-      "winRatePct": null,
-      "maxDrawdownPct": 16.6,
-      "sharpeish": 3.7,
-      "openPositions": 11,
+      "positiveWindows": 3,
+      "monthRoiPct": 88.3,
+      "roundTrips": 4,
+      "winRatePct": 0,
+      "maxDrawdownPct": 17.2,
+      "sharpeish": 2.99,
+      "openPositions": 2,
       "components": {
-        "consistency": 1,
-        "sample": 0.6,
-        "drawdown": 0.59,
+        "consistency": 0.75,
+        "sample": 0.41,
+        "drawdown": 0.57,
         "riskAdjusted": 1,
-        "efficiency": 0.21,
+        "efficiency": 1,
         "directional": 1
       },
       "styleEvidence": {
         "fillCount": 2000,
-        "medianFillUsd": 499,
-        "grossPositionUsd": 154899801,
-        "sliceRatio": 0,
-        "avgFillsPerRoundTrip": null,
+        "medianFillUsd": 1205,
+        "grossPositionUsd": 15356427,
+        "sliceRatio": 0.00008,
+        "avgFillsPerRoundTrip": 200.5,
         "netDirectionalBias": 1,
-        "medianHoldHours": null,
+        "medianHoldHours": 90,
         "neutralBook": false,
         "fastTurnover": false
       },
@@ -233,7 +188,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2640,
-        "grossPositionUsd": 74496000,
+        "grossPositionUsd": 74520000,
         "sliceRatio": 0.00004,
         "avgFillsPerRoundTrip": 875,
         "netDirectionalBias": 1,
@@ -278,7 +233,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 1924,
-        "grossPositionUsd": 2545896,
+        "grossPositionUsd": 2546744,
         "sliceRatio": 0.00076,
         "avgFillsPerRoundTrip": 200.6,
         "netDirectionalBias": 1,
@@ -310,7 +265,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 9.4,
-      "sharpeish": 3.45,
+      "sharpeish": 3.44,
       "openPositions": 13,
       "components": {
         "consistency": 1,
@@ -322,54 +277,9 @@
       },
       "styleEvidence": {
         "fillCount": 2000,
-        "medianFillUsd": 858,
-        "grossPositionUsd": 248452747,
+        "medianFillUsd": 802,
+        "grossPositionUsd": 248641253,
         "sliceRatio": 0,
-        "avgFillsPerRoundTrip": null,
-        "netDirectionalBias": 1,
-        "medianHoldHours": null,
-        "neutralBook": false,
-        "fastTurnover": false
-      },
-      "algoScore": 0
-    },
-    {
-      "addr": "0xe0698483810b7ac6ece05988efe06707fd8049f5",
-      "short": "0xe069…49f5",
-      "trustScore": 76.9,
-      "confidence": 0.75,
-      "flags": [],
-      "sampleBasis": "closingFills",
-      "closingFills": 235,
-      "marketsTraded": 1,
-      "style": "directional",
-      "accountValue": 6839488,
-      "pnl": {
-        "day": -445481,
-        "week": 66085,
-        "month": 2491571,
-        "allTime": 2491571
-      },
-      "positiveWindows": 3,
-      "monthRoiPct": 57.3,
-      "roundTrips": 0,
-      "winRatePct": null,
-      "maxDrawdownPct": 28.8,
-      "sharpeish": 2.65,
-      "openPositions": 1,
-      "components": {
-        "consistency": 0.75,
-        "sample": 0.6,
-        "drawdown": 0.28,
-        "riskAdjusted": 0.91,
-        "efficiency": 1,
-        "directional": 1
-      },
-      "styleEvidence": {
-        "fillCount": 2000,
-        "medianFillUsd": 4015,
-        "grossPositionUsd": 39693556,
-        "sliceRatio": 0.0001,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
         "medianHoldHours": null,
@@ -400,7 +310,7 @@
       "roundTrips": 4,
       "winRatePct": 100,
       "maxDrawdownPct": 4.6,
-      "sharpeish": 10.22,
+      "sharpeish": 10.21,
       "openPositions": 0,
       "components": {
         "consistency": 1,
@@ -458,7 +368,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 4765,
-        "grossPositionUsd": 74497078,
+        "grossPositionUsd": 74521078,
         "sliceRatio": 0.00006,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -490,7 +400,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 9.2,
-      "sharpeish": 5.66,
+      "sharpeish": 5.65,
       "openPositions": 8,
       "components": {
         "consistency": 1,
@@ -503,7 +413,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 1113,
-        "grossPositionUsd": 138094448,
+        "grossPositionUsd": 138169747,
         "sliceRatio": 0.00001,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -535,7 +445,7 @@
       "roundTrips": 7,
       "winRatePct": 57.1,
       "maxDrawdownPct": 23.2,
-      "sharpeish": 0.73,
+      "sharpeish": 0.72,
       "openPositions": 4,
       "components": {
         "consistency": 1,
@@ -548,7 +458,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 864,
-        "grossPositionUsd": 7423618,
+        "grossPositionUsd": 7438560,
         "sliceRatio": 0.00012,
         "avgFillsPerRoundTrip": 116,
         "netDirectionalBias": 1,
@@ -580,7 +490,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 20.7,
-      "sharpeish": 7.72,
+      "sharpeish": 7.73,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
@@ -598,51 +508,6 @@
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": null,
         "medianHoldHours": null,
-        "neutralBook": false,
-        "fastTurnover": false
-      },
-      "algoScore": 0
-    },
-    {
-      "addr": "0x6bb971430554e3af58fbd469bce46ab2359a2d23",
-      "short": "0x6bb9…2d23",
-      "trustScore": 72.9,
-      "confidence": 0.9,
-      "flags": [],
-      "sampleBasis": "roundTrips",
-      "closingFills": 562,
-      "marketsTraded": 8,
-      "style": "directional",
-      "accountValue": 5048550,
-      "pnl": {
-        "day": 307825,
-        "week": -246767,
-        "month": 2608217,
-        "allTime": 6111294
-      },
-      "positiveWindows": 3,
-      "monthRoiPct": 68.9,
-      "roundTrips": 9,
-      "winRatePct": 44.4,
-      "maxDrawdownPct": 30,
-      "sharpeish": 1.75,
-      "openPositions": 1,
-      "components": {
-        "consistency": 0.75,
-        "sample": 0.59,
-        "drawdown": 0.25,
-        "riskAdjusted": 0.69,
-        "efficiency": 1,
-        "directional": 1
-      },
-      "styleEvidence": {
-        "fillCount": 1199,
-        "medianFillUsd": 706,
-        "grossPositionUsd": 190361,
-        "sliceRatio": 0.00371,
-        "avgFillsPerRoundTrip": 77.8,
-        "netDirectionalBias": 1,
-        "medianHoldHours": 17.8,
         "neutralBook": false,
         "fastTurnover": false
       },
@@ -683,7 +548,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 3817,
-        "grossPositionUsd": 55872000,
+        "grossPositionUsd": 55890000,
         "sliceRatio": 0.00007,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -739,6 +604,51 @@
       "algoScore": 0
     },
     {
+      "addr": "0xf02d16a272a842f8bac1d9a9e773aba1933454c6",
+      "short": "0xf02d…54c6",
+      "trustScore": 70.2,
+      "confidence": 0.9,
+      "flags": [],
+      "sampleBasis": "roundTrips",
+      "closingFills": 425,
+      "marketsTraded": 2,
+      "style": "directional",
+      "accountValue": 23006271,
+      "pnl": {
+        "day": 0,
+        "week": -583999,
+        "month": 2187285,
+        "allTime": 3261914
+      },
+      "positiveWindows": 2,
+      "monthRoiPct": 65.5,
+      "roundTrips": 2,
+      "winRatePct": 100,
+      "maxDrawdownPct": 9.1,
+      "sharpeish": 1.51,
+      "openPositions": 0,
+      "components": {
+        "consistency": 0.5,
+        "sample": 0.28,
+        "drawdown": 0.77,
+        "riskAdjusted": 0.63,
+        "efficiency": 1,
+        "directional": 1
+      },
+      "styleEvidence": {
+        "fillCount": 2000,
+        "medianFillUsd": 1682,
+        "grossPositionUsd": 0,
+        "sliceRatio": null,
+        "avgFillsPerRoundTrip": 53.5,
+        "netDirectionalBias": null,
+        "medianHoldHours": 23.1,
+        "neutralBook": false,
+        "fastTurnover": false
+      },
+      "algoScore": 0
+    },
+    {
       "addr": "0x7fba7e745bd97f828c824589680749b55a8c04ab",
       "short": "0x7fba…04ab",
       "trustScore": 70.1,
@@ -760,7 +670,7 @@
       "roundTrips": 2,
       "winRatePct": 100,
       "maxDrawdownPct": 24.2,
-      "sharpeish": 5.39,
+      "sharpeish": 5.4,
       "openPositions": 1,
       "components": {
         "consistency": 0.5,
@@ -773,56 +683,11 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 6059,
-        "grossPositionUsd": 60629370,
+        "grossPositionUsd": 60648902,
         "sliceRatio": 0.0001,
         "avgFillsPerRoundTrip": 854.5,
         "netDirectionalBias": 1,
         "medianHoldHours": 14.8,
-        "neutralBook": false,
-        "fastTurnover": false
-      },
-      "algoScore": 0
-    },
-    {
-      "addr": "0xf02d16a272a842f8bac1d9a9e773aba1933454c6",
-      "short": "0xf02d…54c6",
-      "trustScore": 70.1,
-      "confidence": 0.9,
-      "flags": [],
-      "sampleBasis": "roundTrips",
-      "closingFills": 425,
-      "marketsTraded": 2,
-      "style": "directional",
-      "accountValue": 23006271,
-      "pnl": {
-        "day": 0,
-        "week": -583999,
-        "month": 2187285,
-        "allTime": 3261914
-      },
-      "positiveWindows": 2,
-      "monthRoiPct": 65.5,
-      "roundTrips": 2,
-      "winRatePct": 100,
-      "maxDrawdownPct": 9.1,
-      "sharpeish": 1.48,
-      "openPositions": 0,
-      "components": {
-        "consistency": 0.5,
-        "sample": 0.28,
-        "drawdown": 0.77,
-        "riskAdjusted": 0.62,
-        "efficiency": 1,
-        "directional": 1
-      },
-      "styleEvidence": {
-        "fillCount": 2000,
-        "medianFillUsd": 1682,
-        "grossPositionUsd": 0,
-        "sliceRatio": null,
-        "avgFillsPerRoundTrip": 53.5,
-        "netDirectionalBias": null,
-        "medianHoldHours": 23.1,
         "neutralBook": false,
         "fastTurnover": false
       },
@@ -850,7 +715,7 @@
       "roundTrips": 9,
       "winRatePct": 88.9,
       "maxDrawdownPct": 8,
-      "sharpeish": 3.16,
+      "sharpeish": 3.14,
       "openPositions": 2,
       "components": {
         "consistency": 0.75,
@@ -863,7 +728,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2053,
-        "grossPositionUsd": 4652487,
+        "grossPositionUsd": 4660558,
         "sliceRatio": 0.00044,
         "avgFillsPerRoundTrip": 119,
         "netDirectionalBias": 1,
@@ -876,7 +741,7 @@
     {
       "addr": "0x4f7634c03ec4e87e14725c84913ade523c6fad5a",
       "short": "0x4f76…ad5a",
-      "trustScore": 69.5,
+      "trustScore": 69.4,
       "confidence": 0.7,
       "flags": [],
       "sampleBasis": "markets",
@@ -895,7 +760,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 32.6,
-      "sharpeish": 1.89,
+      "sharpeish": 1.87,
       "openPositions": 3,
       "components": {
         "consistency": 1,
@@ -908,7 +773,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 241,
-        "grossPositionUsd": 15875893,
+        "grossPositionUsd": 15898413,
         "sliceRatio": 0.00002,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -940,13 +805,13 @@
       "roundTrips": 2,
       "winRatePct": 100,
       "maxDrawdownPct": 40.6,
-      "sharpeish": 2.98,
+      "sharpeish": 2.99,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
         "sample": 0.28,
         "drawdown": 0,
-        "riskAdjusted": 0.99,
+        "riskAdjusted": 1,
         "efficiency": 1,
         "directional": 1
       },
@@ -998,10 +863,10 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 1968,
-        "grossPositionUsd": 33691260,
+        "grossPositionUsd": 33691294,
         "sliceRatio": 0.00006,
         "avgFillsPerRoundTrip": 86,
-        "netDirectionalBias": 0.893,
+        "netDirectionalBias": 0.894,
         "medianHoldHours": 875.6,
         "neutralBook": false,
         "fastTurnover": false
@@ -1043,11 +908,101 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2013,
-        "grossPositionUsd": 82733000,
+        "grossPositionUsd": 82729100,
         "sliceRatio": 0.00002,
         "avgFillsPerRoundTrip": 815,
         "netDirectionalBias": 1,
         "medianHoldHours": 103.6,
+        "neutralBook": false,
+        "fastTurnover": false
+      },
+      "algoScore": 0
+    },
+    {
+      "addr": "0xf822fa0fd364c573fcdb7009fcf47601bc8be01a",
+      "short": "0xf822…e01a",
+      "trustScore": 68.1,
+      "confidence": 0.6,
+      "flags": [],
+      "sampleBasis": "closingFills",
+      "closingFills": 1824,
+      "marketsTraded": 7,
+      "style": "directional",
+      "accountValue": 63535277,
+      "pnl": {
+        "day": 2319263,
+        "week": 1538055,
+        "month": 1709533,
+        "allTime": 13533985
+      },
+      "positiveWindows": 4,
+      "monthRoiPct": 2.8,
+      "roundTrips": 0,
+      "winRatePct": null,
+      "maxDrawdownPct": null,
+      "sharpeish": null,
+      "openPositions": 11,
+      "components": {
+        "consistency": 1,
+        "sample": 0.6,
+        "drawdown": 0.4,
+        "riskAdjusted": 0.4,
+        "efficiency": 0.21,
+        "directional": 1
+      },
+      "styleEvidence": {
+        "fillCount": 2000,
+        "medianFillUsd": 499,
+        "grossPositionUsd": 154922807,
+        "sliceRatio": 0,
+        "avgFillsPerRoundTrip": null,
+        "netDirectionalBias": 1,
+        "medianHoldHours": null,
+        "neutralBook": false,
+        "fastTurnover": false
+      },
+      "algoScore": 0
+    },
+    {
+      "addr": "0xe0698483810b7ac6ece05988efe06707fd8049f5",
+      "short": "0xe069…49f5",
+      "trustScore": 67.9,
+      "confidence": 0.6,
+      "flags": [],
+      "sampleBasis": "markets",
+      "closingFills": 0,
+      "marketsTraded": 0,
+      "style": "directional",
+      "accountValue": 6839488,
+      "pnl": {
+        "day": -445481,
+        "week": 66085,
+        "month": 2491571,
+        "allTime": 2491571
+      },
+      "positiveWindows": 3,
+      "monthRoiPct": 57.3,
+      "roundTrips": 0,
+      "winRatePct": null,
+      "maxDrawdownPct": 28.8,
+      "sharpeish": 2.66,
+      "openPositions": 1,
+      "components": {
+        "consistency": 0.75,
+        "sample": 0,
+        "drawdown": 0.28,
+        "riskAdjusted": 0.92,
+        "efficiency": 1,
+        "directional": 1
+      },
+      "styleEvidence": {
+        "fillCount": 0,
+        "medianFillUsd": 0,
+        "grossPositionUsd": 39706344,
+        "sliceRatio": null,
+        "avgFillsPerRoundTrip": null,
+        "netDirectionalBias": 1,
+        "medianHoldHours": null,
         "neutralBook": false,
         "fastTurnover": false
       },
@@ -1088,10 +1043,10 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 1011,
-        "grossPositionUsd": 566373,
-        "sliceRatio": 0.00179,
+        "grossPositionUsd": 567289,
+        "sliceRatio": 0.00178,
         "avgFillsPerRoundTrip": 1010,
-        "netDirectionalBias": 0.474,
+        "netDirectionalBias": 0.475,
         "medianHoldHours": 1.1,
         "neutralBook": false,
         "fastTurnover": true
@@ -1133,7 +1088,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 5233,
-        "grossPositionUsd": 32213398,
+        "grossPositionUsd": 32216590,
         "sliceRatio": 0.00016,
         "avgFillsPerRoundTrip": 31,
         "netDirectionalBias": 1,
@@ -1165,7 +1120,7 @@
       "roundTrips": 2,
       "winRatePct": 100,
       "maxDrawdownPct": 15.7,
-      "sharpeish": 8.97,
+      "sharpeish": 8.96,
       "openPositions": 1,
       "components": {
         "consistency": 1,
@@ -1178,7 +1133,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2000,
-        "grossPositionUsd": 7449600,
+        "grossPositionUsd": 7452000,
         "sliceRatio": 0.00027,
         "avgFillsPerRoundTrip": 538.5,
         "netDirectionalBias": 1,
@@ -1187,6 +1142,51 @@
         "fastTurnover": true
       },
       "algoScore": 3
+    },
+    {
+      "addr": "0x42bc06d636e9a9a93edb1ddf781ee97821a73946",
+      "short": "0x42bc…3946",
+      "trustScore": 67,
+      "confidence": 0.45,
+      "flags": [],
+      "sampleBasis": "markets",
+      "closingFills": 0,
+      "marketsTraded": 0,
+      "style": "directional",
+      "accountValue": 4117571,
+      "pnl": {
+        "day": 576031,
+        "week": 566375,
+        "month": 2544183,
+        "allTime": 2668262
+      },
+      "positiveWindows": 4,
+      "monthRoiPct": 172.8,
+      "roundTrips": 0,
+      "winRatePct": null,
+      "maxDrawdownPct": null,
+      "sharpeish": null,
+      "openPositions": 1,
+      "components": {
+        "consistency": 1,
+        "sample": 0,
+        "drawdown": 0.4,
+        "riskAdjusted": 0.4,
+        "efficiency": 1,
+        "directional": 1
+      },
+      "styleEvidence": {
+        "fillCount": 0,
+        "medianFillUsd": 0,
+        "grossPositionUsd": 5761,
+        "sliceRatio": null,
+        "avgFillsPerRoundTrip": null,
+        "netDirectionalBias": 1,
+        "medianHoldHours": null,
+        "neutralBook": false,
+        "fastTurnover": false
+      },
+      "algoScore": 0
     },
     {
       "addr": "0xfe7ce058edc7cfcde9ef8262ba51f8d4796ab7ae",
@@ -1223,7 +1223,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 488,
-        "grossPositionUsd": 17652988,
+        "grossPositionUsd": 17649286,
         "sliceRatio": 0.00003,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 0.998,
@@ -1236,7 +1236,7 @@
     {
       "addr": "0xc26cbb6483229e0d0f9a1cab675271eda535b8f4",
       "short": "0xc26c…b8f4",
-      "trustScore": 66.2,
+      "trustScore": 66.3,
       "confidence": 0.9,
       "flags": [],
       "sampleBasis": "roundTrips",
@@ -1268,7 +1268,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 3227,
-        "grossPositionUsd": 19632824,
+        "grossPositionUsd": 19637031,
         "sliceRatio": 0.00016,
         "avgFillsPerRoundTrip": 579.7,
         "netDirectionalBias": 1,
@@ -1345,7 +1345,7 @@
       "roundTrips": 4,
       "winRatePct": 75,
       "maxDrawdownPct": 13.2,
-      "sharpeish": 5.35,
+      "sharpeish": 5.36,
       "openPositions": 2,
       "components": {
         "consistency": 0.75,
@@ -1358,10 +1358,10 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 398,
-        "grossPositionUsd": 943004,
+        "grossPositionUsd": 945112,
         "sliceRatio": 0.00042,
         "avgFillsPerRoundTrip": 108,
-        "netDirectionalBias": 0.829,
+        "netDirectionalBias": 0.828,
         "medianHoldHours": 5.6,
         "neutralBook": false,
         "fastTurnover": true
@@ -1390,7 +1390,7 @@
       "roundTrips": 3,
       "winRatePct": 0,
       "maxDrawdownPct": 8.2,
-      "sharpeish": 3.38,
+      "sharpeish": 3.4,
       "openPositions": 1,
       "components": {
         "consistency": 1,
@@ -1403,7 +1403,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 264,
-        "grossPositionUsd": 1005969,
+        "grossPositionUsd": 1009837,
         "sliceRatio": 0.00026,
         "avgFillsPerRoundTrip": 123,
         "netDirectionalBias": 1,
@@ -1480,20 +1480,20 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 14.2,
-      "sharpeish": 0.7,
+      "sharpeish": 0.71,
       "openPositions": 4,
       "components": {
         "consistency": 0.75,
         "sample": 0.06,
         "drawdown": 0.65,
-        "riskAdjusted": 0.42,
+        "riskAdjusted": 0.43,
         "efficiency": 0.65,
         "directional": 1
       },
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 385,
-        "grossPositionUsd": 6744679,
+        "grossPositionUsd": 6764013,
         "sliceRatio": 0.00006,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -1504,44 +1504,44 @@
       "algoScore": 0
     },
     {
-      "addr": "0x0c4a3a7ac74d43732f9b5ea507f01ab72a381b19",
-      "short": "0x0c4a…1b19",
-      "trustScore": 62,
-      "confidence": 0.35,
+      "addr": "0xa312114b5795dff9b8db50474dd57701aa78ad1e",
+      "short": "0xa312…ad1e",
+      "trustScore": 62.8,
+      "confidence": 0.45,
       "flags": [],
       "sampleBasis": "markets",
       "closingFills": 0,
       "marketsTraded": 0,
       "style": "directional",
-      "accountValue": 3790554,
+      "accountValue": 19653538,
       "pnl": {
-        "day": -225876,
-        "week": 16910,
-        "month": 1777556,
-        "allTime": 1777556
+        "day": 484656,
+        "week": 487246,
+        "month": 2454863,
+        "allTime": 98796580
       },
-      "positiveWindows": 3,
-      "monthRoiPct": 88.3,
+      "positiveWindows": 4,
+      "monthRoiPct": 24.8,
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": null,
       "sharpeish": null,
-      "openPositions": 2,
+      "openPositions": 0,
       "components": {
-        "consistency": 0.75,
+        "consistency": 1,
         "sample": 0,
         "drawdown": 0.4,
         "riskAdjusted": 0.4,
-        "efficiency": 1,
+        "efficiency": 0.58,
         "directional": 1
       },
       "styleEvidence": {
         "fillCount": 0,
         "medianFillUsd": 0,
-        "grossPositionUsd": 15354619,
+        "grossPositionUsd": 0,
         "sliceRatio": null,
         "avgFillsPerRoundTrip": null,
-        "netDirectionalBias": 1,
+        "netDirectionalBias": null,
         "medianHoldHours": null,
         "neutralBook": false,
         "fastTurnover": false
@@ -1551,7 +1551,7 @@
     {
       "addr": "0xdfd526409007db0d524a62dedaaba7706736d88e",
       "short": "0xdfd5…d88e",
-      "trustScore": 61.9,
+      "trustScore": 62.1,
       "confidence": 0.9,
       "flags": [],
       "sampleBasis": "roundTrips",
@@ -1570,13 +1570,13 @@
       "roundTrips": 2,
       "winRatePct": 0,
       "maxDrawdownPct": 19.5,
-      "sharpeish": -0.98,
+      "sharpeish": -0.95,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
         "sample": 0.28,
         "drawdown": 0.51,
-        "riskAdjusted": 0,
+        "riskAdjusted": 0.01,
         "efficiency": 1,
         "directional": 1
       },
@@ -1588,6 +1588,51 @@
         "avgFillsPerRoundTrip": 90.5,
         "netDirectionalBias": null,
         "medianHoldHours": 16.2,
+        "neutralBook": false,
+        "fastTurnover": false
+      },
+      "algoScore": 0
+    },
+    {
+      "addr": "0x6bb971430554e3af58fbd469bce46ab2359a2d23",
+      "short": "0x6bb9…2d23",
+      "trustScore": 62,
+      "confidence": 0.35,
+      "flags": [],
+      "sampleBasis": "markets",
+      "closingFills": 0,
+      "marketsTraded": 0,
+      "style": "directional",
+      "accountValue": 5048550,
+      "pnl": {
+        "day": 307825,
+        "week": -246767,
+        "month": 2608217,
+        "allTime": 6111294
+      },
+      "positiveWindows": 3,
+      "monthRoiPct": 68.9,
+      "roundTrips": 0,
+      "winRatePct": null,
+      "maxDrawdownPct": null,
+      "sharpeish": null,
+      "openPositions": 0,
+      "components": {
+        "consistency": 0.75,
+        "sample": 0,
+        "drawdown": 0.4,
+        "riskAdjusted": 0.4,
+        "efficiency": 1,
+        "directional": 1
+      },
+      "styleEvidence": {
+        "fillCount": 0,
+        "medianFillUsd": 0,
+        "grossPositionUsd": 0,
+        "sliceRatio": null,
+        "avgFillsPerRoundTrip": null,
+        "netDirectionalBias": null,
+        "medianHoldHours": null,
         "neutralBook": false,
         "fastTurnover": false
       },
@@ -1615,7 +1660,7 @@
       "roundTrips": 4,
       "winRatePct": 75,
       "maxDrawdownPct": 23.4,
-      "sharpeish": 4.67,
+      "sharpeish": 4.68,
       "openPositions": 2,
       "components": {
         "consistency": 0.75,
@@ -1628,7 +1673,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 671,
-        "grossPositionUsd": 8027713,
+        "grossPositionUsd": 8027189,
         "sliceRatio": 0.00008,
         "avgFillsPerRoundTrip": 402.5,
         "netDirectionalBias": 0.976,
@@ -1660,7 +1705,7 @@
       "roundTrips": 6,
       "winRatePct": 66.7,
       "maxDrawdownPct": 27.1,
-      "sharpeish": 3.72,
+      "sharpeish": 3.73,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
@@ -1731,7 +1776,7 @@
     {
       "addr": "0x49e96e255ba418d08e66c35b588e2f2f3766e1d0",
       "short": "0x49e9…e1d0",
-      "trustScore": 58.6,
+      "trustScore": 58.7,
       "confidence": 0.75,
       "flags": [],
       "sampleBasis": "closingFills",
@@ -1795,7 +1840,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 8.4,
-      "sharpeish": 0.87,
+      "sharpeish": 0.88,
       "openPositions": 2,
       "components": {
         "consistency": 0.5,
@@ -1808,7 +1853,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 909,
-        "grossPositionUsd": 96997903,
+        "grossPositionUsd": 96957374,
         "sliceRatio": 0.00001,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 0.677,
@@ -1840,7 +1885,7 @@
       "roundTrips": 1,
       "winRatePct": 100,
       "maxDrawdownPct": 11.5,
-      "sharpeish": 3.32,
+      "sharpeish": 3.33,
       "openPositions": 1,
       "components": {
         "consistency": 0.5,
@@ -1853,7 +1898,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 3243,
-        "grossPositionUsd": 18624241,
+        "grossPositionUsd": 18629341,
         "sliceRatio": 0.00017,
         "avgFillsPerRoundTrip": 566,
         "netDirectionalBias": 1,
@@ -1891,14 +1936,14 @@
         "consistency": 0.25,
         "sample": 0.18,
         "drawdown": 0.6,
-        "riskAdjusted": 0.69,
+        "riskAdjusted": 0.68,
         "efficiency": 0.48,
         "directional": 1
       },
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2014,
-        "grossPositionUsd": 64108000,
+        "grossPositionUsd": 64099000,
         "sliceRatio": 0.00003,
         "avgFillsPerRoundTrip": 452,
         "netDirectionalBias": 1,
@@ -1911,7 +1956,7 @@
     {
       "addr": "0x484bc1608211d0604bf70bae72792a56884562f8",
       "short": "0x484b…62f8",
-      "trustScore": 56.1,
+      "trustScore": 56.2,
       "confidence": 0.9,
       "flags": [],
       "sampleBasis": "roundTrips",
@@ -1930,21 +1975,21 @@
       "roundTrips": 4,
       "winRatePct": 75,
       "maxDrawdownPct": 16.7,
-      "sharpeish": 1.29,
+      "sharpeish": 1.32,
       "openPositions": 1,
       "components": {
         "consistency": 0.75,
         "sample": 0.41,
         "drawdown": 0.58,
-        "riskAdjusted": 0.57,
+        "riskAdjusted": 0.58,
         "efficiency": 0.89,
         "directional": 0.35
       },
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 79,
-        "grossPositionUsd": 1608,
-        "sliceRatio": 0.04939,
+        "grossPositionUsd": 1609,
+        "sliceRatio": 0.04936,
         "avgFillsPerRoundTrip": 173.3,
         "netDirectionalBias": 1,
         "medianHoldHours": 0.1,
@@ -1975,7 +2020,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 13.6,
-      "sharpeish": 0.89,
+      "sharpeish": 0.88,
       "openPositions": 0,
       "components": {
         "consistency": 0.5,
@@ -1997,96 +2042,6 @@
         "fastTurnover": false
       },
       "algoScore": 0
-    },
-    {
-      "addr": "0xa312114b5795dff9b8db50474dd57701aa78ad1e",
-      "short": "0xa312…ad1e",
-      "trustScore": 54.1,
-      "confidence": 0.7,
-      "flags": [],
-      "sampleBasis": "markets",
-      "closingFills": 0,
-      "marketsTraded": 0,
-      "style": "directional",
-      "accountValue": 19653538,
-      "pnl": {
-        "day": 484656,
-        "week": 487246,
-        "month": 2454863,
-        "allTime": 98796580
-      },
-      "positiveWindows": 4,
-      "monthRoiPct": 24.8,
-      "roundTrips": 0,
-      "winRatePct": null,
-      "maxDrawdownPct": 31.2,
-      "sharpeish": -2.65,
-      "openPositions": 20,
-      "components": {
-        "consistency": 1,
-        "sample": 0,
-        "drawdown": 0.22,
-        "riskAdjusted": 0,
-        "efficiency": 0.58,
-        "directional": 1
-      },
-      "styleEvidence": {
-        "fillCount": 0,
-        "medianFillUsd": 0,
-        "grossPositionUsd": 17620457,
-        "sliceRatio": null,
-        "avgFillsPerRoundTrip": null,
-        "netDirectionalBias": 1,
-        "medianHoldHours": null,
-        "neutralBook": false,
-        "fastTurnover": false
-      },
-      "algoScore": 0
-    },
-    {
-      "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
-      "short": "0x469e…58a5",
-      "trustScore": 53.5,
-      "confidence": 0.9,
-      "flags": [],
-      "sampleBasis": "roundTrips",
-      "closingFills": 1110,
-      "marketsTraded": 8,
-      "style": "market-maker",
-      "accountValue": 17977952,
-      "pnl": {
-        "day": -166182,
-        "week": 1776568,
-        "month": 3123272,
-        "allTime": 19800977
-      },
-      "positiveWindows": 3,
-      "monthRoiPct": 43.4,
-      "roundTrips": 5,
-      "winRatePct": 80,
-      "maxDrawdownPct": 12.7,
-      "sharpeish": 1.68,
-      "openPositions": 6,
-      "components": {
-        "consistency": 0.75,
-        "sample": 0.46,
-        "drawdown": 0.68,
-        "riskAdjusted": 0.67,
-        "efficiency": 0.89,
-        "directional": 0.1
-      },
-      "styleEvidence": {
-        "fillCount": 2000,
-        "medianFillUsd": 2890,
-        "grossPositionUsd": 40818316,
-        "sliceRatio": 0.00007,
-        "avgFillsPerRoundTrip": 354.6,
-        "netDirectionalBias": 0.355,
-        "medianHoldHours": 4.6,
-        "neutralBook": true,
-        "fastTurnover": true
-      },
-      "algoScore": 5
     },
     {
       "addr": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29",
@@ -2123,7 +2078,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 119,
-        "grossPositionUsd": 23925531,
+        "grossPositionUsd": 23928390,
         "sliceRatio": 0,
         "avgFillsPerRoundTrip": 205.3,
         "netDirectionalBias": 1,
@@ -2132,6 +2087,51 @@
         "fastTurnover": false
       },
       "algoScore": 0
+    },
+    {
+      "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+      "short": "0x469e…58a5",
+      "trustScore": 53.4,
+      "confidence": 0.9,
+      "flags": [],
+      "sampleBasis": "roundTrips",
+      "closingFills": 1110,
+      "marketsTraded": 8,
+      "style": "market-maker",
+      "accountValue": 17977952,
+      "pnl": {
+        "day": -166182,
+        "week": 1776568,
+        "month": 3123272,
+        "allTime": 19800977
+      },
+      "positiveWindows": 3,
+      "monthRoiPct": 43.4,
+      "roundTrips": 5,
+      "winRatePct": 80,
+      "maxDrawdownPct": 12.7,
+      "sharpeish": 1.65,
+      "openPositions": 6,
+      "components": {
+        "consistency": 0.75,
+        "sample": 0.46,
+        "drawdown": 0.68,
+        "riskAdjusted": 0.66,
+        "efficiency": 0.89,
+        "directional": 0.1
+      },
+      "styleEvidence": {
+        "fillCount": 2000,
+        "medianFillUsd": 2890,
+        "grossPositionUsd": 40862556,
+        "sliceRatio": 0.00007,
+        "avgFillsPerRoundTrip": 354.6,
+        "netDirectionalBias": 0.356,
+        "medianHoldHours": 4.6,
+        "neutralBook": true,
+        "fastTurnover": true
+      },
+      "algoScore": 5
     },
     {
       "addr": "0x9eec98d048d06d9cd75318fffa3f3960e081daab",
@@ -2155,7 +2155,7 @@
       "roundTrips": 1,
       "winRatePct": 0,
       "maxDrawdownPct": 20.9,
-      "sharpeish": 3.16,
+      "sharpeish": 3.17,
       "openPositions": 2,
       "components": {
         "consistency": 0.5,
@@ -2168,7 +2168,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 4354,
-        "grossPositionUsd": 17079036,
+        "grossPositionUsd": 17083578,
         "sliceRatio": 0.00025,
         "avgFillsPerRoundTrip": 1,
         "netDirectionalBias": 1,
@@ -2200,7 +2200,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 46.8,
-      "sharpeish": -4.65,
+      "sharpeish": -4.66,
       "openPositions": 11,
       "components": {
         "consistency": 0.75,
@@ -2213,7 +2213,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 384,
-        "grossPositionUsd": 19998762,
+        "grossPositionUsd": 20044099,
         "sliceRatio": 0.00002,
         "avgFillsPerRoundTrip": null,
         "netDirectionalBias": 1,
@@ -2226,7 +2226,7 @@
     {
       "addr": "0x24de6b77e8bc31c40aa452926daa6bbab7a71b0f",
       "short": "0x24de…1b0f",
-      "trustScore": 48.5,
+      "trustScore": 48.4,
       "confidence": 0.6,
       "flags": [],
       "sampleBasis": "markets",
@@ -2245,7 +2245,7 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 17.2,
-      "sharpeish": 0.98,
+      "sharpeish": 0.97,
       "openPositions": 0,
       "components": {
         "consistency": 0.25,
@@ -2271,7 +2271,7 @@
     {
       "addr": "0xa1a2401268b976cb46c35550f2b2428908dd53cb",
       "short": "0xa1a2…53cb",
-      "trustScore": 46.9,
+      "trustScore": 47,
       "confidence": 0.9,
       "flags": [],
       "sampleBasis": "roundTrips",
@@ -2290,13 +2290,13 @@
       "roundTrips": 5,
       "winRatePct": 40,
       "maxDrawdownPct": 54.8,
-      "sharpeish": 0.69,
+      "sharpeish": 0.7,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
         "sample": 0.46,
         "drawdown": 0,
-        "riskAdjusted": 0.42,
+        "riskAdjusted": 0.43,
         "efficiency": 1,
         "directional": 0.35
       },
@@ -2335,7 +2335,7 @@
       "roundTrips": 2,
       "winRatePct": 0,
       "maxDrawdownPct": 19.7,
-      "sharpeish": -1.07,
+      "sharpeish": -1.05,
       "openPositions": 0,
       "components": {
         "consistency": 0.75,
@@ -2380,7 +2380,7 @@
       "roundTrips": 1,
       "winRatePct": 0,
       "maxDrawdownPct": 24.2,
-      "sharpeish": -2.32,
+      "sharpeish": -2.3,
       "openPositions": 5,
       "components": {
         "consistency": 1,
@@ -2393,11 +2393,56 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 2224,
-        "grossPositionUsd": 33653080,
+        "grossPositionUsd": 33643556,
         "sliceRatio": 0.00007,
         "avgFillsPerRoundTrip": 161,
         "netDirectionalBias": 1,
         "medianHoldHours": 0.2,
+        "neutralBook": false,
+        "fastTurnover": true
+      },
+      "algoScore": 4
+    },
+    {
+      "addr": "0x1ee7a73cb5b0b6b056d8138085b2009e6a6bedf5",
+      "short": "0x1ee7…edf5",
+      "trustScore": 44.3,
+      "confidence": 0.9,
+      "flags": [],
+      "sampleBasis": "roundTrips",
+      "closingFills": 1157,
+      "marketsTraded": 4,
+      "style": "mixed",
+      "accountValue": 5257935,
+      "pnl": {
+        "day": -777990,
+        "week": -876917,
+        "month": 2501544,
+        "allTime": -4182795
+      },
+      "positiveWindows": 1,
+      "monthRoiPct": 90.8,
+      "roundTrips": 1,
+      "winRatePct": 0,
+      "maxDrawdownPct": 32.3,
+      "sharpeish": 3.68,
+      "openPositions": 4,
+      "components": {
+        "consistency": 0.25,
+        "sample": 0.18,
+        "drawdown": 0.19,
+        "riskAdjusted": 1,
+        "efficiency": 1,
+        "directional": 0.35
+      },
+      "styleEvidence": {
+        "fillCount": 2000,
+        "medianFillUsd": 2000,
+        "grossPositionUsd": 37242880,
+        "sliceRatio": 0.00005,
+        "avgFillsPerRoundTrip": 108,
+        "netDirectionalBias": 1,
+        "medianHoldHours": 0,
         "neutralBook": false,
         "fastTurnover": true
       },
@@ -2438,7 +2483,7 @@
       "styleEvidence": {
         "fillCount": 2000,
         "medianFillUsd": 999,
-        "grossPositionUsd": 9994034,
+        "grossPositionUsd": 10006573,
         "sliceRatio": 0.0001,
         "avgFillsPerRoundTrip": 104.3,
         "netDirectionalBias": 1,
@@ -2447,51 +2492,6 @@
         "fastTurnover": true
       },
       "algoScore": 4
-    },
-    {
-      "addr": "0x1ee7a73cb5b0b6b056d8138085b2009e6a6bedf5",
-      "short": "0x1ee7…edf5",
-      "trustScore": 38.4,
-      "confidence": 0.65,
-      "flags": [],
-      "sampleBasis": "roundTrips",
-      "closingFills": 1157,
-      "marketsTraded": 4,
-      "style": "mixed",
-      "accountValue": 5257935,
-      "pnl": {
-        "day": -777990,
-        "week": -876917,
-        "month": 2501544,
-        "allTime": -4182795
-      },
-      "positiveWindows": 1,
-      "monthRoiPct": 90.8,
-      "roundTrips": 1,
-      "winRatePct": 0,
-      "maxDrawdownPct": null,
-      "sharpeish": null,
-      "openPositions": 0,
-      "components": {
-        "consistency": 0.25,
-        "sample": 0.18,
-        "drawdown": 0.4,
-        "riskAdjusted": 0.4,
-        "efficiency": 1,
-        "directional": 0.35
-      },
-      "styleEvidence": {
-        "fillCount": 2000,
-        "medianFillUsd": 2000,
-        "grossPositionUsd": 0,
-        "sliceRatio": null,
-        "avgFillsPerRoundTrip": 108,
-        "netDirectionalBias": null,
-        "medianHoldHours": 0,
-        "neutralBook": false,
-        "fastTurnover": true
-      },
-      "algoScore": 3
     },
     {
       "addr": "0xbeef000000414d106d6456ac030ad0ab918ceb75",
@@ -2611,13 +2611,13 @@
       "roundTrips": 0,
       "winRatePct": null,
       "maxDrawdownPct": 2.7,
-      "sharpeish": 2.17,
+      "sharpeish": 2.18,
       "openPositions": 0,
       "components": {
         "consistency": 0.5,
         "sample": 0,
         "drawdown": 0.93,
-        "riskAdjusted": 0.79,
+        "riskAdjusted": 0.8,
         "efficiency": 0.19,
         "directional": 1
       },
