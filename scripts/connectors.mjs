@@ -291,10 +291,14 @@ export async function binanceTakerFlow(assets = DEFAULT_ASSETS) {
   return { signals, warn: t.warn() };
 }
 
-// Bybit's account long/short ratio. Added because Binance geo-blocks the CI runners,
-// and this endpoint answers from everywhere — it keeps a venue in the mix when Binance
-// drops out. NOTE: this is ALL accounts, not top traders, so it is a crowd signal and
-// is NOT a substitute for binance-top's smart signal. Labelled accordingly.
+// Bybit's account long/short ratio. ALL accounts, not top traders, so it is a crowd
+// signal and never a substitute for binance-top's smart signal.
+//
+// CORRECTION: this was added on the assumption that it answers from anywhere, unlike
+// Binance. That was wrong — verified against a real CI run, Bybit returns HTTP 403 to
+// GitHub's runners just as Binance returns 451. It contributes locally and nothing in CI.
+// Kept because it is real signal on a local run, but it does NOT solve the CI shortfall.
+// The only free top-trader source that answers from GitHub runners is OKX.
 export async function bybitAccountRatio(assets = DEFAULT_ASSETS) {
   const signals = [];
   const t = tally('bybit');
