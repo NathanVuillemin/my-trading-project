@@ -406,6 +406,44 @@ R['macro-flows']=function(d){
     +(d.cotLookbackYears||3)+'y — raw net positions are not comparable across markets. '
     +'Commercials/dealers hedge (informed); large specs and leveraged funds chase (crowded).</p>';
 
+  // COT-index contrarian setup (Briese/Williams). Computed here from the group indices the
+  // collector already provides — no collector change needed.
+  //   bullish  = crowd washed out (spec index < 20) AND hedgers accumulating (index > 80)
+  //   bearish  = crowd crowded long (spec index > 80) AND hedgers hedged short (index < 20)
+  // Group mapping differs by report: legacy (commodities) uses commercials vs large specs;
+  // TFF (FX/indices) uses dealers vs leveraged funds. It is a mean-reversion heuristic —
+  // extremes can persist, so this flags a SETUP, not a trigger.
+  (function(){
+    var HEDGER={legacy:'commercial',tff:'dealer'}, SPEC={legacy:'largeSpec',tff:'levFunds'};
+    var sig=[], near=[];
+    (d.cot||[]).forEach(function(mkt){
+      var byKey={}; (mkt.groups||[]).forEach(function(g){byKey[g.key]=g;});
+      var h=byKey[HEDGER[mkt.report]], s=byKey[SPEC[mkt.report]];
+      if(!h||!s||h.index==null||s.index==null)return;
+      var row={label:mkt.label,cls:mkt.cls,hedger:h.index,spec:s.index};
+      if(s.index<20&&h.index>80){row.signal='BULLISH';sig.push(row);}
+      else if(s.index>80&&h.index<20){row.signal='BEARISH';sig.push(row);}
+      // "approaching" — within 10 of both thresholds, so you see setups forming
+      else if((s.index<30&&h.index>70)||(s.index>70&&h.index<30)){
+        row.signal=(s.index<30?'bullish-ish':'bearish-ish'); near.push(row);
+      }
+    });
+    var mk=function(list,title,note){
+      if(!list.length)return '';
+      return '<div style="margin-top:12px"><b style="font-size:.85rem">'+title+'</b> <span class="sub">'+note+'</span></div>'
+        +table([{label:'Market'},{label:'Class'},{label:'Signal'},{label:'Hedger idx',num:true},{label:'Spec idx',num:true}],
+          list.map(function(r){
+            var bull=/BULL|bull/.test(r.signal);
+            return '<tr><td><b>'+esc(r.label)+'</b></td><td>'+esc(r.cls)+'</td>'
+              +'<td class="'+(bull?'bull':'bear')+'">'+esc(r.signal)+'</td>'
+              +'<td class="num">'+r.hedger+'</td><td class="num">'+r.spec+'</td></tr>';
+          }));
+    };
+    if(sig.length) body+=mk(sig,'COT signals — markets at an 80/20 extreme now','spec &lt;20 &amp; hedger &gt;80 = bullish; inverse = bearish. A mean-reversion SETUP, not a trigger — extremes can persist for months.');
+    else body+='<div class="alert"><span class="lvl">COT signals</span><span>No market at a full 80/20 extreme right now.</span></div>';
+    if(near.length) body+='<details><summary>Approaching a setup ('+near.length+')</summary>'+mk(near,'','within 10 of both thresholds')+'</details>';
+  })();
+
   // Conviction extremes: informed money at a percentile extreme. "opposed" means the fast
   // money is positioned against them, which is the configuration that historically matters.
   var ce=d.convictionExtremes||[];
