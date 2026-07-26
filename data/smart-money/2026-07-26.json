@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T12:17:20.276Z",
+  "generatedAt": "2026-07-26T15:16:22.565Z",
   "invertCrowd": false,
   "minSources": 1,
   "connectors": [
@@ -59,15 +59,15 @@
   },
   "warns": [
     "dune: skipped (set DUNE_QUERY_ID to a saved query)",
-    "binance-top: NO DATA — all 9 requests failed (HTTP 451)",
     "bybit: NO DATA — all 9 requests failed (HTTP 403)",
+    "binance-top: NO DATA — all 9 requests failed (HTTP 451)",
     "DEGRADED: only 53% of smart-tier weight present (missing: binance-top, dune, bybit) — composite leans on crowd data"
   ],
   "composite": [
     {
       "asset": "ETH",
       "cls": "CRYPTO",
-      "score": -0.5230956526074799,
+      "score": -0.522850369588612,
       "smartScore": -0.6160904352932541,
       "sources": 3,
       "bulls": 1,
@@ -79,14 +79,14 @@
           "kind": "smart",
           "tier": "A",
           "score": -1,
-          "detail": "3L/2S wallets, net -4.3M"
+          "detail": "3L/2S wallets, net -4.9M"
         },
         {
           "source": "dydx",
           "kind": "crowd",
           "tier": "C",
-          "score": 0,
-          "detail": "OI $10.6M, funding 0.0000%"
+          "score": 0.002,
+          "detail": "OI $10.6M, funding 0.0001%"
         },
         {
           "source": "okx-top",
@@ -100,8 +100,8 @@
     {
       "asset": "BTC",
       "cls": "CRYPTO",
-      "score": -0.3150006000659217,
-      "smartScore": -0.3733719485743731,
+      "score": -0.28946296906905367,
+      "smartScore": -0.3409230524591076,
       "sources": 3,
       "bulls": 1,
       "bears": 1,
@@ -111,15 +111,15 @@
           "source": "hyperliquid",
           "kind": "smart",
           "tier": "A",
-          "score": -0.623,
-          "detail": "1L/5S wallets, net -2.7M"
+          "score": -0.574,
+          "detail": "2L/5S wallets, net -2.8M"
         },
         {
           "source": "dydx",
           "kind": "crowd",
           "tier": "C",
-          "score": 0.013,
-          "detail": "OI $19.7M, funding 0.0007%"
+          "score": 0,
+          "detail": "OI $19.7M, funding 0.0000%"
         },
         {
           "source": "okx-top",
@@ -209,19 +209,19 @@
     {
       "asset": "SOL",
       "cls": "CRYPTO",
-      "score": 0.06266559549518343,
+      "score": 0.05350415048239572,
       "smartScore": 0.11671469740634009,
       "sources": 2,
       "bulls": 1,
-      "bears": 0,
-      "agreement": true,
+      "bears": 1,
+      "agreement": false,
       "union": [
         {
           "source": "dydx",
           "kind": "crowd",
           "tier": "C",
-          "score": -0.039,
-          "detail": "OI $4.7M, funding -0.0019%"
+          "score": -0.065,
+          "detail": "OI $4.7M, funding -0.0033%"
         },
         {
           "source": "okx-top",
