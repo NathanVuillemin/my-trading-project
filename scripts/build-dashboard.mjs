@@ -92,11 +92,22 @@ function readJournal() {
     .filter(Boolean);
 }
 
+// Public Hyperliquid addresses to re-fetch live, client-side, for the real-time strip.
+// These are already public (on-chain, in config); the live layer only reads them.
+let liveAddresses = [];
+try {
+  const cfg = JSON.parse(readFileSync(join(ROOT, 'config', 'portfolio.json'), 'utf8'));
+  liveAddresses = (cfg.addresses?.hyperliquid || [])
+    .filter(a => a && a.address && !/placeholder/i.test(a.label || ''))
+    .map(a => ({ label: a.label, address: a.address }));
+} catch { /* no config; live strip stays hidden */ }
+
 const payload = {
   builtAt: new Date().toISOString(),
   feeds: Object.fromEntries(Object.entries(feeds).map(([k, v]) => [k, { date: v.date, count: v.count, data: v.data }])),
   flowHistory,
   journal: readJournal(),
+  liveAddresses,
 };
 
 // ---------------------------------------------------------------- page
@@ -176,6 +187,18 @@ const html = `<title>Trading Cockpit</title>
 <div class="viz-root">
   <h1>Trading Cockpit</h1>
   <p class="sub" id="built"></p>
+  <div class="card" id="live-card" style="display:none">
+    <div class="hdr">
+      <h2>Live <span id="live-dot" style="color:var(--muted);font-size:.7rem">●</span></h2>
+      <span class="sub" id="live-status"></span>
+    </div>
+    <p class="sub">Re-fetched from Hyperliquid in your browser — positions, liquidation distance and gold, live. The panels below stay at the last daily build.</p>
+    <div id="live-body"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button id="live-refresh" style="font-size:.8rem;padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:var(--plane);color:var(--text-primary);cursor:pointer">Refresh now</button>
+      <label class="sub" style="display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" id="live-auto"> auto every 30s</label>
+    </div>
+  </div>
   <div class="nav" id="nav"></div>
   <div id="panels"></div>
   <p class="note">Static build — <code>npm run dashboard</code> regenerates. Panels are discovered from <code>data/*/</code>; new collectors appear automatically. No external requests.</p>
@@ -639,6 +662,83 @@ names.forEach(function(n){
 });
 el('panels').innerHTML=out||'<div class="card"><p class="empty">No data yet. Run the collectors.</p></div>';
 el('nav').innerHTML=nav;
+
+// ---------------- live layer ----------------
+// Re-fetches the fast, safety-critical numbers straight from Hyperliquid in the browser,
+// so the liquidation distance is current to the second rather than the last daily build.
+// Read-only public API calls; no keys, no writes. Only the fast/CORS-friendly data — the
+// slow institutional feeds do not move intraday.
+(function(){
+  var addrs=D.liveAddresses||[];
+  if(!addrs.length) return;   // no own address configured; keep the strip hidden
+  el('live-card').style.display='';
+  var hp=function(body){return fetch('https://api.hyperliquid.xyz/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})};
+  var nz=function(v){var n=+v;return isFinite(n)?n:0};
+  var busy=false;
+
+  function render(state){
+    var body='';
+    body+=tiles([
+      ['Equity',m(state.equity)],
+      ['Gross exposure',m(state.gross)],
+      ['Gold (PAXG)', state.gold?('$'+state.gold.toLocaleString()):'—']
+    ]);
+    if(state.positions.length){
+      var rows=state.positions.map(function(p){
+        var near=p.distPct!=null&&p.distPct<10;
+        return '<tr><td><b>'+esc(p.coin)+'</b></td><td>'+esc(p.side)+'</td>'
+          +'<td class="num">'+m(p.notional)+'</td>'
+          +'<td class="num '+cls(p.uPnl)+'">'+m(p.uPnl)+'</td>'
+          +'<td class="num '+(near?'bear':'')+'">'+(p.distPct==null?'—':p.distPct.toFixed(1)+'%')+'</td>'
+          +'<td class="num">'+(p.liqPx==null?'—':p.liqPx.toLocaleString())+'</td></tr>';
+      });
+      body+=table([{label:'Market'},{label:'Side'},{label:'Notional',num:true},{label:'uPnL',num:true},{label:'Dist to liq',num:true},{label:'Liq price',num:true}],rows);
+      var crit=state.positions.filter(function(p){return p.distPct!=null&&p.distPct<7});
+      if(crit.length)body='<div class="alert"><span class="lvl critical">‼ near liquidation</span><span>'+crit.map(function(p){return esc(p.coin)+' '+p.distPct.toFixed(1)+'%'}).join(', ')+'</span></div>'+body;
+    } else body+='<p class="empty">No open positions.</p>';
+    el('live-body').innerHTML=body;
+  }
+
+  function refresh(){
+    if(busy)return; busy=true;
+    el('live-dot').style.color='var(--warning)';
+    el('live-status').textContent='fetching…';
+    var agg={equity:0,gross:0,positions:[],gold:null};
+    var jobs=addrs.map(function(a){
+      return hp({type:'clearinghouseState',user:a.address}).then(function(s){
+        var ms=s.marginSummary||{};
+        agg.equity+=nz(ms.accountValue); agg.gross+=nz(ms.totalNtlPos);
+        (s.assetPositions||[]).forEach(function(ap){
+          var p=ap.position, szi=nz(p.szi); if(!szi)return;
+          var notional=nz(p.positionValue), mark=Math.abs(szi)>0?notional/Math.abs(szi):0;
+          var liq=p.liquidationPx==null?null:nz(p.liquidationPx);
+          agg.positions.push({coin:p.coin.replace(/^xyz:/,''),side:szi>0?'long':'short',notional:notional,
+            uPnl:nz(p.unrealizedPnl),liqPx:liq,distPct:(liq&&mark)?Math.abs(liq-mark)/mark*100:null});
+        });
+      });
+    });
+    // gold from PAXG last candle
+    jobs.push(hp({type:'candleSnapshot',req:{coin:'PAXG',interval:'1d',startTime:Date.now()-3*864e5,endTime:Date.now()}})
+      .then(function(c){if(Array.isArray(c)&&c.length)agg.gold=Math.round(+c[c.length-1].c)}).catch(function(){}));
+    Promise.all(jobs).then(function(){
+      agg.positions.sort(function(a,b){return (a.distPct==null?1e9:a.distPct)-(b.distPct==null?1e9:b.distPct)});
+      render(agg);
+      el('live-dot').style.color='var(--good)';
+      el('live-status').textContent='live as of '+new Date().toLocaleTimeString();
+    }).catch(function(e){
+      el('live-dot').style.color='var(--critical)';
+      el('live-status').textContent='fetch failed: '+e.message;
+    }).finally(function(){busy=false;});
+  }
+
+  el('live-refresh').addEventListener('click',refresh);
+  var timer=null;
+  el('live-auto').addEventListener('change',function(e){
+    if(e.target.checked){refresh();timer=setInterval(refresh,30000);}
+    else if(timer){clearInterval(timer);timer=null;}
+  });
+  refresh();   // one live pull on load
+})();
 })();
 </script>`;
 
