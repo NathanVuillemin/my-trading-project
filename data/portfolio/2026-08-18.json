@@ -1,0 +1,110 @@
+{
+  "date": "2026-08-18",
+  "generatedAt": "2026-08-18T22:27:54.277Z",
+  "usingPlaceholder": false,
+  "account": {
+    "equity": 79.259034,
+    "grossNotional": 815.29176,
+    "marginUsed": 79.259034,
+    "maintenanceMargin": 0,
+    "withdrawable": 0,
+    "accountLeverage": 10.286420599070132,
+    "cashTotal": 0,
+    "manualTotal": 0,
+    "netWorth": 79.259034
+  },
+  "positions": [
+    {
+      "coin": "BTC",
+      "cls": "CRYPTO",
+      "side": "short",
+      "size": 0.01263,
+      "notional": 815.29176,
+      "entry": 62845,
+      "mark": 64551.99999999999,
+      "uPnl": -21.55941,
+      "roe": -21.72965232,
+      "leverage": 8,
+      "marginUsed": 79.259034,
+      "liqPx": 69953.0448960441,
+      "distToLiqPct": 8.366967554907836,
+      "fundingSinceOpen": 2.32745,
+      "fundingAllTime": 3.436418,
+      "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
+      "label": "Main (Hyperliquid)"
+    }
+  ],
+  "manual": [],
+  "cash": [],
+  "risk": {
+    "gross": 815.29176,
+    "net": -815.29176,
+    "longUsd": 0,
+    "shortUsd": 815.29176,
+    "byAsset": [
+      {
+        "key": "BTC",
+        "usd": 815.29176,
+        "pct": 100
+      }
+    ],
+    "byClass": [
+      {
+        "key": "CRYPTO",
+        "usd": 815.29176,
+        "pct": 100
+      }
+    ],
+    "closestToLiq": [
+      {
+        "coin": "BTC",
+        "side": "short",
+        "distPct": 8.366967554907836,
+        "liqPx": 69953.0448960441,
+        "mark": 64551.99999999999
+      }
+    ],
+    "alerts": [
+      {
+        "level": "warning",
+        "msg": "BTC short is 8.4% from liquidation"
+      },
+      {
+        "level": "warning",
+        "msg": "BTC is 100% of gross exposure"
+      },
+      {
+        "level": "warning",
+        "msg": "Account leverage 10.3x"
+      }
+    ]
+  },
+  "trades": {
+    "tradeCount": 2,
+    "openTrades": 1,
+    "closingFills": 2,
+    "fillsCapped": false,
+    "grossWin": 9.423495,
+    "grossLoss": 38.493289,
+    "totalFees": 4.482381999999999,
+    "byCoin": [
+      {
+        "coin": "BTC",
+        "cls": "CRYPTO",
+        "realised": -29.069793999999995,
+        "n": 2,
+        "wins": 1
+      }
+    ],
+    "netRealised": -29.069793999999995,
+    "winRate": 50,
+    "expectancy": -14.534896999999997,
+    "profitFactor": 0.24480877692732367
+  },
+  "funding": {
+    "last30d": 0,
+    "byCoin": []
+  },
+  "equityHistory": [],
+  "pnlHistory": []
+}
