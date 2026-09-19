@@ -1,6 +1,6 @@
 {
   "date": "2026-09-18",
-  "generatedAt": "2026-09-18T00:00:46.414Z",
+  "generatedAt": "2026-09-18T23:59:49.938Z",
   "cotLookbackYears": 3,
   "cot": [
     {
@@ -8,71 +8,66 @@
       "cls": "COMMOD",
       "market": "GOLD - COMMODITY EXCHANGE INC.",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 411227,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 409899,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -270274,
-          "change": -5556,
-          "index": 32,
-          "shareOfOi": 65.72379731875581
+          "net": -261721,
+          "change": 8553,
+          "index": 40,
+          "shareOfOi": 63.85011917569938
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 231960,
-          "change": 3836,
-          "index": 63,
-          "shareOfOi": 56.40680208254808
+          "net": 230338,
+          "change": -1622,
+          "index": 62,
+          "shareOfOi": 56.19384287348834
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 38314,
-          "change": 1720,
-          "index": 89,
-          "shareOfOi": 9.31699523620774
+          "net": 31383,
+          "change": -6931,
+          "index": 63,
+          "shareOfOi": 7.656276302211032
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -270274,
-        "change": -5556,
-        "index": 32,
-        "shareOfOi": 65.72379731875581
+        "net": -261721,
+        "change": 8553,
+        "index": 40,
+        "shareOfOi": 63.85011917569938
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -270274,
-        "change": -5556,
-        "index": 32,
-        "shareOfOi": 65.72379731875581
+        "net": -261721,
+        "change": 8553,
+        "index": 40,
+        "shareOfOi": 63.85011917569938
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 231960,
-        "change": 3836,
-        "index": 63,
-        "shareOfOi": 56.40680208254808
+        "net": 230338,
+        "change": -1622,
+        "index": 62,
+        "shareOfOi": 56.19384287348834
       },
       "history": [
-        [
-          "2025-09-16",
-          -302371,
-          266410
-        ],
         [
           "2025-09-23",
           -298403,
@@ -327,6 +322,11 @@
           "2026-09-08",
           -270274,
           231960
+        ],
+        [
+          "2026-09-15",
+          -261721,
+          230338
         ]
       ]
     },
@@ -335,71 +335,66 @@
       "cls": "COMMOD",
       "market": "SILVER - COMMODITY EXCHANGE INC.",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 103250,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 103745,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -44908,
-          "change": 372,
-          "index": 70,
-          "shareOfOi": 43.49443099273608
+          "net": -42700,
+          "change": 2208,
+          "index": 75,
+          "shareOfOi": 41.15861005349655
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 26049,
-          "change": -690,
-          "index": 29,
-          "shareOfOi": 25.229055690072638
+          "net": 25326,
+          "change": -723,
+          "index": 28,
+          "shareOfOi": 24.411778880909925
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 18859,
-          "change": 318,
-          "index": 57,
-          "shareOfOi": 18.26537530266344
+          "net": 17374,
+          "change": -1485,
+          "index": 31,
+          "shareOfOi": 16.74683117258663
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -44908,
-        "change": 372,
-        "index": 70,
-        "shareOfOi": 43.49443099273608
+        "net": -42700,
+        "change": 2208,
+        "index": 75,
+        "shareOfOi": 41.15861005349655
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -44908,
-        "change": 372,
-        "index": 70,
-        "shareOfOi": 43.49443099273608
+        "net": -42700,
+        "change": 2208,
+        "index": 75,
+        "shareOfOi": 41.15861005349655
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 26049,
-        "change": -690,
-        "index": 29,
-        "shareOfOi": 25.229055690072638
+        "net": 25326,
+        "change": -723,
+        "index": 28,
+        "shareOfOi": 24.411778880909925
       },
       "history": [
-        [
-          "2025-09-16",
-          -71389,
-          51538
-        ],
         [
           "2025-09-23",
           -72755,
@@ -654,6 +649,11 @@
           "2026-09-08",
           -44908,
           26049
+        ],
+        [
+          "2026-09-15",
+          -42700,
+          25326
         ]
       ]
     },
@@ -662,71 +662,66 @@
       "cls": "COMMOD",
       "market": "COPPER- #1 - COMMODITY EXCHANGE INC.",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 297491,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 289463,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -104644,
-          "change": -12537,
-          "index": 1,
-          "shareOfOi": 35.17551791482767
+          "net": -84387,
+          "change": 20257,
+          "index": 7,
+          "shareOfOi": 29.1529487361079
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 92476,
-          "change": 11607,
-          "index": 100,
-          "shareOfOi": 31.08531014383629
+          "net": 75134,
+          "change": -17342,
+          "index": 94,
+          "shareOfOi": 25.956339843088756
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 12168,
-          "change": 930,
-          "index": 88,
-          "shareOfOi": 4.090207770991391
+          "net": 9253,
+          "change": -2915,
+          "index": 63,
+          "shareOfOi": 3.196608893019142
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -104644,
-        "change": -12537,
-        "index": 1,
-        "shareOfOi": 35.17551791482767
+        "net": -84387,
+        "change": 20257,
+        "index": 7,
+        "shareOfOi": 29.1529487361079
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -104644,
-        "change": -12537,
-        "index": 1,
-        "shareOfOi": 35.17551791482767
+        "net": -84387,
+        "change": 20257,
+        "index": 7,
+        "shareOfOi": 29.1529487361079
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 92476,
-        "change": 11607,
-        "index": 100,
-        "shareOfOi": 31.08531014383629
+        "net": 75134,
+        "change": -17342,
+        "index": 94,
+        "shareOfOi": 25.956339843088756
       },
       "history": [
-        [
-          "2025-09-16",
-          -38424,
-          30348
-        ],
         [
           "2025-09-23",
           -38253,
@@ -981,6 +976,11 @@
           "2026-09-08",
           -104644,
           92476
+        ],
+        [
+          "2026-09-15",
+          -84387,
+          75134
         ]
       ]
     },
@@ -989,71 +989,66 @@
       "cls": "COMMOD",
       "market": "PLATINUM - NEW YORK MERCANTILE EXCHANGE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 67810,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 65478,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -19848,
-          "change": -543,
+          "net": -19809,
+          "change": 39,
           "index": 64,
-          "shareOfOi": 29.270019171213686
+          "shareOfOi": 30.252909374140934
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 15976,
-          "change": 976,
-          "index": 52,
-          "shareOfOi": 23.55994691048518
+          "net": 15220,
+          "change": -756,
+          "index": 46,
+          "shareOfOi": 23.244448517059165
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 3872,
-          "change": -433,
-          "index": 11,
-          "shareOfOi": 5.710072260728507
+          "net": 4589,
+          "change": 717,
+          "index": 25,
+          "shareOfOi": 7.008460857081768
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -19848,
-        "change": -543,
+        "net": -19809,
+        "change": 39,
         "index": 64,
-        "shareOfOi": 29.270019171213686
+        "shareOfOi": 30.252909374140934
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -19848,
-        "change": -543,
+        "net": -19809,
+        "change": 39,
         "index": 64,
-        "shareOfOi": 29.270019171213686
+        "shareOfOi": 30.252909374140934
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 15976,
-        "change": 976,
-        "index": 52,
-        "shareOfOi": 23.55994691048518
+        "net": 15220,
+        "change": -756,
+        "index": 46,
+        "shareOfOi": 23.244448517059165
       },
       "history": [
-        [
-          "2025-09-16",
-          -21087,
-          15203
-        ],
         [
           "2025-09-23",
           -25329,
@@ -1308,6 +1303,11 @@
           "2026-09-08",
           -19848,
           15976
+        ],
+        [
+          "2026-09-15",
+          -19809,
+          15220
         ]
       ]
     },
@@ -1316,71 +1316,66 @@
       "cls": "COMMOD",
       "market": "WTI FINANCIAL CRUDE OIL - NEW YORK MERCANTILE EXCHANGE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 192025,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 202164,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -13497,
-          "change": 392,
-          "index": 71,
-          "shareOfOi": 7.028772295274052
+          "net": -12718,
+          "change": 779,
+          "index": 72,
+          "shareOfOi": 6.290932114520883
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 35358,
-          "change": -216,
-          "index": 83,
-          "shareOfOi": 18.413227444343182
+          "net": 36740,
+          "change": 1382,
+          "index": 89,
+          "shareOfOi": 18.173364199362894
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": -21861,
-          "change": -176,
-          "index": 3,
-          "shareOfOi": 11.384455149069133
+          "net": -24022,
+          "change": -2161,
+          "index": 1,
+          "shareOfOi": 11.882432084842009
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -13497,
-        "change": 392,
-        "index": 71,
-        "shareOfOi": 7.028772295274052
+        "net": -12718,
+        "change": 779,
+        "index": 72,
+        "shareOfOi": 6.290932114520883
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -13497,
-        "change": 392,
-        "index": 71,
-        "shareOfOi": 7.028772295274052
+        "net": -12718,
+        "change": 779,
+        "index": 72,
+        "shareOfOi": 6.290932114520883
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 35358,
-        "change": -216,
-        "index": 83,
-        "shareOfOi": 18.413227444343182
+        "net": 36740,
+        "change": 1382,
+        "index": 89,
+        "shareOfOi": 18.173364199362894
       },
       "history": [
-        [
-          "2025-09-16",
-          -21826,
-          29091
-        ],
         [
           "2025-09-23",
           -22057,
@@ -1635,6 +1630,11 @@
           "2026-09-08",
           -13497,
           35358
+        ],
+        [
+          "2026-09-15",
+          -12718,
+          36740
         ]
       ]
     },
@@ -1643,71 +1643,66 @@
       "cls": "COMMOD",
       "market": "NAT GAS NYME - NEW YORK MERCANTILE EXCHANGE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 1823243,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 1820003,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": 201126,
-          "change": 7694,
+          "net": 206752,
+          "change": 5626,
           "index": 100,
-          "shareOfOi": 11.031222936273442
+          "shareOfOi": 11.35998127475614
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": -219767,
-          "change": -10856,
+          "net": -221587,
+          "change": -1820,
           "index": 1,
-          "shareOfOi": 12.053631907540574
+          "shareOfOi": 12.175089821280514
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 18641,
-          "change": 3162,
-          "index": 71,
-          "shareOfOi": 1.0224089712671323
+          "net": 14835,
+          "change": -3806,
+          "index": 47,
+          "shareOfOi": 0.8151085465243738
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": 201126,
-        "change": 7694,
+        "net": 206752,
+        "change": 5626,
         "index": 100,
-        "shareOfOi": 11.031222936273442
+        "shareOfOi": 11.35998127475614
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": 201126,
-        "change": 7694,
+        "net": 206752,
+        "change": 5626,
         "index": 100,
-        "shareOfOi": 11.031222936273442
+        "shareOfOi": 11.35998127475614
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": -219767,
-        "change": -10856,
+        "net": -221587,
+        "change": -1820,
         "index": 1,
-        "shareOfOi": 12.053631907540574
+        "shareOfOi": 12.175089821280514
       },
       "history": [
-        [
-          "2025-09-16",
-          104419,
-          -110944
-        ],
         [
           "2025-09-23",
           119742,
@@ -1962,6 +1957,11 @@
           "2026-09-08",
           201126,
           -219767
+        ],
+        [
+          "2026-09-15",
+          206752,
+          -221587
         ]
       ]
     },
@@ -1970,71 +1970,66 @@
       "cls": "COMMOD",
       "market": "WHEAT-SRW - CHICAGO BOARD OF TRADE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 484680,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 485138,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -12548,
-          "change": 11188,
-          "index": 1,
-          "shareOfOi": 2.5889246513163324
+          "net": -4799,
+          "change": 7749,
+          "index": 2,
+          "shareOfOi": 0.9892030721155629
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 10470,
-          "change": -14233,
+          "net": 1228,
+          "change": -9242,
           "index": 99,
-          "shareOfOi": 2.1601881653874724
+          "shareOfOi": 0.25312385341902716
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 2078,
-          "change": 3045,
-          "index": 82,
-          "shareOfOi": 0.4287364859288603
+          "net": 3571,
+          "change": 1493,
+          "index": 92,
+          "shareOfOi": 0.7360792186965359
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -12548,
-        "change": 11188,
-        "index": 1,
-        "shareOfOi": 2.5889246513163324
+        "net": -4799,
+        "change": 7749,
+        "index": 2,
+        "shareOfOi": 0.9892030721155629
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -12548,
-        "change": 11188,
-        "index": 1,
-        "shareOfOi": 2.5889246513163324
+        "net": -4799,
+        "change": 7749,
+        "index": 2,
+        "shareOfOi": 0.9892030721155629
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 10470,
-        "change": -14233,
+        "net": 1228,
+        "change": -9242,
         "index": 99,
-        "shareOfOi": 2.1601881653874724
+        "shareOfOi": 0.25312385341902716
       },
       "history": [
-        [
-          "2025-09-16",
-          73100,
-          -72159
-        ],
         [
           "2025-09-23",
           81083,
@@ -2289,6 +2284,11 @@
           "2026-09-08",
           -12548,
           10470
+        ],
+        [
+          "2026-09-15",
+          -4799,
+          1228
         ]
       ]
     },
@@ -2297,71 +2297,66 @@
       "cls": "COMMOD",
       "market": "CORN - CHICAGO BOARD OF TRADE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 1803323,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 1843824,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -470605,
-          "change": 6216,
+          "net": -476845,
+          "change": -6240,
           "index": 1,
-          "shareOfOi": 26.096545100350856
+          "shareOfOi": 25.861741684672722
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 542999,
-          "change": 6256,
-          "index": 100,
-          "shareOfOi": 30.111022817321135
+          "net": 542384,
+          "change": -615,
+          "index": 99,
+          "shareOfOi": 29.416256649224653
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": -72394,
-          "change": -12472,
-          "index": 6,
-          "shareOfOi": 4.014477716970282
+          "net": -65539,
+          "change": 6855,
+          "index": 9,
+          "shareOfOi": 3.554514964551931
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -470605,
-        "change": 6216,
+        "net": -476845,
+        "change": -6240,
         "index": 1,
-        "shareOfOi": 26.096545100350856
+        "shareOfOi": 25.861741684672722
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -470605,
-        "change": 6216,
+        "net": -476845,
+        "change": -6240,
         "index": 1,
-        "shareOfOi": 26.096545100350856
+        "shareOfOi": 25.861741684672722
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 542999,
-        "change": 6256,
-        "index": 100,
-        "shareOfOi": 30.111022817321135
+        "net": 542384,
+        "change": -615,
+        "index": 99,
+        "shareOfOi": 29.416256649224653
       },
       "history": [
-        [
-          "2025-09-16",
-          68373,
-          -36169
-        ],
         [
           "2025-09-23",
           79646,
@@ -2616,6 +2611,11 @@
           "2026-09-08",
           -470605,
           542999
+        ],
+        [
+          "2026-09-15",
+          -476845,
+          542384
         ]
       ]
     },
@@ -2624,71 +2624,66 @@
       "cls": "COMMOD",
       "market": "SOYBEANS - CHICAGO BOARD OF TRADE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 1070401,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 1104880,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -251550,
-          "change": -22808,
+          "net": -238575,
+          "change": 12975,
           "index": 1,
-          "shareOfOi": 23.500538583203863
+          "shareOfOi": 21.592842661646515
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 273424,
-          "change": 25437,
-          "index": 100,
-          "shareOfOi": 25.544071801128737
+          "net": 261183,
+          "change": -12241,
+          "index": 99,
+          "shareOfOi": 23.639037723553688
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": -21874,
-          "change": -2629,
-          "index": 33,
-          "shareOfOi": 2.043533217924871
+          "net": -22608,
+          "change": -734,
+          "index": 29,
+          "shareOfOi": 2.0461950619071754
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -251550,
-        "change": -22808,
+        "net": -238575,
+        "change": 12975,
         "index": 1,
-        "shareOfOi": 23.500538583203863
+        "shareOfOi": 21.592842661646515
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -251550,
-        "change": -22808,
+        "net": -238575,
+        "change": 12975,
         "index": 1,
-        "shareOfOi": 23.500538583203863
+        "shareOfOi": 21.592842661646515
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 273424,
-        "change": 25437,
-        "index": 100,
-        "shareOfOi": 25.544071801128737
+        "net": 261183,
+        "change": -12241,
+        "index": 99,
+        "shareOfOi": 23.639037723553688
       },
       "history": [
-        [
-          "2025-09-16",
-          -8293,
-          21187
-        ],
         [
           "2025-09-23",
           7371,
@@ -2943,6 +2938,11 @@
           "2026-09-08",
           -251550,
           273424
+        ],
+        [
+          "2026-09-15",
+          -238575,
+          261183
         ]
       ]
     },
@@ -2951,80 +2951,75 @@
       "cls": "FX",
       "market": "EURO FX - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 942464,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 920035,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": -261454,
-          "change": 6124,
+          "net": -258080,
+          "change": 3374,
           "index": 79,
-          "shareOfOi": 27.741537077278284
+          "shareOfOi": 28.051106751373588
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": 250678,
-          "change": -12575,
+          "net": 251698,
+          "change": 1020,
           "index": 26,
-          "shareOfOi": 26.598151229118567
+          "shareOfOi": 27.357437488791188
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -33285,
-          "change": 4888,
-          "index": 14,
-          "shareOfOi": 3.531699884557925
+          "net": -28156,
+          "change": 5129,
+          "index": 17,
+          "shareOfOi": 3.060318357453793
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 8175,
-          "change": -671,
-          "index": 41,
-          "shareOfOi": 0.8674071370365342
+          "net": 7755,
+          "change": -420,
+          "index": 38,
+          "shareOfOi": 0.8429027156575566
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": -261454,
-        "change": 6124,
+        "net": -258080,
+        "change": 3374,
         "index": 79,
-        "shareOfOi": 27.741537077278284
+        "shareOfOi": 28.051106751373588
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": 250678,
-        "change": -12575,
+        "net": 251698,
+        "change": 1020,
         "index": 26,
-        "shareOfOi": 26.598151229118567
+        "shareOfOi": 27.357437488791188
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -33285,
-        "change": 4888,
-        "index": 14,
-        "shareOfOi": 3.531699884557925
+        "net": -28156,
+        "change": 5129,
+        "index": 17,
+        "shareOfOi": 3.060318357453793
       },
       "history": [
-        [
-          "2025-09-16",
-          -465164,
-          389699
-        ],
         [
           "2025-09-23",
           -469054,
@@ -3279,6 +3274,11 @@
           "2026-09-08",
           -261454,
           250678
+        ],
+        [
+          "2026-09-15",
+          -258080,
+          251698
         ]
       ]
     },
@@ -3287,80 +3287,75 @@
       "cls": "FX",
       "market": "JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 499635,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 542802,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": -39477,
-          "change": -118798,
-          "index": 39,
-          "shareOfOi": 7.901167852532348
+          "net": -168570,
+          "change": -129093,
+          "index": 13,
+          "shareOfOi": 31.0555230083898
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": -570,
-          "change": 23951,
-          "index": 53,
-          "shareOfOi": 0.11408328079498034
+          "net": 53845,
+          "change": 54415,
+          "index": 72,
+          "shareOfOi": 9.91982343469626
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -49098,
-          "change": 53090,
-          "index": 54,
-          "shareOfOi": 9.826773544687622
+          "net": 23170,
+          "change": 72268,
+          "index": 97,
+          "shareOfOi": 4.2685914937675244
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 85900,
-          "change": 33178,
-          "index": 83,
-          "shareOfOi": 17.192550561910195
+          "net": 87240,
+          "change": 1340,
+          "index": 86,
+          "shareOfOi": 16.072158908773364
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": -39477,
-        "change": -118798,
-        "index": 39,
-        "shareOfOi": 7.901167852532348
+        "net": -168570,
+        "change": -129093,
+        "index": 13,
+        "shareOfOi": 31.0555230083898
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": -570,
-        "change": 23951,
-        "index": 53,
-        "shareOfOi": 0.11408328079498034
+        "net": 53845,
+        "change": 54415,
+        "index": 72,
+        "shareOfOi": 9.91982343469626
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -49098,
-        "change": 53090,
-        "index": 54,
-        "shareOfOi": 9.826773544687622
+        "net": 23170,
+        "change": 72268,
+        "index": 97,
+        "shareOfOi": 4.2685914937675244
       },
       "history": [
-        [
-          "2025-09-16",
-          -122130,
-          70100
-        ],
         [
           "2025-09-23",
           -129255,
@@ -3615,6 +3610,11 @@
           "2026-09-08",
           -39477,
           -570
+        ],
+        [
+          "2026-09-15",
+          -168570,
+          53845
         ]
       ]
     },
@@ -3623,80 +3623,75 @@
       "cls": "FX",
       "market": "BRITISH POUND - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 318608,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 314293,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": 68548,
-          "change": 9345,
-          "index": 77,
-          "shareOfOi": 21.514839552051424
+          "net": 68223,
+          "change": -325,
+          "index": 76,
+          "shareOfOi": 21.706814978380045
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": -105864,
-          "change": 1469,
-          "index": 16,
-          "shareOfOi": 33.227037613619245
+          "net": -89211,
+          "change": 16653,
+          "index": 24,
+          "shareOfOi": 28.38466017378688
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": 34627,
-          "change": -8540,
-          "index": 56,
-          "shareOfOi": 10.868214231908803
+          "net": 18878,
+          "change": -15749,
+          "index": 17,
+          "shareOfOi": 6.006497122112169
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 955,
-          "change": -236,
-          "index": 84,
-          "shareOfOi": 0.29974137498116804
+          "net": 460,
+          "change": -495,
+          "index": 78,
+          "shareOfOi": 0.14636024346708326
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": 68548,
-        "change": 9345,
-        "index": 77,
-        "shareOfOi": 21.514839552051424
+        "net": 68223,
+        "change": -325,
+        "index": 76,
+        "shareOfOi": 21.706814978380045
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": -105864,
-        "change": 1469,
-        "index": 16,
-        "shareOfOi": 33.227037613619245
+        "net": -89211,
+        "change": 16653,
+        "index": 24,
+        "shareOfOi": 28.38466017378688
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": 34627,
-        "change": -8540,
-        "index": 56,
-        "shareOfOi": 10.868214231908803
+        "net": 18878,
+        "change": -15749,
+        "index": 17,
+        "shareOfOi": 6.006497122112169
       },
       "history": [
-        [
-          "2025-09-16",
-          10793,
-          -42998
-        ],
         [
           "2025-09-23",
           9791,
@@ -3951,6 +3946,11 @@
           "2026-09-08",
           68548,
           -105864
+        ],
+        [
+          "2026-09-15",
+          68223,
+          -89211
         ]
       ]
     },
@@ -3959,80 +3959,75 @@
       "cls": "FX",
       "market": "SWISS FRANC - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 153683,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 171313,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": 60845,
-          "change": 5102,
-          "index": 87,
-          "shareOfOi": 39.59123650631495
+          "net": 66512,
+          "change": 5667,
+          "index": 94,
+          "shareOfOi": 38.82484108036168
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": -35677,
-          "change": -3560,
-          "index": 45,
-          "shareOfOi": 23.214669156640618
+          "net": -36121,
+          "change": -444,
+          "index": 41,
+          "shareOfOi": 21.08479800131922
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -13440,
-          "change": -3142,
-          "index": 15,
-          "shareOfOi": 8.745274363462451
+          "net": -14964,
+          "change": -1524,
+          "index": 10,
+          "shareOfOi": 8.734888770846345
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": -209,
-          "change": -93,
-          "index": 34,
-          "shareOfOi": 0.13599422187229557
+          "net": 59,
+          "change": 268,
+          "index": 47,
+          "shareOfOi": 0.03443988488906271
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": 60845,
-        "change": 5102,
-        "index": 87,
-        "shareOfOi": 39.59123650631495
+        "net": 66512,
+        "change": 5667,
+        "index": 94,
+        "shareOfOi": 38.82484108036168
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": -35677,
-        "change": -3560,
-        "index": 45,
-        "shareOfOi": 23.214669156640618
+        "net": -36121,
+        "change": -444,
+        "index": 41,
+        "shareOfOi": 21.08479800131922
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -13440,
-        "change": -3142,
-        "index": 15,
-        "shareOfOi": 8.745274363462451
+        "net": -14964,
+        "change": -1524,
+        "index": 10,
+        "shareOfOi": 8.734888770846345
       },
       "history": [
-        [
-          "2025-09-16",
-          39358,
-          -35323
-        ],
         [
           "2025-09-23",
           40231,
@@ -4287,6 +4282,11 @@
           "2026-09-08",
           60845,
           -35677
+        ],
+        [
+          "2026-09-15",
+          66512,
+          -36121
         ]
       ]
     },
@@ -4295,80 +4295,75 @@
       "cls": "FX",
       "market": "CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 334861,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 358186,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": 82107,
-          "change": -35852,
-          "index": 37,
-          "shareOfOi": 24.519726095305217
+          "net": 48614,
+          "change": -33493,
+          "index": 21,
+          "shareOfOi": 13.572278090154278
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": -30008,
-          "change": 19536,
-          "index": 74,
-          "shareOfOi": 8.961330223585309
+          "net": -9386,
+          "change": 20622,
+          "index": 83,
+          "shareOfOi": 2.620426258982763
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -55448,
-          "change": 13302,
-          "index": 43,
-          "shareOfOi": 16.55851233795515
+          "net": -39022,
+          "change": 16426,
+          "index": 71,
+          "shareOfOi": 10.894339812276304
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 7279,
-          "change": -195,
-          "index": 23,
-          "shareOfOi": 2.173737759846623
+          "net": 9140,
+          "change": 1861,
+          "index": 42,
+          "shareOfOi": 2.5517468577778026
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": 82107,
-        "change": -35852,
-        "index": 37,
-        "shareOfOi": 24.519726095305217
+        "net": 48614,
+        "change": -33493,
+        "index": 21,
+        "shareOfOi": 13.572278090154278
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": -30008,
-        "change": 19536,
-        "index": 74,
-        "shareOfOi": 8.961330223585309
+        "net": -9386,
+        "change": 20622,
+        "index": 83,
+        "shareOfOi": 2.620426258982763
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -55448,
-        "change": 13302,
-        "index": 43,
-        "shareOfOi": 16.55851233795515
+        "net": -39022,
+        "change": 16426,
+        "index": 71,
+        "shareOfOi": 10.894339812276304
       },
       "history": [
-        [
-          "2025-09-16",
-          107279,
-          -58150
-        ],
         [
           "2025-09-23",
           112217,
@@ -4623,6 +4618,11 @@
           "2026-09-08",
           82107,
           -30008
+        ],
+        [
+          "2026-09-15",
+          48614,
+          -9386
         ]
       ]
     },
@@ -4631,80 +4631,75 @@
       "cls": "FX",
       "market": "AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 455468,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 493141,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": -33579,
-          "change": 9877,
-          "index": 18,
-          "shareOfOi": 7.372416942573354
+          "net": -38303,
+          "change": -4724,
+          "index": 16,
+          "shareOfOi": 7.76714976041335
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": -40199,
-          "change": -9732,
-          "index": 51,
-          "shareOfOi": 8.825867020295608
+          "net": -46396,
+          "change": -6197,
+          "index": 43,
+          "shareOfOi": 9.408262545600548
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": 49779,
-          "change": 117,
-          "index": 92,
-          "shareOfOi": 10.92919809953718
+          "net": 61135,
+          "change": 11356,
+          "index": 97,
+          "shareOfOi": 12.397062908985463
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 4813,
-          "change": 1148,
-          "index": 39,
-          "shareOfOi": 1.0567152906461046
+          "net": 4483,
+          "change": -330,
+          "index": 37,
+          "shareOfOi": 0.9090706309148905
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": -33579,
-        "change": 9877,
-        "index": 18,
-        "shareOfOi": 7.372416942573354
+        "net": -38303,
+        "change": -4724,
+        "index": 16,
+        "shareOfOi": 7.76714976041335
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": -40199,
-        "change": -9732,
-        "index": 51,
-        "shareOfOi": 8.825867020295608
+        "net": -46396,
+        "change": -6197,
+        "index": 43,
+        "shareOfOi": 9.408262545600548
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": 49779,
-        "change": 117,
-        "index": 92,
-        "shareOfOi": 10.92919809953718
+        "net": 61135,
+        "change": 11356,
+        "index": 97,
+        "shareOfOi": 12.397062908985463
       },
       "history": [
-        [
-          "2025-09-16",
-          29791,
-          -40442
-        ],
         [
           "2025-09-23",
           40235,
@@ -4959,6 +4954,11 @@
           "2026-09-08",
           -33579,
           -40199
+        ],
+        [
+          "2026-09-15",
+          -38303,
+          -46396
         ]
       ]
     },
@@ -4967,80 +4967,75 @@
       "cls": "INDEX",
       "market": "E-MINI S&P 500 - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 2071836,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 2446519,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": -685342,
-          "change": 35405,
-          "index": 53,
-          "shareOfOi": 33.0789695709506
+          "net": -702938,
+          "change": -17596,
+          "index": 48,
+          "shareOfOi": 28.732170075114887
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": 912361,
-          "change": -21819,
-          "index": 39,
-          "shareOfOi": 44.036352298154874
+          "net": 904684,
+          "change": -7677,
+          "index": 35,
+          "shareOfOi": 36.978417089750785
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -341104,
-          "change": -23540,
-          "index": 50,
-          "shareOfOi": 16.46385138592051
+          "net": -293143,
+          "change": 47961,
+          "index": 72,
+          "shareOfOi": 11.98204469288814
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": -11968,
-          "change": -6045,
-          "index": 27,
-          "shareOfOi": 0.5776518990885379
+          "net": 127,
+          "change": 12095,
+          "index": 38,
+          "shareOfOi": 0.0051910489965538795
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": -685342,
-        "change": 35405,
-        "index": 53,
-        "shareOfOi": 33.0789695709506
+        "net": -702938,
+        "change": -17596,
+        "index": 48,
+        "shareOfOi": 28.732170075114887
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": 912361,
-        "change": -21819,
-        "index": 39,
-        "shareOfOi": 44.036352298154874
+        "net": 904684,
+        "change": -7677,
+        "index": 35,
+        "shareOfOi": 36.978417089750785
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -341104,
-        "change": -23540,
-        "index": 50,
-        "shareOfOi": 16.46385138592051
+        "net": -293143,
+        "change": 47961,
+        "index": 72,
+        "shareOfOi": 11.98204469288814
       },
       "history": [
-        [
-          "2025-09-16",
-          -570610,
-          896300
-        ],
         [
           "2025-09-23",
           -590410,
@@ -5295,6 +5290,11 @@
           "2026-09-08",
           -685342,
           912361
+        ],
+        [
+          "2026-09-15",
+          -702938,
+          904684
         ]
       ]
     },
@@ -5303,80 +5303,75 @@
       "cls": "INDEX",
       "market": "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE",
       "report": "tff",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 313941,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 345886,
       "groups": [
         {
           "key": "dealer",
           "name": "dealers",
           "role": "hedging",
-          "net": -57602,
-          "change": 12113,
-          "index": 46,
-          "shareOfOi": 18.348033547704823
+          "net": -69952,
+          "change": -12350,
+          "index": 26,
+          "shareOfOi": 20.2240044407695
         },
         {
           "key": "assetMgr",
           "name": "asset managers",
           "role": "conviction-slow",
-          "net": 76559,
-          "change": 3673,
-          "index": 53,
-          "shareOfOi": 24.386429297224637
+          "net": 67788,
+          "change": -8771,
+          "index": 32,
+          "shareOfOi": 19.598364779146888
         },
         {
           "key": "levFunds",
           "name": "leveraged funds",
           "role": "conviction-fast",
-          "net": -36884,
-          "change": -18850,
-          "index": 52,
-          "shareOfOi": 11.748704374388819
+          "net": -13052,
+          "change": 23832,
+          "index": 87,
+          "shareOfOi": 3.7734976263855717
         },
         {
           "key": "other",
           "name": "other reportable",
           "role": "noise",
-          "net": 2880,
-          "change": 1426,
-          "index": 41,
-          "shareOfOi": 0.9173698242663431
+          "net": 3687,
+          "change": 807,
+          "index": 45,
+          "shareOfOi": 1.0659581480603435
         }
       ],
       "hedging": {
         "key": "dealer",
         "name": "dealers",
         "role": "hedging",
-        "net": -57602,
-        "change": 12113,
-        "index": 46,
-        "shareOfOi": 18.348033547704823
+        "net": -69952,
+        "change": -12350,
+        "index": 26,
+        "shareOfOi": 20.2240044407695
       },
       "conviction": {
         "key": "assetMgr",
         "name": "asset managers",
         "role": "conviction-slow",
-        "net": 76559,
-        "change": 3673,
-        "index": 53,
-        "shareOfOi": 24.386429297224637
+        "net": 67788,
+        "change": -8771,
+        "index": 32,
+        "shareOfOi": 19.598364779146888
       },
       "fast": {
         "key": "levFunds",
         "name": "leveraged funds",
         "role": "conviction-fast",
-        "net": -36884,
-        "change": -18850,
-        "index": 52,
-        "shareOfOi": 11.748704374388819
+        "net": -13052,
+        "change": 23832,
+        "index": 87,
+        "shareOfOi": 3.7734976263855717
       },
       "history": [
-        [
-          "2025-09-16",
-          -64548,
-          82073
-        ],
         [
           "2025-09-23",
           -60216,
@@ -5631,6 +5626,11 @@
           "2026-09-08",
           -57602,
           76559
+        ],
+        [
+          "2026-09-15",
+          -69952,
+          67788
         ]
       ]
     },
@@ -5639,71 +5639,66 @@
       "cls": "CRYPTO",
       "market": "BITCOIN - CHICAGO MERCANTILE EXCHANGE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 21083,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 20773,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -2061,
-          "change": -984,
-          "index": 12,
-          "shareOfOi": 9.77564862685576
+          "net": -2657,
+          "change": -596,
+          "index": 7,
+          "shareOfOi": 12.790641698358446
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": 1524,
-          "change": 821,
-          "index": 83,
-          "shareOfOi": 7.228572783759427
+          "net": 2468,
+          "change": 944,
+          "index": 92,
+          "shareOfOi": 11.880806816540703
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 537,
-          "change": 163,
-          "index": 72,
-          "shareOfOi": 2.5470758430963336
+          "net": 189,
+          "change": -348,
+          "index": 36,
+          "shareOfOi": 0.9098348818177442
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -2061,
-        "change": -984,
-        "index": 12,
-        "shareOfOi": 9.77564862685576
+        "net": -2657,
+        "change": -596,
+        "index": 7,
+        "shareOfOi": 12.790641698358446
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -2061,
-        "change": -984,
-        "index": 12,
-        "shareOfOi": 9.77564862685576
+        "net": -2657,
+        "change": -596,
+        "index": 7,
+        "shareOfOi": 12.790641698358446
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": 1524,
-        "change": 821,
-        "index": 83,
-        "shareOfOi": 7.228572783759427
+        "net": 2468,
+        "change": 944,
+        "index": 92,
+        "shareOfOi": 11.880806816540703
       },
       "history": [
-        [
-          "2025-09-16",
-          -453,
-          20
-        ],
         [
           "2025-09-23",
           -325,
@@ -5958,6 +5953,11 @@
           "2026-09-08",
           -2061,
           1524
+        ],
+        [
+          "2026-09-15",
+          -2657,
+          2468
         ]
       ]
     },
@@ -5966,71 +5966,66 @@
       "cls": "CRYPTO",
       "market": "MICRO ETHER - CHICAGO MERCANTILE EXCHANGE",
       "report": "legacy",
-      "date": "2026-09-08",
-      "weeks": 155,
-      "oi": 63819,
+      "date": "2026-09-15",
+      "weeks": 156,
+      "oi": 60971,
       "groups": [
         {
           "key": "commercial",
           "name": "commercials",
           "role": "hedging-informed",
-          "net": -161,
-          "change": -361,
-          "index": 16,
-          "shareOfOi": 0.2522759679719206
+          "net": -839,
+          "change": -678,
+          "index": 6,
+          "shareOfOi": 1.3760640304407012
         },
         {
           "key": "largeSpec",
           "name": "large specs",
           "role": "conviction-fast",
-          "net": -1180,
-          "change": 121,
-          "index": 67,
-          "shareOfOi": 1.8489791441420267
+          "net": -404,
+          "change": 776,
+          "index": 88,
+          "shareOfOi": 0.6626100933230552
         },
         {
           "key": "small",
           "name": "small traders",
           "role": "noise",
-          "net": 1341,
-          "change": 240,
-          "index": 37,
-          "shareOfOi": 2.1012551121139476
+          "net": 1243,
+          "change": -98,
+          "index": 33,
+          "shareOfOi": 2.0386741237637565
         }
       ],
       "hedging": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -161,
-        "change": -361,
-        "index": 16,
-        "shareOfOi": 0.2522759679719206
+        "net": -839,
+        "change": -678,
+        "index": 6,
+        "shareOfOi": 1.3760640304407012
       },
       "conviction": {
         "key": "commercial",
         "name": "commercials",
         "role": "hedging-informed",
-        "net": -161,
-        "change": -361,
-        "index": 16,
-        "shareOfOi": 0.2522759679719206
+        "net": -839,
+        "change": -678,
+        "index": 6,
+        "shareOfOi": 1.3760640304407012
       },
       "fast": {
         "key": "largeSpec",
         "name": "large specs",
         "role": "conviction-fast",
-        "net": -1180,
-        "change": 121,
-        "index": 67,
-        "shareOfOi": 1.8489791441420267
+        "net": -404,
+        "change": 776,
+        "index": 88,
+        "shareOfOi": 0.6626100933230552
       },
       "history": [
-        [
-          "2025-09-16",
-          0,
-          -5937
-        ],
         [
           "2025-09-23",
           0,
@@ -6285,6 +6280,11 @@
           "2026-09-08",
           -161,
           -1180
+        ],
+        [
+          "2026-09-15",
+          -839,
+          -404
         ]
       ]
     }
@@ -6292,20 +6292,16 @@
   "flows": [
     {
       "asset": "BTC",
-      "date": "2026-09-16",
+      "date": "2026-09-17",
       "flash": true,
-      "net1d": 160298912.5000677,
-      "net7d": 547748932.9127086,
-      "net30d": 5445231256.606454,
-      "supplyOnExchanges": 2715643.25254517,
-      "supplyChange30dPct": -0.51336140316326,
-      "mvrv": 1.4299286407994745,
+      "net1d": 76532110.38139606,
+      "net7d": 235239062.31707156,
+      "net30d": 5111056561.887711,
+      "supplyOnExchanges": 2717241.34934502,
+      "supplyChange30dPct": -0.541310497753535,
+      "mvrv": 1.4358494332162952,
       "read": "ACCUMULATION (net leaving exchanges)",
       "history": [
-        [
-          "2026-06-19",
-          124388832
-        ],
         [
           "2026-06-20",
           88848512
@@ -6661,25 +6657,25 @@
         [
           "2026-09-16",
           160298913
+        ],
+        [
+          "2026-09-17",
+          76532110
         ]
       ]
     },
     {
       "asset": "ETH",
-      "date": "2026-09-16",
+      "date": "2026-09-17",
       "flash": true,
-      "net1d": -184984432.3700056,
-      "net7d": 271590920.8967058,
-      "net30d": 1040144710.4974575,
-      "supplyOnExchanges": 15388706.801086798,
-      "supplyChange30dPct": -2.60248791491519,
-      "mvrv": 1.0698155979540618,
+      "net1d": -66856796.50696695,
+      "net7d": 220079701.02127343,
+      "net30d": 942569649.4395791,
+      "supplyOnExchanges": 15416030.460658764,
+      "supplyChange30dPct": -2.330609056831468,
+      "mvrv": 1.083938437476739,
       "read": "ACCUMULATION (net leaving exchanges)",
       "history": [
-        [
-          "2026-06-19",
-          165464626
-        ],
         [
           "2026-06-20",
           -48632792
@@ -7035,6 +7031,10 @@
         [
           "2026-09-16",
           -184984432
+        ],
+        [
+          "2026-09-17",
+          -66856797
         ]
       ]
     }
@@ -7045,32 +7045,10 @@
       "cls": "COMMOD",
       "group": "commercials",
       "index": 100,
-      "net": 201126,
+      "net": 206752,
       "fastIndex": 1,
       "fastGroup": "large specs",
       "dir": "LONG",
-      "opposed": true
-    },
-    {
-      "label": "COPPER",
-      "cls": "COMMOD",
-      "group": "commercials",
-      "index": 1,
-      "net": -104644,
-      "fastIndex": 100,
-      "fastGroup": "large specs",
-      "dir": "SHORT",
-      "opposed": true
-    },
-    {
-      "label": "WHEAT",
-      "cls": "COMMOD",
-      "group": "commercials",
-      "index": 1,
-      "net": -12548,
-      "fastIndex": 99,
-      "fastGroup": "large specs",
-      "dir": "SHORT",
       "opposed": true
     },
     {
@@ -7078,8 +7056,8 @@
       "cls": "COMMOD",
       "group": "commercials",
       "index": 1,
-      "net": -470605,
-      "fastIndex": 100,
+      "net": -476845,
+      "fastIndex": 99,
       "fastGroup": "large specs",
       "dir": "SHORT",
       "opposed": true
@@ -7089,8 +7067,41 @@
       "cls": "COMMOD",
       "group": "commercials",
       "index": 1,
-      "net": -251550,
-      "fastIndex": 100,
+      "net": -238575,
+      "fastIndex": 99,
+      "fastGroup": "large specs",
+      "dir": "SHORT",
+      "opposed": true
+    },
+    {
+      "label": "WHEAT",
+      "cls": "COMMOD",
+      "group": "commercials",
+      "index": 2,
+      "net": -4799,
+      "fastIndex": 99,
+      "fastGroup": "large specs",
+      "dir": "SHORT",
+      "opposed": true
+    },
+    {
+      "label": "ETHER",
+      "cls": "CRYPTO",
+      "group": "commercials",
+      "index": 6,
+      "net": -839,
+      "fastIndex": 88,
+      "fastGroup": "large specs",
+      "dir": "SHORT",
+      "opposed": true
+    },
+    {
+      "label": "COPPER",
+      "cls": "COMMOD",
+      "group": "commercials",
+      "index": 7,
+      "net": -84387,
+      "fastIndex": 94,
       "fastGroup": "large specs",
       "dir": "SHORT",
       "opposed": true
@@ -7099,33 +7110,22 @@
       "label": "BITCOIN",
       "cls": "CRYPTO",
       "group": "commercials",
-      "index": 12,
-      "net": -2061,
-      "fastIndex": 83,
+      "index": 7,
+      "net": -2657,
+      "fastIndex": 92,
       "fastGroup": "large specs",
       "dir": "SHORT",
       "opposed": true
     },
     {
-      "label": "GBP",
+      "label": "CAD",
       "cls": "FX",
       "group": "asset managers",
-      "index": 16,
-      "net": -105864,
-      "fastIndex": 56,
+      "index": 83,
+      "net": -9386,
+      "fastIndex": 71,
       "fastGroup": "leveraged funds",
-      "dir": "SHORT",
-      "opposed": false
-    },
-    {
-      "label": "ETHER",
-      "cls": "CRYPTO",
-      "group": "commercials",
-      "index": 16,
-      "net": -161,
-      "fastIndex": 67,
-      "fastGroup": "large specs",
-      "dir": "SHORT",
+      "dir": "LONG",
       "opposed": false
     }
   ],
@@ -7134,190 +7134,190 @@
       "label": "GOLD",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": -270274,
-      "index": 32,
-      "shareOfOi": 65.72379731875581,
-      "change": -5556,
+      "net": -261721,
+      "index": 40,
+      "shareOfOi": 63.85011917569938,
+      "change": 8553,
       "building": false
     },
     {
       "label": "SILVER",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": -44908,
-      "index": 70,
-      "shareOfOi": 43.49443099273608,
-      "change": 372,
+      "net": -42700,
+      "index": 75,
+      "shareOfOi": 41.15861005349655,
+      "change": 2208,
       "building": false
     },
     {
       "label": "CHF",
       "cls": "FX",
       "group": "dealers",
-      "net": 60845,
-      "index": 87,
-      "shareOfOi": 39.59123650631495,
-      "change": 5102,
+      "net": 66512,
+      "index": 94,
+      "shareOfOi": 38.82484108036168,
+      "change": 5667,
+      "building": false
+    },
+    {
+      "label": "JPY",
+      "cls": "FX",
+      "group": "dealers",
+      "net": -168570,
+      "index": 13,
+      "shareOfOi": 31.0555230083898,
+      "change": -129093,
+      "building": true
+    },
+    {
+      "label": "PLATINUM",
+      "cls": "COMMOD",
+      "group": "commercials",
+      "net": -19809,
+      "index": 64,
+      "shareOfOi": 30.252909374140934,
+      "change": 39,
       "building": false
     },
     {
       "label": "COPPER",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": -104644,
-      "index": 1,
-      "shareOfOi": 35.17551791482767,
-      "change": -12537,
+      "net": -84387,
+      "index": 7,
+      "shareOfOi": 29.1529487361079,
+      "change": 20257,
       "building": true
     },
     {
       "label": "S&P 500",
       "cls": "INDEX",
       "group": "dealers",
-      "net": -685342,
-      "index": 53,
-      "shareOfOi": 33.0789695709506,
-      "change": 35405,
-      "building": false
-    },
-    {
-      "label": "PLATINUM",
-      "cls": "COMMOD",
-      "group": "commercials",
-      "net": -19848,
-      "index": 64,
-      "shareOfOi": 29.270019171213686,
-      "change": -543,
+      "net": -702938,
+      "index": 48,
+      "shareOfOi": 28.732170075114887,
+      "change": -17596,
       "building": false
     },
     {
       "label": "EUR",
       "cls": "FX",
       "group": "dealers",
-      "net": -261454,
+      "net": -258080,
       "index": 79,
-      "shareOfOi": 27.741537077278284,
-      "change": 6124,
+      "shareOfOi": 28.051106751373588,
+      "change": 3374,
       "building": false
     },
     {
       "label": "CORN",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": -470605,
+      "net": -476845,
       "index": 1,
-      "shareOfOi": 26.096545100350856,
-      "change": 6216,
-      "building": false
-    },
-    {
-      "label": "CAD",
-      "cls": "FX",
-      "group": "dealers",
-      "net": 82107,
-      "index": 37,
-      "shareOfOi": 24.519726095305217,
-      "change": -35852,
-      "building": true
-    },
-    {
-      "label": "SOYBEANS",
-      "cls": "COMMOD",
-      "group": "commercials",
-      "net": -251550,
-      "index": 1,
-      "shareOfOi": 23.500538583203863,
-      "change": -22808,
+      "shareOfOi": 25.861741684672722,
+      "change": -6240,
       "building": false
     },
     {
       "label": "GBP",
       "cls": "FX",
       "group": "dealers",
-      "net": 68548,
-      "index": 77,
-      "shareOfOi": 21.514839552051424,
-      "change": 9345,
-      "building": true
+      "net": 68223,
+      "index": 76,
+      "shareOfOi": 21.706814978380045,
+      "change": -325,
+      "building": false
+    },
+    {
+      "label": "SOYBEANS",
+      "cls": "COMMOD",
+      "group": "commercials",
+      "net": -238575,
+      "index": 1,
+      "shareOfOi": 21.592842661646515,
+      "change": 12975,
+      "building": false
     },
     {
       "label": "NASDAQ 100",
       "cls": "INDEX",
       "group": "dealers",
-      "net": -57602,
-      "index": 46,
-      "shareOfOi": 18.348033547704823,
-      "change": 12113,
+      "net": -69952,
+      "index": 26,
+      "shareOfOi": 20.2240044407695,
+      "change": -12350,
+      "building": true
+    },
+    {
+      "label": "CAD",
+      "cls": "FX",
+      "group": "dealers",
+      "net": 48614,
+      "index": 21,
+      "shareOfOi": 13.572278090154278,
+      "change": -33493,
+      "building": true
+    },
+    {
+      "label": "BITCOIN",
+      "cls": "CRYPTO",
+      "group": "commercials",
+      "net": -2657,
+      "index": 7,
+      "shareOfOi": 12.790641698358446,
+      "change": -596,
       "building": true
     },
     {
       "label": "NATGAS",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": 201126,
+      "net": 206752,
       "index": 100,
-      "shareOfOi": 11.031222936273442,
-      "change": 7694,
+      "shareOfOi": 11.35998127475614,
+      "change": 5626,
       "building": false
-    },
-    {
-      "label": "BITCOIN",
-      "cls": "CRYPTO",
-      "group": "commercials",
-      "net": -2061,
-      "index": 12,
-      "shareOfOi": 9.77564862685576,
-      "change": -984,
-      "building": true
-    },
-    {
-      "label": "JPY",
-      "cls": "FX",
-      "group": "dealers",
-      "net": -39477,
-      "index": 39,
-      "shareOfOi": 7.901167852532348,
-      "change": -118798,
-      "building": true
     },
     {
       "label": "AUD",
       "cls": "FX",
       "group": "dealers",
-      "net": -33579,
-      "index": 18,
-      "shareOfOi": 7.372416942573354,
-      "change": 9877,
+      "net": -38303,
+      "index": 16,
+      "shareOfOi": 7.76714976041335,
+      "change": -4724,
       "building": true
     },
     {
       "label": "WTI CRUDE",
       "cls": "COMMOD",
       "group": "commercials",
-      "net": -13497,
-      "index": 71,
-      "shareOfOi": 7.028772295274052,
-      "change": 392,
+      "net": -12718,
+      "index": 72,
+      "shareOfOi": 6.290932114520883,
+      "change": 779,
       "building": false
-    },
-    {
-      "label": "WHEAT",
-      "cls": "COMMOD",
-      "group": "commercials",
-      "net": -12548,
-      "index": 1,
-      "shareOfOi": 2.5889246513163324,
-      "change": 11188,
-      "building": true
     },
     {
       "label": "ETHER",
       "cls": "CRYPTO",
       "group": "commercials",
-      "net": -161,
-      "index": 16,
-      "shareOfOi": 0.2522759679719206,
-      "change": -361,
+      "net": -839,
+      "index": 6,
+      "shareOfOi": 1.3760640304407012,
+      "change": -678,
+      "building": true
+    },
+    {
+      "label": "WHEAT",
+      "cls": "COMMOD",
+      "group": "commercials",
+      "net": -4799,
+      "index": 2,
+      "shareOfOi": 0.9892030721155629,
+      "change": 7749,
       "building": true
     }
   ],

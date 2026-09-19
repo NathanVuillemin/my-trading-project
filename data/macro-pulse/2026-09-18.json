@@ -1,72 +1,65 @@
 {
   "date": "2026-09-18",
-  "generatedAt": "2026-09-18T00:00:56.171Z",
+  "generatedAt": "2026-09-18T23:59:59.714Z",
   "stablecoins": {
-    "totalUsd": 312237905016,
-    "dayChangeUsd": 1818286447,
-    "weekChangeUsd": 1062384383,
-    "monthChangeUsd": 5094258982,
+    "totalUsd": 311956771524,
+    "dayChangeUsd": 1425352773,
+    "weekChangeUsd": 1066277961,
+    "monthChangeUsd": 4742340461,
     "weekChangePct": 0.34,
     "read": "EXPANDING — capital entering crypto (dry powder building)",
     "top": [
       {
         "sym": "USDT",
-        "usd": 183251562267.38123,
-        "weekChange": -48196631.954193115
+        "usd": 183392303274.82507,
+        "weekChange": -73164793.22076416
       },
       {
         "sym": "USDC",
-        "usd": 74905513178.59198,
-        "weekChange": 387762432.3464508
+        "usd": 74387644509.58244,
+        "weekChange": 43523758.647750854
       },
       {
         "sym": "USDS",
-        "usd": 6539988694.979343,
-        "weekChange": -114988301.68224049
-      },
-      {
-        "sym": "DAI",
-        "usd": 4771808072.792849,
-        "weekChange": -21294157.24689293
+        "usd": 6564352646.852514,
+        "weekChange": 183256038.31538486
       },
       {
         "sym": "USDe",
-        "usd": 4735746278.931705,
-        "weekChange": 270290304.4755659
+        "usd": 4807031393.761269,
+        "weekChange": 273666315.82512665
+      },
+      {
+        "sym": "DAI",
+        "usd": 4800639808.438653,
+        "weekChange": 21294762.065885544
       },
       {
         "sym": "USD1",
-        "usd": 4359059019.562583,
-        "weekChange": 66515993.16747236
+        "usd": 4371610795.021402,
+        "weekChange": 76552702.64456558
       }
     ]
   },
   "options": [
     {
       "currency": "BTC",
-      "putCallOi": 0.57,
-      "totalOiCoins": 441000,
-      "totalOiUsd": 33670609005,
-      "dayVolumeUsd": 24410902,
+      "putCallOi": 0.56,
+      "totalOiCoins": 429759,
+      "totalOiUsd": 34756916105,
+      "dayVolumeUsd": 41381505,
       "read": "risk-seeking — call-heavy"
     },
     {
       "currency": "ETH",
-      "putCallOi": 0.51,
-      "totalOiCoins": 1907513,
-      "totalOiUsd": 4695724752,
-      "dayVolumeUsd": 9707915,
+      "putCallOi": 0.53,
+      "totalOiCoins": 1849853,
+      "totalOiUsd": 4868979583,
+      "dayVolumeUsd": 8460417,
       "read": "risk-seeking — call-heavy"
     }
   ],
-  "sentiment": {
-    "fngValue": 56,
-    "fngClass": "Greed",
-    "btcDominance": 58.1,
-    "ethDominance": 11.31,
-    "totalMcapUsd": 2636289877602,
-    "mcapChange24hPct": -1.11,
-    "fngRead": "neutral"
-  },
-  "warns": []
+  "warns": [
+    "sentiment: The operation was aborted due to timeout"
+  ]
 }
