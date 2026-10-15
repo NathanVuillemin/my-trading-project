@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-15",
+  "generatedAt": "2026-10-15T12:06:38.213Z",
+  "source": "TradingView scanner",
+  "symbols": {
+    "EURUSD": {
+      "tv": "FX:EURUSD",
+      "kind": "price",
+      "value": 1.12108,
+      "prevMonth": 1.15484,
+      "changeMonthPct": -2.92,
+      "changeWeekPct": 0.14,
+      "sma200": 1.15851,
+      "feed": "streaming"
+    },
+    "GBPUSD": {
+      "tv": "FX:GBPUSD",
+      "kind": "price",
+      "value": 1.32476,
+      "prevMonth": 1.34985,
+      "changeMonthPct": -1.86,
+      "changeWeekPct": 0.26,
+      "sma200": 1.34318,
+      "feed": "streaming"
+    },
+    "USDJPY": {
+      "tv": "FX:USDJPY",
+      "kind": "price",
+      "value": 157.97,
+      "prevMonth": 154.34,
+      "changeMonthPct": 2.35,
+      "changeWeekPct": -0.05,
+      "sma200": 158.54,
+      "feed": "streaming"
+    },
+    "AUDJPY": {
+      "tv": "FX:AUDJPY",
+      "kind": "price",
+      "value": 109.19,
+      "prevMonth": 110.18,
+      "changeMonthPct": -0.9,
+      "changeWeekPct": -0.75,
+      "sma200": 111.62,
+      "feed": "streaming",
+      "note": "risk barometer: rising = risk-on"
+    },
+    "XAUUSD": {
+      "tv": "OANDA:XAUUSD",
+      "kind": "price",
+      "value": 4147.13,
+      "prevMonth": 4299.31,
+      "changeMonthPct": -3.54,
+      "changeWeekPct": 0.84,
+      "sma200": 4524.02,
+      "feed": "streaming"
+    },
+    "NAS100": {
+      "tv": "NASDAQ:NDX",
+      "kind": "price",
+      "value": 29950.82,
+      "prevMonth": 28890.93,
+      "changeMonthPct": 3.67,
+      "changeWeekPct": -3.31,
+      "sma200": 27697.31,
+      "feed": "delayed_streaming_900"
+    },
+    "DXY": {
+      "tv": "TVC:DXY",
+      "kind": "price",
+      "value": 102.11,
+      "prevMonth": 99.48,
+      "changeMonthPct": 2.64,
+      "changeWeekPct": -0.12,
+      "sma200": 99.48,
+      "feed": "streaming",
+      "note": "ICE US Dollar Index"
+    },
+    "US02Y": {
+      "tv": "TVC:US02Y",
+      "kind": "yield",
+      "value": 4.751,
+      "prevMonth": 4.65,
+      "changeMonthPct": 2.17,
+      "changeMonthBp": 10.1,
+      "changeWeekPct": -0.44,
+      "feed": "streaming"
+    },
+    "DE02Y": {
+      "tv": "TVC:DE02Y",
+      "kind": "yield",
+      "value": 3.046,
+      "prevMonth": 3.259,
+      "changeMonthPct": -6.54,
+      "changeMonthBp": -21.3,
+      "changeWeekPct": -1,
+      "feed": "streaming",
+      "note": "EUR 2Y proxy (German Schatz)"
+    },
+    "GB02Y": {
+      "tv": "TVC:GB02Y",
+      "kind": "yield",
+      "value": 4.847,
+      "prevMonth": 4.923,
+      "changeMonthPct": -1.54,
+      "changeMonthBp": -7.6,
+      "changeWeekPct": -0.72,
+      "feed": "streaming"
+    },
+    "JP02Y": {
+      "tv": "TVC:JP02Y",
+      "kind": "yield",
+      "value": 1.903,
+      "prevMonth": 1.844,
+      "changeMonthPct": 3.2,
+      "changeMonthBp": 5.9,
+      "changeWeekPct": -1.81,
+      "feed": "streaming"
+    },
+    "VIX": {
+      "tv": "TVC:VIX",
+      "kind": "price",
+      "value": 17.53,
+      "prevMonth": 17.57,
+      "changeMonthPct": -0.23,
+      "changeWeekPct": 11.8,
+      "sma200": 18.08,
+      "feed": "streaming"
+    },
+    "SPX": {
+      "tv": "SP:SPX",
+      "kind": "price",
+      "value": 7718.94,
+      "prevMonth": 7611.44,
+      "changeMonthPct": 1.41,
+      "changeWeekPct": -0.95,
+      "sma200": 7263.43,
+      "feed": "delayed_streaming_600"
+    },
+    "XLY": {
+      "tv": "AMEX:XLY",
+      "kind": "price",
+      "value": 111.5,
+      "prevMonth": 112.31,
+      "changeMonthPct": -0.72,
+      "changeWeekPct": 0.42,
+      "sma200": 115.97,
+      "feed": "delayed_streaming_900"
+    },
+    "XLP": {
+      "tv": "AMEX:XLP",
+      "kind": "price",
+      "value": 86.06,
+      "prevMonth": 84.38,
+      "changeMonthPct": 1.99,
+      "changeWeekPct": 4.85,
+      "sma200": 83.91,
+      "feed": "delayed_streaming_900"
+    },
+    "CPER": {
+      "tv": "AMEX:CPER",
+      "kind": "price",
+      "value": 39.66,
+      "prevMonth": 38.23,
+      "changeMonthPct": 3.74,
+      "changeWeekPct": -0.78,
+      "sma200": 37.69,
+      "feed": "delayed_streaming_900"
+    },
+    "GLD": {
+      "tv": "AMEX:GLD",
+      "kind": "price",
+      "value": 375.99,
+      "prevMonth": 391.89,
+      "changeMonthPct": -4.06,
+      "changeWeekPct": 0.27,
+      "sma200": 415.14,
+      "feed": "delayed_streaming_900"
+    }
+  },
+  "barometer": {
+    "AUDJPY": {
+      "changeMonthPct": -0.9,
+      "read": "NEUTRAL"
+    },
+    "CPER_GLD": {
+      "changeMonthPct": 8.13,
+      "read": "RISK-ON"
+    },
+    "XLY_XLP": {
+      "changeMonthPct": -2.66,
+      "read": "RISK-OFF"
+    }
+  },
+  "warns": []
+}
