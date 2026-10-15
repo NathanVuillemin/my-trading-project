@@ -1,53 +1,38 @@
-# Trade journal
+# Trade journal — archive
 
-One markdown file per entry: `journal/YYYY-MM-DD.md`. Multiple entries in a day are fine —
-add a suffix: `2026-07-25-b.md`.
+**The journal lives in Notion.** Since 2026-09-07 all writing happens there:
 
-The dashboard reads every file here and renders the newest ones. Git gives you free version
-history, and the whole journal stays greppable from the command line.
+https://app.notion.com/p/3d4530da046b80baabc7e8a9bf1992fd
 
-## Format
+This folder is the frozen archive of entries written before the move. Nothing new goes here.
+The dashboard still renders these files under the Journal panel, labelled as archive, and
+links out to Notion for anything current.
 
-Frontmatter is optional but makes entries filterable. Keys are plain `key: value` lines
-between `---` fences — no nested YAML, since the parser is deliberately dependency-free.
+Why the move: the notebook is handwritten, and photographs of notebook pages need somewhere
+that holds images, works on a phone, and can relate an entry to a trade row. Markdown files in
+a repo do none of those. What the repo was good at — versioning, grep — Notion trades away,
+which is the cost of the decision.
 
-```markdown
----
-date: 2026-07-25
-tags: BTC, short, liquidity-sweep
-mood: patient
-result: open
----
+## What went where
 
-## Setup
-What you saw. Which level, which timeframe, what made it valid.
-
-## Execution
-Entry, size, stop, target. What you actually did versus what you planned.
-
-## Notes
-What you got wrong. What you'd repeat.
-```
-
-Recognised frontmatter keys (all optional):
-
-| Key | Use |
+| Was | Now |
 |---|---|
-| `date` | Overrides the filename date |
-| `tags` | Comma-separated. Shown as chips |
-| `result` | `win` / `loss` / `open` / `scratch` — colour-coded |
-| `mood` | Free text. Worth tracking against results over time |
+| `journal/YYYY-MM-DD.md` | Journal database, one page per entry |
+| Frontmatter `result` / `tags` / `mood` | Journal properties of the same name |
+| `strategy-rules/*.md` | Playbook Rules database (same fields — still mirrored both ways) |
+| — | Trade Log database: typed numbers, R multiples, rules-followed rate |
 
-Everything below the frontmatter is free-form markdown. The first heading becomes the
-entry title in the dashboard.
+`strategy-rules/` is **not** archived — it still feeds the Pine Script builders, and the Notion
+Playbook Rules database deliberately uses the same field names so a rule can be copied either
+direction without translation.
 
-## Why files rather than an app
+## Reading the archive
 
-A static dashboard has no backend to accept input. Files in the repo cost nothing, version
-themselves, survive any tool change, and work offline. You can edit them from the GitHub
-mobile app when you're away from the machine.
+Format of these files is documented by the entries themselves: optional `---` frontmatter with
+flat `key: value` lines, then free-form markdown. The dashboard's parser
+(`readJournal` in `scripts/build-dashboard.mjs`) is the reference implementation.
 
-## Writing entries from your phone
+## If you ever move back
 
-Open the repo in the GitHub app, navigate to `journal/`, tap **Add file**. The dashboard
-picks it up on the next build.
+The parser and the panel are both intact. Drop new `.md` files in here and they render — the
+only thing that changed is the copy telling you where to write.

@@ -1,0 +1,3 @@
+Name,Tags,Indicators,Macro Filter,Timeframe,Entry,Exit,Status,Trades Logged,Notes
+Liquidity sweep reversal,"liquidity, reversal","Equal highs/lows, volume",none,H4,Price sweeps equal highs then closes back inside range with displacement candle. Enter on retest of the swept level.,Stop above sweep wick. Target opposing liquidity pool.,Testing,0,Works best in ranging regimes. Dies in strong trends.
+Order block retest,"smc, continuation","Order block, FVG",DXY strength filter,M15,Higher timeframe trend intact. Price returns to unmitigated order block and prints bullish confirmation candle.,Stop below order block low. Target 3R or next FVG fill.,Testing,0,Requires confirmation candle — early entry is the known failure mode.

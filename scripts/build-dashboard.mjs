@@ -610,15 +610,19 @@ R['macro-pulse']=function(d){
 
 // Journal is not a data feed — it comes from journal/*.md rather than data/*/ — so it is
 // rendered from its own slot on the payload rather than through the feed registry.
+// Notion is the primary journal now; journal/*.md is the frozen archive that predates it,
+// so this panel reads as history plus a link out rather than a place to write.
+var NOTION_JOURNAL='https://app.notion.com/p/3d4530da046b80baabc7e8a9bf1992fd';
 function journalPanel(entries){
+  var notionLink='<a href="'+NOTION_JOURNAL+'" target="_blank" rel="noopener">Notion</a>';
   if(!entries.length){
-    return '<p class="empty">No entries yet. Copy <code>journal/_TEMPLATE.md</code> to '
-      +'<code>journal/'+new Date().toISOString().slice(0,10)+'.md</code> and write. '
-      +'Git versions every edit; the GitHub mobile app works for writing on the move.</p>';
+    return '<p class="empty">Journal lives in '+notionLink+'. Nothing archived in '
+      +'<code>journal/</code>.</p>';
   }
   var res={win:'good',loss:'critical',open:'warning',scratch:''};
   var counts=entries.reduce(function(a,e){ if(e.result)a[e.result]=(a[e.result]||0)+1; return a },{});
-  var body='';
+  var body='<p class="sub" style="margin-bottom:8px">Writing happens in '+notionLink
+    +'. Below is the archive from before the move.</p>';
   if(Object.keys(counts).length)body+=tiles(Object.entries(counts).map(function(e){return [e[0],e[1]]}));
   body+=entries.slice(0,8).map(function(e){
     return '<div class="alert" style="flex-wrap:wrap">'
@@ -631,6 +635,7 @@ function journalPanel(entries){
       +esc(e.excerpt)+(e.words>60?'…':'')+'</span></div>';
   }).join('');
   if(entries.length>8)body+='<p class="sub" style="margin-top:8px">'+(entries.length-8)+' older entries in <code>journal/</code></p>';
+
   return body;
 }
 
@@ -694,7 +699,7 @@ names.forEach(function(n){
   // Journal sits directly after the book, where the day's trades are freshest in mind.
   if(n==='portfolio'){
     var J=D.journal||[];
-    out+=card('journal','Journal',J.length?J.length+' entries':'empty',journalPanel(J));
+    out+=card('journal','Journal',J.length?'in Notion · '+J.length+' archived':'in Notion',journalPanel(J));
     nav+='<a href="#p-journal">Journal</a>';
   }
 });

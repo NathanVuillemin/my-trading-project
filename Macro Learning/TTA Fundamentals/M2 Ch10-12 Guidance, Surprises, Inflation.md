@@ -1,0 +1,31 @@
+# TTA · Ch 10–12 (Words, surprises & liquidity → Inflation → Inflation expectations)
+Condensed notes in my own words. `[Claude+]` = my additions.
+
+## Ch 10 · Words, Surprises and Liquidity
+**10.1 Hawkish, dovish, forward guidance**: hawk = leaning toward tighter policy (usually currency and yields up); dove = leaning toward easier policy (usually down). Forward guidance = signalling the future path via statements, pressers, minutes and speeches. Because markets price the *path*, one changed sentence can move the 2y like an actual hike. Traders diff each statement against the previous one. **The change in tone matters, not the tone itself**: a usually-dovish bank sounding a bit less dovish is a hawkish surprise.
+**10.2 Delivered vs expected** (flagged as the most important idea in the course): reaction = reality − expectation. Money-market pricing shows the consensus before each meeting. Delivered more than priced → hawkish surprise; less → dovish surprise (the currency can drop *on a hike*); exactly priced → the guidance decides. Applies equally to CPI, NFP and earnings. Case: SNB removes the EURCHF 1.20 floor (15 Jan 2015), EURCHF ~−30% at the extreme; positions and stops were built on the floor holding. *Move size = gap between priced and reality.*
+**10.3 Money supply & balance sheet**: **M2** = cash + checking + savings + small deposits (a *stock* of money held, not government spending). Watch its **growth rate**: fast growth with stuck supply = inflation risk; outright contraction = genuinely tight conditions. CB balance sheet: bond buying creates reserves (QE grows it, QT shrinks it). Compare balance sheets as **% of GDP**, not dollars (rough anchors: Fed <10% pre-2008, ~⅓ after 2020; BoJ >100%). Liquidity is **a tide, not a trigger**: a rising tide supports equities, gold and credit (and can dilute a currency); a falling tide makes markets fragile. There is no timing signal. Case: US M2 ~$15tn → ~$21tn (2020–21, ~25% YoY peak) with CPI peaking ~9.1% in June 2022, but with a long lag and alongside supply shocks and the energy shock.
+
+## Ch 11 · What Inflation Is and How It's Measured
+**11.1 What & why**: inflation = annual % rise in the general price level (each unit of money buys less). Two engines: **demand-pull** (too much spending chasing goods; hikes work well) vs **cost-push** (input shocks passed on; hikes work poorly). Disinflation = still rising, but slower; deflation = falling prices (feared: delayed spending, stalling). Every print is really a bet on the next policy move.
+**11.2 Measuring it**: headline CPI (all), core CPI (ex food & energy, the trend), **core PCE** (the Fed's 2% target; broader, adjusts for substitution), PPI (factory gate; a *loose, slow* pipeline hint, since firms often absorb costs). MoM = fresh; YoY = smooth but slow; annualise MoM for the current pace (0.3% MoM ≈ 3.7% annual). **Base-effect trap**: a big month dropping out of the 12-month window lowers YoY without any real improvement, so check the MoM run rate. Markets react most to **core MoM**. Case: June 2022 US CPI ~9.1% YoY; the next month MoM was ~0 while YoY still read ~8.5%.
+**11.3 Goods vs services vs wages**: goods = volatile, often imported, can reverse on their own; services = homegrown, **sticky, driven by wages** (wages rarely fall). Wage-price spiral risk → wage data *is* inflation data. A cooler headline with hot services can still be hawkish. Split every report into volatile vs sticky.
+
+## Ch 12 · Inflation Expectations and Markets
+**12.1 Breakevens & real yields**: expectations are self-fulfilling (wage demands, pre-emptive pricing), so CBs fight to keep them anchored near 2%. **Breakeven = nominal Treasury yield − TIPS yield** = the market's money-backed inflation forecast. **Real yield ≈ nominal − expected inflation** = growth of purchasing power. Rising breakevens → hawkish CB response; rising real yields tighten everything, *especially gold and expensive growth stocks*. The same 4% nominal is loose with 3% expected inflation and tight with 1%.
+**12.2 How inflation moves markets, the CPI chain**: hot vs consensus → more hikes/fewer cuts priced → nominal and real yields up → USD up broadly → equities down (growth stocks most) → gold down. A cool print runs it in reverse. **Size tracks the surprise, not the level.** Case: Oct-2022 CPI (released Nov 2022) a couple of tenths below consensus → S&P +5%+, USD sharply lower. Caveat: the chain holds when inflation is the market's main fear; in a growth-scare regime, hot inflation plus weak growth can hurt the currency instead.
+
+> `[Claude+]` **CPI-day routine for XAUUSD** (combining 10.2, 11.2, 12.2):
+> 1. Day before: note consensus for core MoM (the number that matters most), the CME FedWatch path, and the 2y yield.
+> 2. On release: read core MoM vs consensus first, then services/shelter. A ±0.1 miss on core is a meaningful surprise.
+> 3. Confirm via the chain: 2y yield, DXY, TIPS/real yield direction. If gold moves opposite to the chain (e.g. hot print but gold up), log it as a "contradiction cell" (MMH 00.7), since those are information-rich.
+> 4. Enter only after the initial liquidity sweep (typically 5–30 min), in the direction the chain *and* HTF structure agree on.
+
+## Practice questions (mine, course style)
+1. The Fed is expected to hold with a neutral statement. It holds but drops the phrase about "further cuts". Likely USD reaction? → Up (a hawkish shift in guidance)
+2. Markets price a 25bp cut; the ECB cuts 50bp. EURUSD most likely…? → Falls (dovish surprise)
+3. M2 grows 1% YoY for two years while the policy rate stays at 5%. What does that say about the liquidity backdrop? → Tight; markets are more fragile to bad news
+4. Headline CPI jumps on petrol, core is steady. How should a trader read it? → An energy-driven spike; less signal on underlying trend and CB reaction
+5. Last March had a 1.0% MoM print; this March prints 0.3%. What happens to YoY and why? → It falls sharply due to a base effect, not genuine cooling
+6. 10y nominal 4.4%, 10y TIPS 2.1%. Breakeven? If breakevens rise to 2.6% with nominals flat, what happened to real yields and what's the typical gold reaction? → 2.3%; real yield falls to 1.8%; supportive for gold
+7. Core CPI prints 0.2% vs 0.4% consensus. Sketch the chain for 2y, DXY, Nasdaq, gold. → Down, down, up, up

@@ -8,3 +8,9 @@ node_modules/
 # Local secrets — connectors read API keys from the environment, never from files.
 .env
 .env.*
+
+# Linked into the central Omni AI system - not part of this repo
+.claude/agents
+.claude/skills
+.opencode/agent
+.opencode/skills
