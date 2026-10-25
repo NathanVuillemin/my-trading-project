@@ -1,0 +1,259 @@
+{
+  "date": "2026-09-10",
+  "generatedAt": "2026-09-10T23:50:01.788Z",
+  "window_hours": 24,
+  "wallets_scanned": 150,
+  "wallets_with_fills": 149,
+  "rollup": {
+    "CRYPTO": {
+      "net": -46172762,
+      "opened": -19860696,
+      "buy": 2422746,
+      "sell": -22283442,
+      "coins": 11
+    },
+    "STOCK": {
+      "net": 2619422,
+      "opened": 2619422,
+      "buy": 2619422,
+      "sell": 0,
+      "coins": 1
+    },
+    "INDEX": {
+      "net": -14434139,
+      "opened": -14434139,
+      "buy": 0,
+      "sell": -14434139,
+      "coins": 1
+    },
+    "COMMOD": {
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 0
+    },
+    "FX": {
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 0
+    }
+  },
+  "coins": [
+    {
+      "coin": "BTC",
+      "cls": "CRYPTO",
+      "net": -48026471,
+      "opened": -22283442,
+      "closing": -25743029,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x469e…58a5",
+          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+          "usd": -23051194
+        },
+        {
+          "w": "0xe282…df29",
+          "addr": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29",
+          "usd": 767752
+        }
+      ]
+    },
+    {
+      "coin": "XYZ100",
+      "cls": "INDEX",
+      "net": -14434139,
+      "opened": -14434139,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 1,
+      "drivers": [
+        {
+          "w": "0x469e…58a5",
+          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+          "usd": -14434139
+        }
+      ]
+    },
+    {
+      "coin": "GOOGL",
+      "cls": "STOCK",
+      "net": 2619422,
+      "opened": 2619422,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0xb5b3…7a08",
+          "addr": "0xb5b3f3caf9d778b1293e5cd29f32e84b04c67a08",
+          "usd": 2619422
+        }
+      ]
+    },
+    {
+      "coin": "ZEC",
+      "cls": "CRYPTO",
+      "net": -1468166,
+      "opened": 1526497,
+      "closing": -2994663,
+      "divergent": true,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x152e…c9dc",
+          "addr": "0x152e41f0b83e6cad4b5dc730c1d6279b7d67c9dc",
+          "usd": 1526497
+        }
+      ]
+    },
+    {
+      "coin": "PONS",
+      "cls": "CRYPTO",
+      "net": 462674,
+      "opened": 776229,
+      "closing": -313555,
+      "divergent": false,
+      "bulls": 2,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0xb5b3…7a08",
+          "addr": "0xb5b3f3caf9d778b1293e5cd29f32e84b04c67a08",
+          "usd": 719596
+        },
+        {
+          "w": "0x469e…58a5",
+          "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+          "usd": 56633
+        }
+      ]
+    },
+    {
+      "coin": "AAVE",
+      "cls": "CRYPTO",
+      "net": 120020,
+      "opened": 120020,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0xe282…df29",
+          "addr": "0xe2823659be02e0f48a4660e4da008b5e1abfdf29",
+          "usd": 120020
+        }
+      ]
+    },
+    {
+      "coin": "NEAR",
+      "cls": "CRYPTO",
+      "net": -499229,
+      "opened": 0,
+      "closing": -499229,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "DOGE",
+      "cls": "CRYPTO",
+      "net": -408043,
+      "opened": 0,
+      "closing": -408043,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "HYPE",
+      "cls": "CRYPTO",
+      "net": 846842,
+      "opened": 0,
+      "closing": 846842,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "SOL",
+      "cls": "CRYPTO",
+      "net": 2023288,
+      "opened": 0,
+      "closing": 2023288,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "XRP",
+      "cls": "CRYPTO",
+      "net": 2789758,
+      "opened": 0,
+      "closing": 2789758,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "XMR",
+      "cls": "CRYPTO",
+      "net": -44911,
+      "opened": 0,
+      "closing": -44911,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "ETH",
+      "cls": "CRYPTO",
+      "net": -1968524,
+      "opened": 0,
+      "closing": -1968524,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    }
+  ],
+  "flags": {
+    "coinFlags": [
+      {
+        "coin": "XYZ100",
+        "cls": "INDEX",
+        "opened": -14434139,
+        "net": -14434139,
+        "closing": 0,
+        "dir": "BEARISH",
+        "divergent": false,
+        "z": null,
+        "baselineDays": 4,
+        "consensus": false,
+        "drivers": [
+          {
+            "w": "0x469e…58a5",
+            "addr": "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5",
+            "usd": -14434139
+          }
+        ]
+      }
+    ],
+    "classFlags": []
+  }
+}

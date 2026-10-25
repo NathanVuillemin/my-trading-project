@@ -1,0 +1,112 @@
+{
+  "date": "2026-08-03",
+  "generatedAt": "2026-08-03T23:05:59.331Z",
+  "indicators": [
+    {
+      "id": "GOLD",
+      "label": "Gold (PAXG)",
+      "unit": "",
+      "value": 4051,
+      "changeWeek": -14.4,
+      "changeMonth": 41.1,
+      "riskDir": null,
+      "note": "safe haven — rises on fear & debasement",
+      "asOf": "2026-08-03"
+    },
+    {
+      "id": "DGS2",
+      "label": "2Y Treasury",
+      "unit": "%",
+      "value": 4.28,
+      "changeWeek": -0.05,
+      "changeMonth": 0.14,
+      "riskDir": "risk-off",
+      "note": null,
+      "asOf": "2026-07-31"
+    },
+    {
+      "id": "DGS10",
+      "label": "10Y Treasury",
+      "unit": "%",
+      "value": 4.75,
+      "changeWeek": 0.06,
+      "changeMonth": 0.26,
+      "riskDir": "risk-on",
+      "note": null,
+      "asOf": "2026-07-31"
+    },
+    {
+      "id": "T10Y2Y",
+      "label": "10Y-2Y spread",
+      "unit": "%",
+      "value": 0.45,
+      "changeWeek": 0.11,
+      "changeMonth": 0.1,
+      "riskDir": "risk-on",
+      "note": "negative = inverted curve (recession signal); steepening = normalising",
+      "asOf": "2026-08-03"
+    },
+    {
+      "id": "DFF",
+      "label": "Fed funds rate",
+      "unit": "%",
+      "value": 3.63,
+      "changeWeek": 0,
+      "changeMonth": 0.01,
+      "riskDir": null,
+      "note": null,
+      "asOf": "2026-07-31"
+    },
+    {
+      "id": "DTWEXBGS",
+      "label": "Dollar (broad)",
+      "unit": "idx",
+      "value": 119.7,
+      "changeWeek": -1.007,
+      "changeMonth": -0.987,
+      "riskDir": "risk-on",
+      "note": "rising dollar drains risk appetite; falling supports crypto/risk",
+      "asOf": "2026-07-31"
+    },
+    {
+      "id": "VIXCLS",
+      "label": "VIX",
+      "unit": "",
+      "value": 15.99,
+      "changeWeek": -2.59,
+      "changeMonth": 0.18,
+      "riskDir": "risk-on",
+      "note": ">20 elevated fear",
+      "asOf": "2026-07-31"
+    },
+    {
+      "id": "BAMLH0A0HYM2",
+      "label": "High-yield spread",
+      "unit": "%",
+      "value": 2.84,
+      "changeWeek": 0.07,
+      "changeMonth": 0.09,
+      "riskDir": "risk-off",
+      "note": "widening = credit stress / risk-off",
+      "asOf": "2026-07-30"
+    }
+  ],
+  "gold": {
+    "priceUsd": 4051.1,
+    "changeWeekPct": -0.35,
+    "changeMonthPct": 1.02,
+    "source": "Hyperliquid PAXG",
+    "note": "haven bid on fear; debasement hedge; inverse to real yields"
+  },
+  "netLiquidity": {
+    "valueB": 5825,
+    "changeWeekB": -91,
+    "read": "CONTRACTING — headwind for risk assets",
+    "components": {
+      "fedBalanceSheetB": 6738,
+      "reverseRepoB": 2,
+      "treasuryAccountB": 911
+    }
+  },
+  "warns": []
+}

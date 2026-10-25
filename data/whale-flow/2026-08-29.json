@@ -1,0 +1,139 @@
+{
+  "date": "2026-08-29",
+  "generatedAt": "2026-08-29T23:56:36.621Z",
+  "window_hours": 24,
+  "wallets_scanned": 150,
+  "wallets_with_fills": 142,
+  "rollup": {
+    "CRYPTO": {
+      "net": 22241015,
+      "opened": 19287675,
+      "buy": 19287675,
+      "sell": 0,
+      "coins": 5
+    },
+    "STOCK": {
+      "net": -465895,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 1
+    },
+    "INDEX": {
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 0
+    },
+    "COMMOD": {
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 0
+    },
+    "FX": {
+      "net": 0,
+      "opened": 0,
+      "buy": 0,
+      "sell": 0,
+      "coins": 0
+    }
+  },
+  "coins": [
+    {
+      "coin": "ETH",
+      "cls": "CRYPTO",
+      "net": 12378787,
+      "opened": 12622642,
+      "closing": -243855,
+      "divergent": false,
+      "bulls": 2,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0xde8d…9524",
+          "addr": "0xde8d9e530b0528ffa7b1190f862536c055dd9524",
+          "usd": 12441830
+        },
+        {
+          "w": "0x020c…5872",
+          "addr": "0x020ca66c30bec2c4fe3861a94e4db4a498a35872",
+          "usd": 180813
+        }
+      ]
+    },
+    {
+      "coin": "BTC",
+      "cls": "CRYPTO",
+      "net": 3401933,
+      "opened": 3401933,
+      "closing": 0,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x020c…5872",
+          "addr": "0x020ca66c30bec2c4fe3861a94e4db4a498a35872",
+          "usd": 3401933
+        }
+      ]
+    },
+    {
+      "coin": "HYPE",
+      "cls": "CRYPTO",
+      "net": 6430694,
+      "opened": 3263100,
+      "closing": 3167594,
+      "divergent": false,
+      "bulls": 1,
+      "bears": 0,
+      "drivers": [
+        {
+          "w": "0x020c…5872",
+          "addr": "0x020ca66c30bec2c4fe3861a94e4db4a498a35872",
+          "usd": 3263100
+        }
+      ]
+    },
+    {
+      "coin": "#12090",
+      "cls": "CRYPTO",
+      "net": 1130,
+      "opened": 0,
+      "closing": 1130,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "MU",
+      "cls": "STOCK",
+      "net": -465895,
+      "opened": 0,
+      "closing": -465895,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    },
+    {
+      "coin": "TRX",
+      "cls": "CRYPTO",
+      "net": 28471,
+      "opened": 0,
+      "closing": 28471,
+      "divergent": false,
+      "bulls": 0,
+      "bears": 0,
+      "drivers": []
+    }
+  ],
+  "flags": {
+    "coinFlags": [],
+    "classFlags": []
+  }
+}
