@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Day Trading Dashboard - v0</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #1c2330;
+    --border: #2a3340;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --orange: #f0883e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+  .container { max-width: 1600px; margin: 0 auto; padding: 16px; }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+  }
+  h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  .header-right { display: flex; gap: 24px; align-items: center; font-size: 13px; }
+  .clock { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .session-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+  .session-prime { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid var(--green); }
+  .session-good { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+  .session-skip { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid var(--red); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Bias grid */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td select, td input {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 12px;
+    width: 100%;
+  }
+  .pair-name { font-weight: 600; }
+  .bias-up { color: var(--green); }
+  .bias-down { color: var(--red); }
+  .bias-range { color: var(--yellow); }
+  .align-yes { color: var(--green); font-weight: 600; }
+  .align-no { color: var(--muted); }
+
+  /* Checklist */
+  .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; }
+  @media (max-width: 800px) { .checklist { grid-template-columns: 1fr; } }
+  .checklist label {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist label:hover { background: var(--panel-2); }
+  .checklist input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--green);
+  }
+  .checklist input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .checklist-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .checklist-status {
+    margin-left: auto;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-go { background: rgba(63,185,80,0.15); color: var(--green); }
+  .status-wait { background: rgba(210,153,34,0.15); color: var(--yellow); }
+
+  /* Buttons */
+  button {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  button:hover { background: var(--border); }
+  button.primary { background: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #4493e0; }
+  button.danger { color: var(--red); }
+
+  /* Risk calc */
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .calc-grid label { display: flex; flex-direction: column; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .calc-grid input, .calc-grid select {
+    margin-top: 4px;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+  .calc-results {
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--panel-2);
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 13px;
+  }
+  .calc-results .row { display: flex; justify-content: space-between; }
+  .calc-results .label { color: var(--muted); }
+  .calc-results .value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .calc-results .highlight { color: var(--accent); font-size: 15px; }
+
+  /* Journal */
+  .journal-form { display: grid; grid-template-columns: repeat(8, 1fr) auto; gap: 6px; margin-bottom: 12px; align-items: end; }
+  .journal-form label { display: flex; flex-direction: column; font-size: 10px; color: var(--muted); text-transform: uppercase; }
+  .journal-form input, .journal-form select {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 6px;
+    font-size: 12px;
+    width: 100%;
+  }
+  .journal-stats { display: flex; gap: 24px; padding: 10px 12px; background: var(--panel-2); border-radius: 6px; margin-bottom: 12px; font-size: 13px; }
+  .journal-stats .stat { display: flex; flex-direction: column; }
+  .journal-stats .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .journal-stats .stat-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pnl-pos { color: var(--green); }
+  .pnl-neg { color: var(--red); }
+  .journal-table-wrap { max-height: 320px; overflow-y: auto; }
+
+  /* TradingView container fixes */
+  .tv-widget { background: var(--panel-2); border-radius: 6px; overflow: hidden; }
+
+  .footer-note { color: var(--muted); font-size: 11px; text-align: center; margin-top: 24px; padding: 12px; }
+
+  .placeholder-tag {
+    display: inline-block;
+    background: rgba(240,136,62,0.15);
+    color: var(--orange);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  /* Checklist groups */
+  .check-group { margin-bottom: 14px; }
+  .check-group-title {
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-group .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; }
+  @media (max-width: 800px) { .check-group .checklist { grid-template-columns: 1fr; } }
+
+  /* Account rules panel */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 900px) { .rules-grid { grid-template-columns: repeat(2, 1fr); } }
+  .rule-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .rule-card .rule-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .rule-card .rule-value { font-size: 18px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .rule-card .rule-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .limits-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .limits-row { grid-template-columns: 1fr; } }
+  .limit-bar {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .limit-bar .lb-head { display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; }
+  .limit-bar .lb-label { color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-size: 10px; }
+  .limit-bar .lb-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .progress-track { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; transition: width 0.3s, background-color 0.3s; }
+  .progress-safe { background: var(--green); }
+  .progress-warn { background: var(--yellow); }
+  .progress-danger { background: var(--red); }
+
+  .account-mode-wrap { display: flex; align-items: center; }
+
+  /* Pyramid plan */
+  .pyramid-plan {
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--panel-2);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+  }
+  .pyramid-plan h3 {
+    margin: 0 0 10px 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .pyramid-step {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.02);
+    font-size: 12px;
+  }
+  .pyramid-step:last-child { margin-bottom: 0; }
+  .pyramid-step .step-num {
+    background: var(--bg);
+    color: var(--accent);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .pyramid-step .step-detail { color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .pyramid-step .step-price { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; color: var(--text); }
+  .pyramid-step .step-action { color: var(--text); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Day Trading Dashboard <span class="placeholder-tag">v0.5 — FTB + RB</span></h1>
+    <div class="header-right">
+      <div class="account-mode-wrap">
+        <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Account
+          <select id="account-mode" onchange="changeAccountMode()" style="margin-left:8px;background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;">
+            <option value="private">Private Capital</option>
+            <option value="prop">Prop Firm</option>
+          </select>
+        </label>
+      </div>
+      <div class="clock"><span id="clock-local">--:--:--</span> <span style="color:var(--muted);font-size:11px;">CET</span></div>
+      <div class="clock"><span id="clock">--:--:--</span> <span style="color:var(--muted);font-size:11px;">UTC</span></div>
+      <div class="session-badge" id="session-badge">Session</div>
+    </div>
+  </header>
+
+  <!-- Watchlist ticker -->
+  <div class="panel">
+    <h2>Watchlist</h2>
+    <div class="tv-widget">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            {"proName": "FX:EURUSD", "title": "EUR/USD"},
+            {"proName": "FX:GBPUSD", "title": "GBP/USD"},
+            {"proName": "FX:USDJPY", "title": "USD/JPY"},
+            {"proName": "FX:AUDUSD", "title": "AUD/USD"},
+            {"proName": "FX:USDCAD", "title": "USD/CAD"},
+            {"proName": "FX:NZDUSD", "title": "NZD/USD"},
+            {"proName": "FX:USDCHF", "title": "USD/CHF"},
+            {"proName": "OANDA:XAUUSD", "title": "Gold"},
+            {"proName": "TVC:USOIL", "title": "WTI Oil"},
+            {"proName": "OANDA:US30USD", "title": "US30"},
+            {"proName": "OANDA:NAS100USD", "title": "NAS100"}
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": true,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "en"
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bias + Calendar -->
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Multi-TF Bias (manual top-down)</h2>
+      <table id="bias-table">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th>D1</th>
+            <th>H4</th>
+            <th>H1 setup</th>
+            <th>A+?</th>
+            <th>Align</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="bias-tbody"></tbody>
+      </table>
+      <div style="margin-top: 10px; display: flex; gap: 8px;">
+        <button onclick="resetBias()" class="danger">Reset bias for new day</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Economic Calendar</h2>
+      <div class="tv-widget" style="height: 460px;">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+          {
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "locale": "en",
+            "countryFilter": "us,eu,gb,jp,au,ca,nz,ch,de",
+            "importanceFilter": "0,1",
+            "width": "100%",
+            "height": "100%"
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account rules + daily limits -->
+  <div class="panel">
+    <h2>Account Rules & Daily Gate <span id="account-label" style="color:var(--accent);font-weight:600;text-transform:none;letter-spacing:0;font-size:12px;margin-left:8px;"></span></h2>
+    <div class="rules-grid" id="rules-grid"></div>
+    <div class="limits-row" id="limits-row" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- Pre-trade checklist (FTB + RB) -->
+  <div class="panel">
+    <h2>
+      Pre-Trade Checklist
+      <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;margin-left:8px;">All gates must be GREEN before entry</span>
+    </h2>
+    <div id="checklist"></div>
+    <div class="checklist-actions">
+      <button onclick="resetChecklist()">Reset checklist</button>
+      <div class="checklist-status" id="checklist-status">0 / 0 — WAIT</div>
+    </div>
+  </div>
+
+  <!-- Risk calc + Journal -->
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Risk Calculator</h2>
+      <div class="calc-grid">
+        <label>Account balance ($)
+          <input type="number" id="calc-balance" value="10000" step="100" oninput="calcRisk()" />
+        </label>
+        <label>Risk per trade (%)
+          <input type="number" id="calc-risk-pct" value="1" step="0.1" oninput="calcRisk()" />
+        </label>
+        <label>Instrument
+          <select id="calc-instrument" onchange="calcRisk()">
+            <option value="fx-usdq">FX, USD quoted (EURUSD, GBPUSD, AUDUSD, NZDUSD)</option>
+            <option value="fx-usdb">FX, USD base (USDJPY, USDCAD, USDCHF)</option>
+            <option value="jpy">JPY pair (USDJPY, EURJPY, GBPJPY)</option>
+            <option value="gold">Gold (XAUUSD)</option>
+            <option value="indices">Index CFD (US30, NAS100)</option>
+            <option value="oil">Oil (USOIL)</option>
+          </select>
+        </label>
+        <label>Direction
+          <select id="calc-direction" onchange="calcRisk()">
+            <option value="long">Long</option>
+            <option value="short">Short</option>
+          </select>
+        </label>
+        <label>Entry price
+          <input type="number" id="calc-entry" value="1.0850" step="0.0001" oninput="calcRisk()" />
+        </label>
+        <label>Stop loss price
+          <input type="number" id="calc-stop" value="1.0830" step="0.0001" oninput="calcRisk()" />
+        </label>
+        <label>Target RR (e.g. 2 = 2R)
+          <input type="number" id="calc-rr" value="2" step="0.5" oninput="calcRisk()" />
+        </label>
+        <label>Min RR allowed
+          <input type="number" id="calc-min-rr" value="2" step="0.5" oninput="calcRisk()" />
+        </label>
+      </div>
+      <div class="calc-results" id="calc-results"></div>
+      <div class="pyramid-plan" id="pyramid-plan"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Trade Journal</h2>
+      <div class="journal-stats" id="journal-stats">
+        <div class="stat"><div class="stat-label">Trades</div><div class="stat-value" id="js-trades">0</div></div>
+        <div class="stat"><div class="stat-label">Win rate</div><div class="stat-value" id="js-winrate">—</div></div>
+        <div class="stat"><div class="stat-label">Avg R</div><div class="stat-value" id="js-avgr">—</div></div>
+        <div class="stat"><div class="stat-label">Total R</div><div class="stat-value" id="js-totalr">0.00</div></div>
+      </div>
+      <div class="journal-form">
+        <label>Date<input type="date" id="j-date" /></label>
+        <label>Pair<input type="text" id="j-pair" placeholder="EURUSD" /></label>
+        <label>Dir<select id="j-dir"><option>Long</option><option>Short</option></select></label>
+        <label>Entry<input type="number" id="j-entry" step="0.0001" /></label>
+        <label>Stop<input type="number" id="j-stop" step="0.0001" /></label>
+        <label>Exit<input type="number" id="j-exit" step="0.0001" /></label>
+        <label>R<input type="number" id="j-r" step="0.1" placeholder="auto" /></label>
+        <label>Notes<input type="text" id="j-notes" /></label>
+        <button class="primary" onclick="addTrade()">Add</button>
+      </div>
+      <div class="journal-table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Pair</th><th>Dir</th><th>Entry</th><th>Stop</th><th>Exit</th><th>R</th><th>Notes</th><th></th></tr>
+          </thead>
+          <tbody id="journal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    v0 skeleton. Bias entries, checklist state, and trade journal persist in this browser's local storage. Upload FTB rules and I'll wire them into the checklist + bias logic.
+  </div>
+</div>
+
+<script>
+/* ============= Watchlist & bias data ============= */
+const WATCHLIST = [
+  "EURUSD","GBPUSD","USDJPY","AUDUSD","USDCAD","NZDUSD","USDCHF",
+  "XAUUSD","USOIL","US30","NAS100"
+];
+
+/* ============= Clock & session ============= */
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,"0");
+  const m = String(now.getUTCMinutes()).padStart(2,"0");
+  const s = String(now.getUTCSeconds()).padStart(2,"0");
+  document.getElementById("clock").textContent = `${h}:${m}:${s}`;
+
+  // Local CET/CEST (Europe/Paris handles DST automatically)
+  const cetStr = now.toLocaleTimeString("en-GB", { timeZone: "Europe/Paris", hour12: false });
+  document.getElementById("clock-local").textContent = cetStr;
+
+  const hour = now.getUTCHours();
+  const badge = document.getElementById("session-badge");
+  // Informational only — not a checklist gate
+  if (hour >= 13 && hour < 16) {
+    badge.textContent = "London / NY overlap";
+    badge.className = "session-badge session-prime";
+  } else if (hour >= 7 && hour < 13) {
+    badge.textContent = "London session";
+    badge.className = "session-badge session-good";
+  } else if (hour >= 16 && hour < 22) {
+    badge.textContent = "NY session";
+    badge.className = "session-badge session-good";
+  } else {
+    badge.textContent = "Asia / off-hours";
+    badge.className = "session-badge session-skip";
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ============= Account modes ============= */
+const ACCOUNT_MODES = {
+  private: {
+    label: "Private Capital",
+    riskPct: 1.0,
+    dailyLossPct: 3.0,
+    maxDDPct: 10.0,
+    maxTradesPerDay: 3,
+    profitTargetPct: null
+  },
+  prop: {
+    label: "Prop Firm (challenge)",
+    riskPct: 0.5,
+    dailyLossPct: 4.0,
+    maxDDPct: 8.0,
+    maxTradesPerDay: 2,
+    profitTargetPct: 8.0
+  }
+};
+let currentMode = localStorage.getItem("accountMode") || "private";
+document.getElementById("account-mode").value = currentMode;
+
+function changeAccountMode() {
+  currentMode = document.getElementById("account-mode").value;
+  localStorage.setItem("accountMode", currentMode);
+  renderRules();
+  // Also push the risk % into the calculator
+  document.getElementById("calc-risk-pct").value = ACCOUNT_MODES[currentMode].riskPct;
+  calcRisk();
+}
+
+function renderRules() {
+  const m = ACCOUNT_MODES[currentMode];
+  document.getElementById("account-label").textContent = m.label;
+  const cards = [
+    { label: "Risk / trade",       value: m.riskPct + "%",         sub: "per trade" },
+    { label: "Daily loss limit",   value: m.dailyLossPct + "%",    sub: `≈ ${(m.dailyLossPct / m.riskPct).toFixed(1)}R max loss/day` },
+    { label: "Max drawdown",       value: m.maxDDPct + "%",        sub: "overall account" },
+    { label: "Max trades / day",   value: m.maxTradesPerDay,       sub: m.profitTargetPct ? `Profit target ${m.profitTargetPct}%` : "no profit target" },
+  ];
+  document.getElementById("rules-grid").innerHTML = cards.map(c =>
+    `<div class="rule-card"><div class="rule-label">${c.label}</div><div class="rule-value">${c.value}</div><div class="rule-sub">${c.sub}</div></div>`
+  ).join("");
+  renderLimits();
+}
+
+function renderLimits() {
+  const m = ACCOUNT_MODES[currentMode];
+  // Today's trades from journal
+  const today = todayISO();
+  const todays = journal.filter(t => t.date === today);
+  const todayR = todays.reduce((s,t) => s + (t.r || 0), 0);
+  const maxLossR = m.dailyLossPct / m.riskPct;     // in R
+  const tradesUsed = todays.length;
+
+  // Daily P&L bar — show used % of daily loss budget (only counts negative)
+  const lossUsedR = Math.max(0, -todayR);
+  const lossPct = Math.min(100, (lossUsedR / maxLossR) * 100);
+  const lossClass = lossPct > 80 ? "progress-danger" : lossPct > 50 ? "progress-warn" : "progress-safe";
+
+  // Trades used bar
+  const tradesPct = Math.min(100, (tradesUsed / m.maxTradesPerDay) * 100);
+  const tradesClass = tradesUsed >= m.maxTradesPerDay ? "progress-danger" : tradesUsed >= m.maxTradesPerDay - 1 ? "progress-warn" : "progress-safe";
+
+  document.getElementById("limits-row").innerHTML = `
+    <div class="limit-bar">
+      <div class="lb-head">
+        <span class="lb-label">Today P&L (R)</span>
+        <span class="lb-value ${todayR>=0?"pnl-pos":"pnl-neg"}">${todayR.toFixed(2)}R</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill ${lossClass}" style="width:${lossPct}%;"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Loss used: ${lossUsedR.toFixed(2)}R / ${maxLossR.toFixed(1)}R limit ${lossPct >= 100 ? "— STOP" : ""}</div>
+    </div>
+    <div class="limit-bar">
+      <div class="lb-head">
+        <span class="lb-label">Trades today</span>
+        <span class="lb-value">${tradesUsed} / ${m.maxTradesPerDay}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill ${tradesClass}" style="width:${tradesPct}%;"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">${tradesUsed >= m.maxTradesPerDay ? "Max trades hit — STOP" : "OK to take next valid setup"}</div>
+    </div>
+  `;
+}
+
+/* ============= Bias table ============= */
+const biasState = JSON.parse(localStorage.getItem("biasState") || "{}");
+
+function saveBias() { localStorage.setItem("biasState", JSON.stringify(biasState)); }
+
+function renderBias() {
+  const tbody = document.getElementById("bias-tbody");
+  tbody.innerHTML = "";
+  WATCHLIST.forEach(pair => {
+    const s = biasState[pair] || { d1:"", h4:"", h1:"", aplus:"", notes:"" };
+    const align = (s.d1 && s.h4 && s.d1 === s.h4 && s.d1 !== "Range") ? "YES" : "—";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="pair-name">${pair}</td>
+      <td>${biasSelect(pair, "d1", s.d1)}</td>
+      <td>${biasSelect(pair, "h4", s.h4)}</td>
+      <td>${setupSelect(pair, "h1", s.h1)}</td>
+      <td>${aplusSelect(pair, s.aplus)}</td>
+      <td class="${align === "YES" ? "align-yes" : "align-no"}">${align}</td>
+      <td><input type="text" value="${s.notes || ""}" oninput="updateBias('${pair}','notes',this.value)" placeholder="" /></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function biasSelect(pair, key, val) {
+  const opts = ["","Up","Down","Range"];
+  return `<select onchange="updateBias('${pair}','${key}',this.value)">${opts.map(o=>`<option value="${o}" ${o===val?"selected":""}>${o||"—"}</option>`).join("")}</select>`;
+}
+function setupSelect(pair, key, val) {
+  const opts = ["","None","Forming","Ready"];
+  return `<select onchange="updateBias('${pair}','${key}',this.value)">${opts.map(o=>`<option value="${o}" ${o===val?"selected":""}>${o||"—"}</option>`).join("")}</select>`;
+}
+function aplusSelect(pair, val) {
+  const opts = ["","1","2","3","4","5"];
+  return `<select onchange="updateBias('${pair}','aplus',this.value)">${opts.map(o=>`<option value="${o}" ${o===val?"selected":""}>${o||"—"}</option>`).join("")}</select>`;
+}
+function updateBias(pair, key, val) {
+  biasState[pair] = biasState[pair] || {};
+  biasState[pair][key] = val;
+  saveBias();
+  renderBias();
+}
+function resetBias() {
+  if (!confirm("Clear all bias entries for a new trading day?")) return;
+  Object.keys(biasState).forEach(k => delete biasState[k]);
+  saveBias();
+  renderBias();
+}
+renderBias();
+
+/* ============= Checklist — FTB + Rejection Block ============= */
+const CHECKLIST_SECTIONS = [
+  { title: "1. HTF Analysis (D1 + H4)", items: [
+    "D1 trend direction identified (HH/HL or LH/LL)",
+    "H4 structure aligns with D1 direction (not against it)",
+    "Supply / demand zone marked on D1 or H4 as POI",
+    "Zones are STACKED (D1 zone contains H4 zone) — stronger",
+    "Price in DISCOUNT (longs) or PREMIUM (shorts) on H4",
+  ]},
+  { title: "2. Entry Trigger (15m / 1H)", items: [
+    "Price tapped into the H4 POI",
+    "Liquidity sweep observed at the POI (key wicks / equal highs/lows taken)",
+    "Market Structure Shift (MSS) on entry TF in trade direction",
+    "Displacement candle + Fair Value Gap (FVG) left behind",
+    "Rejection Block marked at 80–90% retracement (precision entry)",
+    "FTB / engulfing / BOS confirmed",
+  ]},
+  { title: "3. Risk & Targets", items: [
+    "Stop placed above/below RB wick or structure invalidation",
+    "R:R ≥ 2.0 (target = next opposing liquidity or HTF zone)",
+    "Position size from risk calculator (≤ account risk %)",
+    "Daily loss limit not yet hit (see panel above)",
+    "Max trades for day not exceeded (see panel above)",
+  ]},
+  { title: "4. Discipline", items: [
+    "Setup matches my written plan — no impulse, no FOMO",
+    "Discord / community noise reviewed but did not drive decision",
+    "No major red-folder news within 30 min on relevant currency",
+    "If unsure: I am skipping, not forcing",
+  ]},
+];
+
+// Backwards-compatible flat list for state indexing
+const CHECKLIST_ITEMS = CHECKLIST_SECTIONS.flatMap(s => s.items);
+
+const checkState = JSON.parse(localStorage.getItem("checkState") || "{}");
+
+function renderChecklist() {
+  const c = document.getElementById("checklist");
+  c.innerHTML = "";
+  let idx = 0;
+  CHECKLIST_SECTIONS.forEach(section => {
+    let html = `<div class="check-group"><div class="check-group-title">${section.title}</div><div class="checklist">`;
+    section.items.forEach(item => {
+      const i = idx++;
+      const checked = checkState[i] ? "checked" : "";
+      html += `<label><input type="checkbox" ${checked} onchange="toggleCheck(${i}, this.checked)"><span>${item}</span></label>`;
+    });
+    html += `</div></div>`;
+    c.innerHTML += html;
+  });
+  updateChecklistStatus();
+}
+function toggleCheck(i, val) {
+  checkState[i] = val;
+  localStorage.setItem("checkState", JSON.stringify(checkState));
+  updateChecklistStatus();
+}
+function updateChecklistStatus() {
+  const total = CHECKLIST_ITEMS.length;
+  const done = Object.values(checkState).filter(Boolean).length;
+  const s = document.getElementById("checklist-status");
+  if (done === total) {
+    s.textContent = `${done} / ${total} — GO`;
+    s.className = "checklist-status status-go";
+  } else {
+    s.textContent = `${done} / ${total} — WAIT`;
+    s.className = "checklist-status status-wait";
+  }
+}
+function resetChecklist() {
+  Object.keys(checkState).forEach(k => delete checkState[k]);
+  localStorage.setItem("checkState", JSON.stringify(checkState));
+  renderChecklist();
+}
+renderChecklist();
+
+/* ============= Risk calculator ============= */
+function calcRisk() {
+  const balance = parseFloat(document.getElementById("calc-balance").value) || 0;
+  const riskPct = parseFloat(document.getElementById("calc-risk-pct").value) || 0;
+  const entry = parseFloat(document.getElementById("calc-entry").value) || 0;
+  const stop = parseFloat(document.getElementById("calc-stop").value) || 0;
+  const direction = document.getElementById("calc-direction").value;
+  const instrument = document.getElementById("calc-instrument").value;
+  const rrTarget = parseFloat(document.getElementById("calc-rr").value) || 2;
+  const minRR = parseFloat(document.getElementById("calc-min-rr").value) || 2;
+
+  const dollarRisk = balance * (riskPct / 100);
+  const stopDistance = Math.abs(entry - stop);
+
+  // Pip definition + dollar-per-pip per 1.0 lot (100,000 units for FX)
+  let pipSize, dollarPerPipPerLot, sizeUnit = "lots";
+  switch (instrument) {
+    case "fx-usdq":   pipSize = 0.0001; dollarPerPipPerLot = 10; break;       // USD quote, 1 pip = $10/lot
+    case "fx-usdb":   pipSize = 0.0001; dollarPerPipPerLot = entry ? (10 / entry) : 0; break; // USD base
+    case "jpy":       pipSize = 0.01;   dollarPerPipPerLot = entry ? (1000 / entry) : 0; break;
+    case "gold":      pipSize = 0.10;   dollarPerPipPerLot = 1;                 sizeUnit = "lots (100 oz)"; break;
+    case "indices":   pipSize = 1.00;   dollarPerPipPerLot = 1;                 sizeUnit = "contracts"; break;
+    case "oil":       pipSize = 0.01;   dollarPerPipPerLot = 10;                sizeUnit = "lots (1000 bbl)"; break;
+    default:          pipSize = 0.0001; dollarPerPipPerLot = 10;
+  }
+  const pips = pipSize ? (stopDistance / pipSize) : 0;
+  const riskPerLot = pips * dollarPerPipPerLot;
+  const size = riskPerLot > 0 ? (dollarRisk / riskPerLot) : 0;
+
+  // Target price
+  const target = direction === "long"
+    ? entry + (stopDistance * rrTarget)
+    : entry - (stopDistance * rrTarget);
+
+  const rrOk = rrTarget >= minRR;
+  const stopDirOk = direction === "long" ? stop < entry : stop > entry;
+
+  const fmt = (x, d=2) => isFinite(x) ? x.toFixed(d) : "—";
+
+  document.getElementById("calc-results").innerHTML = `
+    <div class="row"><span class="label">Dollar risk</span><span class="value highlight">$${fmt(dollarRisk)}</span></div>
+    <div class="row"><span class="label">Stop distance</span><span class="value">${fmt(pips, 1)} pips</span></div>
+    <div class="row"><span class="label">FULL position size</span><span class="value highlight">${fmt(size, 2)} ${sizeUnit}</span></div>
+    <div class="row"><span class="label">Target (${fmt(rrTarget,1)}R)</span><span class="value">${fmt(target, instrument==="indices"?2:5)}</span></div>
+    <div class="row"><span class="label">Min RR check</span><span class="value ${rrOk?"pnl-pos":"pnl-neg"}">${rrOk ? "OK" : "FAIL"}</span></div>
+    <div class="row"><span class="label">Stop direction</span><span class="value ${stopDirOk?"pnl-pos":"pnl-neg"}">${stopDirOk ? "OK" : "WRONG SIDE"}</span></div>
+  `;
+
+  // Pyramid plan: 1/4 initial → +1R add → +2R add (Felix Prehn quarter-position rule)
+  const priceDigits = instrument === "indices" ? 2 : (instrument === "jpy" ? 3 : 5);
+  const sign = direction === "long" ? 1 : -1;
+  const add1Price = entry + sign * stopDistance;        // +1R
+  const add2Price = entry + sign * stopDistance * 2;    // +2R
+  const stepSize = size * 0.25;
+  const pyramidValid = stopDirOk && stopDistance > 0;
+
+  document.getElementById("pyramid-plan").innerHTML = pyramidValid ? `
+    <h3>Pyramid plan (1/4 → +1R add → +2R add)</h3>
+    <div class="pyramid-step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-action">Initial entry @ ${fmt(entry, priceDigits)}</div>
+        <div class="step-detail">Size: ${fmt(stepSize, 2)} ${sizeUnit} (25% of full) · Stop: ${fmt(stop, priceDigits)} · Risk: $${fmt(dollarRisk * 0.25)}</div>
+      </div>
+      <div class="step-price">25%</div>
+    </div>
+    <div class="pyramid-step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-action">Add @ +1R = ${fmt(add1Price, priceDigits)}</div>
+        <div class="step-detail">Add: ${fmt(stepSize, 2)} ${sizeUnit} · Move stop to BREAKEVEN (${fmt(entry, priceDigits)}) · Trade now risk-free</div>
+      </div>
+      <div class="step-price">50%</div>
+    </div>
+    <div class="pyramid-step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-action">Add @ +2R = ${fmt(add2Price, priceDigits)}</div>
+        <div class="step-detail">Add: ${fmt(stepSize, 2)} ${sizeUnit} · Move stop to +1R (${fmt(add1Price, priceDigits)}) · Locks profit on initial</div>
+      </div>
+      <div class="step-price">75%</div>
+    </div>
+  ` : `<h3>Pyramid plan</h3><div style="color:var(--muted);font-size:12px;">Fix entry/stop direction to see plan.</div>`;
+}
+calcRisk();
+
+/* ============= Journal ============= */
+let journal = JSON.parse(localStorage.getItem("journal") || "[]");
+
+function todayISO() {
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+document.getElementById("j-date").value = todayISO();
+
+function addTrade() {
+  const t = {
+    date: document.getElementById("j-date").value || todayISO(),
+    pair: document.getElementById("j-pair").value.trim().toUpperCase(),
+    dir: document.getElementById("j-dir").value,
+    entry: parseFloat(document.getElementById("j-entry").value),
+    stop: parseFloat(document.getElementById("j-stop").value),
+    exit: parseFloat(document.getElementById("j-exit").value),
+    rManual: document.getElementById("j-r").value,
+    notes: document.getElementById("j-notes").value.trim()
+  };
+  if (!t.pair) { alert("Pair is required"); return; }
+  // Compute R if not provided
+  if (t.rManual !== "" && !isNaN(parseFloat(t.rManual))) {
+    t.r = parseFloat(t.rManual);
+  } else if (!isNaN(t.entry) && !isNaN(t.stop) && !isNaN(t.exit)) {
+    const risk = Math.abs(t.entry - t.stop);
+    const move = t.dir === "Long" ? (t.exit - t.entry) : (t.entry - t.exit);
+    t.r = risk > 0 ? move / risk : 0;
+  } else {
+    t.r = 0;
+  }
+  journal.unshift(t);
+  localStorage.setItem("journal", JSON.stringify(journal));
+  // Clear fields except date
+  ["j-pair","j-entry","j-stop","j-exit","j-r","j-notes"].forEach(id => document.getElementById(id).value = "");
+  renderJournal();
+}
+function deleteTrade(i) {
+  journal.splice(i,1);
+  localStorage.setItem("journal", JSON.stringify(journal));
+  renderJournal();
+}
+function renderJournal() {
+  const tbody = document.getElementById("journal-tbody");
+  tbody.innerHTML = "";
+  journal.forEach((t, i) => {
+    const cls = t.r > 0 ? "pnl-pos" : (t.r < 0 ? "pnl-neg" : "");
+    tbody.innerHTML += `
+      <tr>
+        <td>${t.date}</td>
+        <td class="pair-name">${t.pair}</td>
+        <td>${t.dir}</td>
+        <td>${isNaN(t.entry) ? "" : t.entry}</td>
+        <td>${isNaN(t.stop) ? "" : t.stop}</td>
+        <td>${isNaN(t.exit) ? "" : t.exit}</td>
+        <td class="${cls}">${t.r ? t.r.toFixed(2) + "R" : "—"}</td>
+        <td>${t.notes || ""}</td>
+        <td><button class="danger" onclick="deleteTrade(${i})">×</button></td>
+      </tr>
+    `;
+  });
+  // Stats
+  const wins = journal.filter(t => t.r > 0).length;
+  const losses = journal.filter(t => t.r < 0).length;
+  const totalR = journal.reduce((s,t) => s + (t.r || 0), 0);
+  const avgR = journal.length ? (totalR / journal.length) : 0;
+  document.getElementById("js-trades").textContent = journal.length;
+  document.getElementById("js-winrate").textContent = (wins+losses) ? `${Math.round(100*wins/(wins+losses))}%` : "—";
+  document.getElementById("js-avgr").textContent = journal.length ? avgR.toFixed(2) + "R" : "—";
+  const totalEl = document.getElementById("js-totalr");
+  totalEl.textContent = totalR.toFixed(2) + "R";
+  totalEl.className = "stat-value " + (totalR > 0 ? "pnl-pos" : totalR < 0 ? "pnl-neg" : "");
+  // Refresh daily limits panel when journal changes
+  if (typeof renderLimits === "function") renderLimits();
+}
+renderJournal();
+// Initial rules render (depends on journal being defined for limits)
+renderRules();
+// Apply account-mode risk % to calculator on first load
+document.getElementById("calc-risk-pct").value = ACCOUNT_MODES[currentMode].riskPct;
+calcRisk();
+</script>
+</body>
+</html>

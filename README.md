@@ -99,8 +99,22 @@ my-trading-project/
 │   │   └── <TICKER>.json
 │   └── research/                    the detailed research notes behind each entry in events/
 │
-└── docs/                            reserved for longer write-ups later — empty for now
+├── playbooks/                       the trading rulebooks themselves, in plain language
+│   ├── aaa-liquidity-system.md      → the current entry system (5-point checklist, entry model, risk)
+│   ├── institutional-flow-playbook.md → how positioning/flow data sets weekly bias
+│   ├── tradingview-setup.md         → chart layouts, indicators, drawing templates
+│   └── prop-firm-shortlist-2026-06.md → which prop firms, and the scam filter
+│
+├── Macro Learning/                  study notes + quizzes (macro primers, TTA course notes)
+├── library/                         ebooks and course PDFs — LOCAL ONLY, never committed (copyrighted)
+│
+└── docs/                            longer write-ups (DATA-NOTES.md: the data traps)
 ```
+
+**The brain.** Short, linked notes about everything here (systems, concepts, assets, tools, decisions)
+live in the Omni AI system's Obsidian vault, not in this repo. Agents reach it through the `brain` MCP
+tools; you open it in Obsidian. Brain notes point back at files in this repo with
+`source: my-trading-project:<path>`, so the long-form documents stay here and nothing is duplicated.
 
 A short version, if you only remember one thing about each: **`.claude/`** holds the AI's instructions,
 **`strategy-rules/`** holds strategies worth reusing, **`pine/`** holds your finished strategy scripts,
