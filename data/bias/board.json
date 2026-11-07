@@ -1,0 +1,119 @@
+{
+  "generatedAt": "2026-11-07T11:13:47.122Z",
+  "asOf": "2026-11-07",
+  "today": "2026-11-07",
+  "regime": "CAUTION",
+  "currencies": {
+    "USD": {
+      "inflation": 0,
+      "labour": 0,
+      "growth": 1,
+      "pricing": -1,
+      "total": 0,
+      "stance": "NEUTRAL"
+    },
+    "EUR": {
+      "inflation": 1,
+      "labour": 0,
+      "growth": 1,
+      "pricing": -1,
+      "total": 1,
+      "stance": "NEUTRAL"
+    },
+    "GBP": {
+      "inflation": 1,
+      "labour": 0,
+      "growth": 1,
+      "pricing": 0,
+      "total": 2,
+      "stance": "HAWKISH"
+    },
+    "JPY": {
+      "inflation": 0,
+      "labour": 0,
+      "growth": 1,
+      "pricing": 0,
+      "total": 1,
+      "stance": "NEUTRAL"
+    }
+  },
+  "gold": {
+    "realYield": 1,
+    "dollar": -1,
+    "risk": 0,
+    "research": 0,
+    "total": 0,
+    "bias": "FLAT"
+  },
+  "pairs": [
+    {
+      "symbol": "EURUSD",
+      "base": "EUR",
+      "quote": "USD",
+      "scoreDiff": 1,
+      "spreadNow": -141,
+      "spread1mo": -153,
+      "spreadChg": 12,
+      "macroSignal": "FLAT",
+      "yieldsConfirm": "—",
+      "riskOverride": "—",
+      "finalBias": "FLAT",
+      "effectiveBias": "FLAT",
+      "lastReviewed": "2026-10-15",
+      "validUntil": "2026-10-22",
+      "status": "EXPIRED"
+    },
+    {
+      "symbol": "GBPUSD",
+      "base": "GBP",
+      "quote": "USD",
+      "scoreDiff": 2,
+      "spreadNow": 39,
+      "spread1mo": 13,
+      "spreadChg": 26,
+      "macroSignal": "LONG",
+      "yieldsConfirm": "YES",
+      "riskOverride": "—",
+      "finalBias": "LONG",
+      "effectiveBias": "FLAT",
+      "lastReviewed": "2026-10-15",
+      "validUntil": "2026-10-22",
+      "status": "EXPIRED"
+    },
+    {
+      "symbol": "USDJPY",
+      "base": "USD",
+      "quote": "JPY",
+      "scoreDiff": -1,
+      "spreadNow": 256,
+      "spread1mo": 295,
+      "spreadChg": -39,
+      "macroSignal": "FLAT",
+      "yieldsConfirm": "—",
+      "riskOverride": "—",
+      "finalBias": "FLAT",
+      "effectiveBias": "FLAT",
+      "lastReviewed": "2026-10-15",
+      "validUntil": "2026-10-22",
+      "status": "EXPIRED"
+    },
+    {
+      "symbol": "XAUUSD",
+      "type": "gold",
+      "total": 0,
+      "finalBias": "FLAT",
+      "effectiveBias": "FLAT",
+      "drivers": {
+        "realYield": 1,
+        "dollar": -1,
+        "risk": 0,
+        "research": 0,
+        "total": 0,
+        "bias": "FLAT"
+      },
+      "lastReviewed": "2026-10-15",
+      "validUntil": "2026-10-22",
+      "status": "EXPIRED"
+    }
+  ]
+}
