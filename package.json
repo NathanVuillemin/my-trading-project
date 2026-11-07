@@ -18,7 +18,11 @@
     "macro:pulse": "node scripts/macro-pulse.mjs",
     "institutions": "node scripts/institutions.mjs",
     "rates": "node scripts/rates.mjs",
-    "tradingview": "node scripts/tradingview.mjs"
+    "tradingview": "node scripts/tradingview.mjs",
+    "bias": "node scripts/bias-engine.mjs",
+    "bias:test": "node scripts/bias-engine.mjs --selftest",
+    "bias:fred": "node scripts/fred-macro.mjs",
+    "bias:dash": "node scripts/build-bias-dashboard.mjs"
   },
   "devDependencies": {
     "pinets": "^0.9.29"

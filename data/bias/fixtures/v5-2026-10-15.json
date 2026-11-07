@@ -1,0 +1,24 @@
+{
+  "$comment": "Macro bias engine inputs. Snapshot of Macro_Tracker_v5.xlsx (Scorecard + Risk & Gold) as of 2026-10-15. Pullers overwrite this; see scripts/bias-engine.mjs. Percentages as plain numbers (3.1 = 3.1%); yields in %, converted to bp inside the engine.",
+  "asOf": "2026-10-15",
+  "currencies": {
+    "USD": { "centralBank": "Fed", "policyRate": 4.0,  "coreCPI": 2.57, "coreCPI3moAgo": 2.57, "inflationTarget": 2.0, "unemployment": 4.2, "unemployment3moAgo": 4.2, "compositePMI": 58.4, "twoYearYield": 4.75, "twoYearYield1moAgo": 4.65 },
+    "EUR": { "centralBank": "ECB", "policyRate": 2.5,  "coreCPI": 2.5,  "coreCPI3moAgo": 2.4,  "inflationTarget": 2.0, "unemployment": 6.4, "unemployment3moAgo": 6.4, "compositePMI": 53.1, "twoYearYield": 3.05, "twoYearYield1moAgo": 3.26 },
+    "GBP": { "centralBank": "BoE", "policyRate": 3.75, "coreCPI": 2.6,  "coreCPI3moAgo": 2.6,  "inflationTarget": 2.0, "unemployment": 4.9, "unemployment3moAgo": 4.9, "compositePMI": 52.0, "twoYearYield": 4.85, "twoYearYield1moAgo": 4.92 },
+    "JPY": { "centralBank": "BoJ", "policyRate": 1.25, "coreCPI": 1.9,  "coreCPI3moAgo": 1.8,  "inflationTarget": 2.0, "unemployment": 2.5, "unemployment3moAgo": 2.5, "compositePMI": 52.3, "twoYearYield": 1.9,  "twoYearYield1moAgo": 1.84 }
+  },
+  "gold": { "realYield": 2.88, "realYield1moAgo": 2.62, "dxy": 102.11, "dxy1moAgo": 99.48, "researchScore": 0 },
+  "risk": { "vix": 17.53, "sp500": 7718.94, "sp500_200dma": 7263.43 },
+  "pairs": [
+    { "symbol": "EURUSD", "base": "EUR", "quote": "USD" },
+    { "symbol": "GBPUSD", "base": "GBP", "quote": "USD" },
+    { "symbol": "USDJPY", "base": "USD", "quote": "JPY" },
+    { "symbol": "XAUUSD", "type": "gold" }
+  ],
+  "reviews": {
+    "EURUSD": "2026-10-15",
+    "GBPUSD": "2026-10-15",
+    "USDJPY": "2026-10-15",
+    "XAUUSD": "2026-10-15"
+  }
+}
