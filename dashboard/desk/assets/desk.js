@@ -197,21 +197,37 @@ render.bias = async (main) => {
 
 render.levels = async (main) => {
   const data = await load('levels');
-  main.innerHTML = head('Key Levels', 'Where big players have shown their hand. <span class="pill warn">draft layout</span>') +
+  const fams = data.families || {};
+  const typeOf = (k) => data.types[k] || {};
+  const stTone = { defended: 'bull', broken: 'bear', untested: 'flat', reference: 'flat', historical: 'flat' };
+  main.innerHTML = head('Key Levels', 'Where big players act: where they showed their hand, their cost basis, the reference points they hedge against, and macro levels that force a central bank\'s hand. <span class="pill warn">draft layout</span>') +
     `<div class="note">${esc(data.note)}</div>
+    <div class="filters tabs" id="lv-fams">${[['all', 'All'], ...Object.entries(fams)].map(([k, v]) => `<a class="chip" data-fam="${k}" href="#${k === 'all' ? '' : k}">${esc(v)}</a>`).join('')}</div>
     <section class="panel"><div class="table-wrap"><table>
       <thead><tr><th>Instrument</th><th>Level</th><th>Price now</th><th>Type</th><th>Who</th><th>Side</th><th>Evidence</th><th>Status</th><th>Last touch</th><th>Source</th></tr></thead>
-      <tbody>${data.levels.map((l) => `<tr>
+      <tbody id="lv-rows"></tbody></table></div></section>
+    <div class="grid hub-grid" style="margin-top:14px">
+      ${Object.entries(fams).map(([f, label]) => panel(label, `<ul class="list">${Object.entries(data.types).filter(([, t]) => t.family === f).map(([k, t]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(t.desc)}</span></li>`).join('')}</ul>`)).join('')}
+      ${data.statuses ? panel('Status', `<ul class="list">${Object.entries(data.statuses).map(([k, v]) => `<li><span class="pill ${stTone[k] || 'flat'}">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`) : ''}
+    </div>`;
+  const draw = () => {
+    const f = location.hash.slice(1);
+    const want = fams[f] ? f : 'all';
+    main.querySelectorAll('[data-fam]').forEach((a) => a.classList.toggle('on', a.dataset.fam === want));
+    const rows = data.levels.filter((l) => want === 'all' || typeOf(l.type).family === want);
+    $('#lv-rows').innerHTML = rows.map((l) => `<tr>
         <td><span class="ccy">${esc(l.instrument)}</span></td>
         <td class="num">${esc(l.level)}</td><td class="num muted">${esc(l.price)}</td>
-        <td><span class="pill flat" title="${esc(data.types[l.type] || '')}">${esc(l.type)}</span></td>
+        <td><span class="pill flat" title="${esc(typeOf(l.type).desc || '')}">${esc(l.type)}</span></td>
         <td class="small">${esc(l.who)}</td><td class="small">${esc(l.side)}</td>
         <td class="small muted">${esc(l.evidence)}</td>
-        <td><span class="pill ${l.status === 'defended' ? 'bull' : l.status === 'broken' ? 'bear' : 'flat'}">${esc(l.status)}</span></td>
+        <td><span class="pill ${stTone[l.status] || 'flat'}">${esc(l.status)}</span></td>
         <td class="small nowrap">${l.lastTouch === '—' ? '—' : fmtDate(l.lastTouch)}</td>
         <td class="small">${l.source ? `<a href="${esc(l.source.url)}" target="_blank" rel="noopener">${esc(l.source.name)} ↗</a>` : '<span class="faint">—</span>'}</td>
-      </tr>`).join('')}</tbody></table></div></section>
-    <div style="margin-top:14px">${panel('Level types', `<ul class="list">${Object.entries(data.types).map(([k, v]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`)}</div>`;
+      </tr>`).join('') || '<tr><td colspan="10" class="empty">No levels of this kind yet.</td></tr>';
+  };
+  window.addEventListener('hashchange', draw);
+  draw();
 };
 
 render.killswitches = async (main) => {
