@@ -4,27 +4,27 @@
     "start": "2026-11-06",
     "end": "2026-11-09"
   },
-  "generatedAt": "2026-11-09T13:19:44.514Z",
+  "generatedAt": "2026-11-09T16:47:23.948Z",
   "filingsParsed": 250,
   "filingsFailed": 0,
   "codeCensus": {
-    "P": 41,
-    "M": 65,
-    "S": 133,
+    "P": 37,
+    "M": 69,
+    "S": 126,
+    "F": 77,
     "A": 60,
     "D": 4,
-    "F": 73,
+    "G": 7,
     "C": 7,
-    "G": 6,
     "J": 12
   },
   "counts": {
-    "buys": 41,
-    "sells": 133
+    "buys": 37,
+    "sells": 126
   },
   "totals": {
-    "buyUsd": 18242831,
-    "sellUsd": 168201830
+    "buyUsd": 2735975,
+    "sellUsd": 153536791
   },
   "clusters": [
     {
@@ -48,6 +48,21 @@
       ]
     },
     {
+      "ticker": "CZNC",
+      "issuer": "CITIZENS &amp; NORTHERN CORP",
+      "usd": 7365,
+      "buyerCount": 2,
+      "buyers": [
+        "Shattuck Katherine W",
+        "Pellegrino Frank G"
+      ],
+      "weightedUsd": 7365,
+      "anyPlanned": false,
+      "roles": [
+        "Insider"
+      ]
+    },
+    {
       "ticker": "OWLS",
       "issuer": "OBOOK HOLDINGS INC.",
       "usd": 949,
@@ -66,30 +81,6 @@
   ],
   "topBuys": [
     {
-      "ticker": "KMI",
-      "issuer": "KINDER MORGAN, INC.",
-      "owner": "KINDER RICHARD D",
-      "role": "Executive Chairman",
-      "usd": 14994200,
-      "shares": 500000,
-      "price": 29.9884,
-      "planned": false,
-      "date": "2026-11-06",
-      "url": "https://www.sec.gov/Archives/edgar/data/1506307/000150630726000139/wk-form4_1794008631.xml"
-    },
-    {
-      "ticker": "MXF",
-      "issuer": "MEXICO EQUITY &amp; INCOME FUND INC",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 499663,
-      "shares": 24115,
-      "price": 20.72,
-      "planned": false,
-      "date": "2026-11-05",
-      "url": "https://www.sec.gov/Archives/edgar/data/863900/000151028126000419/primary_doc.xml"
-    },
-    {
       "ticker": "DGICA",
       "issuer": "DONEGAL GROUP INC",
       "owner": "DONEGAL MUTUAL INSURANCE CO",
@@ -102,6 +93,18 @@
       "url": "https://www.sec.gov/Archives/edgar/data/800457/000093559626000028/wk-form4_1794230310.xml"
     },
     {
+      "ticker": "TTMI",
+      "issuer": "TTM TECHNOLOGIES INC",
+      "owner": "FRANKLIN PHILIP G",
+      "role": "Insider",
+      "usd": 309600,
+      "shares": 5000,
+      "price": 61.92,
+      "planned": false,
+      "date": "2026-11-05",
+      "url": "https://www.sec.gov/Archives/edgar/data/1116942/000119312526452897/ownership.xml"
+    },
+    {
       "ticker": "TSM",
       "issuer": "TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD",
       "owner": "SPLINTER MICHAEL R",
@@ -112,18 +115,6 @@
       "planned": false,
       "date": "2026-11-05",
       "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000734/wk-form4_1794222904.xml"
-    },
-    {
-      "ticker": "JOF",
-      "issuer": "JAPAN SMALLER CAPITALIZATION FUND INC",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 299287,
-      "shares": 28208,
-      "price": 10.61,
-      "planned": false,
-      "date": "2026-11-05",
-      "url": "https://www.sec.gov/Archives/edgar/data/859796/000151028126000420/primary_doc.xml"
     },
     {
       "ticker": "MTDR",
@@ -186,6 +177,18 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1979414/000121390026117150/marketforms-74251.xml"
     },
     {
+      "ticker": "LKFN",
+      "issuer": "LAKELAND FINANCIAL CORP",
+      "owner": "BARTELS ROBERT E JR",
+      "role": "Director",
+      "usd": 117177,
+      "shares": 1918,
+      "price": 61.0931,
+      "planned": false,
+      "date": "2026-11-06",
+      "url": "https://www.sec.gov/Archives/edgar/data/721994/000121021226000004/wk-form4_1794242205.xml"
+    },
+    {
       "ticker": "NTHI",
       "issuer": "NEONC TECHNOLOGIES HOLDINGS, INC.",
       "owner": "Heshmatpour Amir F",
@@ -208,30 +211,6 @@
       "planned": false,
       "date": "2026-11-05",
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026071813/wk-form4_1794006357.xml"
-    },
-    {
-      "ticker": "GRX",
-      "issuer": "Gabelli Healthcare &amp; WellnessRx Trust",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 93083,
-      "shares": 8916,
-      "price": 10.44,
-      "planned": false,
-      "date": "2026-11-05",
-      "url": "https://www.sec.gov/Archives/edgar/data/1391437/000151028126000417/primary_doc.xml"
-    },
-    {
-      "ticker": "ECF",
-      "issuer": "ELLSWORTH GROWTH &amp; INCOME FUND LTD",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 87851,
-      "shares": 7747,
-      "price": 11.34,
-      "planned": false,
-      "date": "2026-11-05",
-      "url": "https://www.sec.gov/Archives/edgar/data/793040/000151028126000418/primary_doc.xml"
     },
     {
       "ticker": "AUDC",
@@ -304,6 +283,42 @@
       "planned": false,
       "date": "2026-11-05",
       "url": "https://www.sec.gov/Archives/edgar/data/1520006/000201575426000003/wk-form4_1793968219.xml"
+    },
+    {
+      "ticker": "MTDR",
+      "issuer": "Matador Resources Co",
+      "owner": "Elsener William Thomas",
+      "role": "EVP, Reservoir Engineering",
+      "usd": 46332,
+      "shares": 900,
+      "price": 51.48,
+      "planned": false,
+      "date": "2026-11-05",
+      "url": "https://www.sec.gov/Archives/edgar/data/1520006/000193469226000008/wk-form4_1793968268.xml"
+    },
+    {
+      "ticker": "API",
+      "issuer": "Agora, Inc.",
+      "owner": "Zhao Bin",
+      "role": "Chief Executive Officer",
+      "usd": 43499,
+      "shares": 10000,
+      "price": 4.3499,
+      "planned": true,
+      "date": "2026-11-04",
+      "url": "https://www.sec.gov/Archives/edgar/data/1802883/000119312526452690/ownership.xml"
+    },
+    {
+      "ticker": "API",
+      "issuer": "Agora, Inc.",
+      "owner": "Zhao Bin",
+      "role": "Chief Executive Officer",
+      "usd": 41955,
+      "shares": 9699,
+      "price": 4.3257,
+      "planned": true,
+      "date": "2026-11-05",
+      "url": "https://www.sec.gov/Archives/edgar/data/1802883/000119312526452690/ownership.xml"
     }
   ]
 }
