@@ -91,6 +91,11 @@ jobs:
         continue-on-error: true
         run: node scripts/rates.mjs
 
+      - name: Correlations for the desk (Yahoo + FRED)
+        id: corr
+        continue-on-error: true
+        run: node scripts/correlations.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -111,6 +116,7 @@ jobs:
             echo "| institutions | ${{ steps.inst.outcome }} |"
             echo "| macro-pulse | ${{ steps.pulse.outcome }} |"
             echo "| rates | ${{ steps.rates.outcome }} |"
+            echo "| correlations | ${{ steps.corr.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —

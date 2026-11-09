@@ -203,3 +203,22 @@ select {
 .chain tr.group th { background: var(--panel-2); color: var(--text, inherit); letter-spacing: 1px; padding: 6px 10px; }
 .chain td .pill { font-family: var(--mono); white-space: nowrap; }
 .chain-flow { padding: 0 2px; }
+
+/* ---------- forms (kill switch editor) ---------- */
+.btn { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); padding: 6px 12px; border-radius: 7px; font: inherit; font-size: 13px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #0b1017; font-weight: 600; }
+.btn.danger { color: var(--bear); border-color: var(--bear); background: none; margin-left: auto; }
+.link-btn { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; font-size: 12px; padding: 0; }
+.ks-form { margin-bottom: 14px; border-color: var(--accent); }
+.form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--faint); min-width: 0; }
+.form-grid .wide { grid-column: span 2; }
+input, textarea { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; font: inherit; font-size: 13px; text-transform: none; letter-spacing: 0; }
+.form-grid select, .form-grid input, .form-grid textarea { width: 100%; text-transform: none; letter-spacing: 0; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+@media (max-width: 640px) { .form-grid { grid-template-columns: minmax(0, 1fr); } .form-grid .wide { grid-column: auto; } }
+
+/* ---------- drivers + correlation links ---------- */
+.chip-link { display: inline-block; font-family: var(--mono); font-size: 11px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 999px; color: var(--accent); text-decoration: none; margin: 1px 0; white-space: nowrap; }
+tr:target td { background: rgba(106, 168, 255, 0.10); }

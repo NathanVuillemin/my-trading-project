@@ -21,8 +21,9 @@ Deploys with the rest of `dashboard/` via `whale-flow.yml` (live at `/my-trading
 |---|---|---|---|
 | `brief.json` | Morning brief | `date, regime, headline, bullets[], focus[{pair,direction,why}], avoid[]` | morning-debrief agent |
 | `bias.json` | Bias per currency + gold | `code, cb, nextMeeting, net, structural (-2..+2), conviction (1-5), status (ACTIVE/FROZEN/EXPIRED), growth, inflation, cbPath{expectedBp, pricedBp}, thesis, driver{name,status}, positioning, invalidation, killSwitches[], reviewed, expires` | Nathan's input (shared store TBD); `pricedBp` from OIS / Market Context |
-| `killswitches.json` | What kills or changes a bias | `id, currency, kind (data/cb/pricing/driver/price/expiry), condition, now, effect (flip/downgrade/upgrade/freeze/flat), status (armed/near/fired), firedOn` | kill-switch checker over data releases (external calendar) + drivers |
+| `killswitches.json` | What kills or changes a bias | `id, currency, kind (data/cb/pricing/driver/price/expiry), condition, now, effect (flip/downgrade/upgrade/freeze/flat), status (armed/near/fired), firedOn, by? ('manual' = typed on the desk), created?, edited?` | Nathan on the Kill Switches page (saved to GitHub) + kill-switch checker later |
 | `drivers.json` | Driver layer | `currency, driver, symbol, measure, move1m, corr20, corr60, effect (supports/neutral/conflict), secondOrder` | TradingView pull + rolling correlation |
+| `correlations.json` | Correlation pairs (live) | `asOf, method, missing[], errors[], pairs[{id, a, b, labelA, labelB, typical (positive/inverse), drivers[], driverOf?, why, r20, r60, r60MonthAgo, change1m, shift, status (strong/moderate/weak/flipped), history[{date, r60, r20}]}]` | `scripts/correlations.mjs`, daily in CI (Yahoo + FRED); archive in `data/correlations/` |
 | `levels.json` | Key levels (draft layout) | `note, families{key: label}, types{key: {family, desc}}, statuses{key: desc}, levels[{id, instrument, level, type, who, side, evidence, price, status (untested/defended/broken/reference/historical), lastTouch, source}]`. Families: hand (intervention, options, positioning, flow, cb-floor), cost (avwap, volume-profile), reference (period-open), macro (rate-spread, exporter-pain, yield-cap, fixing-peg) | manual + COT / flow / TradingView later |
 | `indicators.json` | Indicator catalog (Economy Read Chain) | `layers, rates[], performance[], economies{CODE: {cb{name,url}, releases{inflation[],growth[],labour[]}, themes{...}}}` each {name, unit, impact, source}. impact `up` = a rise supports the currency, `down` = a fall does | hand-kept; live jobs fetch exactly this list |
 | `recaps/index.json` | Recap archive | `recaps[{sunday, week, file, headline}]`, newest first | written by the Sunday recap job |
@@ -43,3 +44,14 @@ the currency, not the economy: green = supportive / hawkish, red = negative / do
 falling jobless claims green).
 
 No calendar page: Nathan uses a separate economic calendar (Events page removed 2026-11-09). The old V5 model board link was removed from the nav at the same time.
+
+## Editing kill switches from the desk
+The Kill Switches page commits straight to `data/killswitches.json` through the GitHub contents API.
+Nathan pastes a fine-grained token (this repo only, Contents read/write) once per device; it stays in that
+browser's localStorage and is sent only to api.github.com. Each save re-reads the file and applies just that
+one change, so the daily data commit is never overwritten. Without a token the page is read-only. Pages
+that show kill switches (Hub, Weekly Recap, Kill Switches) read the repo's current file, not the deployed copy.
+
+## Drivers and correlations
+`drivers.json` rows with `corrId` take their 20d / 60d correlation from `correlations.json` (marked live);
+the rest (EUR gas, GBP gilts, NZD dairy) have no free daily feed and stay manual.
