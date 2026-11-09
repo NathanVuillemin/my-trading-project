@@ -1,6 +1,6 @@
 # Trading Desk
 
-Multi-page bias dashboard. Hub (morning brief) + Weekly Recap, Bias, Events, Key Levels, Kill Switches,
+Multi-page bias dashboard. Hub (morning brief) + Weekly Recap, Bias, Key Levels, Kill Switches,
 Drivers, Review, with a top nav bar. The Weekly Recap is the Sunday read: one overview plus one tab per economy. Market Context covers raw data (calendar, flow, news, positioning, notes); this desk
 holds Nathan's own bias, what changes it, and whether it was right.
 
@@ -11,7 +11,7 @@ Preview locally: `npm run desk`, then open http://localhost:8787/desk/ (pages fe
 Deploys with the rest of `dashboard/` via `whale-flow.yml` (live at `/my-trading-project/desk/`).
 
 ## Files
-- `index.html`, `weekly-recap.html`, `bias.html`, `events.html`, `levels.html`, `kill-switches.html`,
+- `index.html`, `weekly-recap.html`, `bias.html`, `levels.html`, `kill-switches.html`,
   `drivers.html`, `review.html`: thin shells, `<body data-page="…">`.
 - `assets/desk.js`: nav bar + one renderer per page. `assets/desk.css`: styles.
 - `data/*.json`: one file per page domain. `data/recaps/`: one file per Sunday + `index.json` (newest first).
@@ -21,8 +21,7 @@ Deploys with the rest of `dashboard/` via `whale-flow.yml` (live at `/my-trading
 |---|---|---|---|
 | `brief.json` | Morning brief | `date, regime, headline, bullets[], focus[{pair,direction,why}], avoid[]` | morning-debrief agent |
 | `bias.json` | Bias per currency + gold | `code, cb, nextMeeting, net, structural (-2..+2), conviction (1-5), status (ACTIVE/FROZEN/EXPIRED), growth, inflation, cbPath{expectedBp, pricedBp}, thesis, driver{name,status}, positioning, invalidation, killSwitches[], reviewed, expires` | Nathan's input (shared store TBD); `pricedBp` from OIS / Market Context |
-| `events.json` | Releases | `id, asset (currency; commodity later), currency, time (UTC), type, name, impact, previous, forecast, actual, surprise, affects{CCY: note}, killSwitch?, source{name,url}` | calendar puller; `source.url` = official release page |
-| `killswitches.json` | What kills or changes a bias | `id, currency, kind (data/cb/pricing/driver/price/expiry), condition, now, effect (flip/downgrade/upgrade/freeze/flat), status (armed/near/fired), firedOn, event?` | kill-switch checker over events + drivers |
+| `killswitches.json` | What kills or changes a bias | `id, currency, kind (data/cb/pricing/driver/price/expiry), condition, now, effect (flip/downgrade/upgrade/freeze/flat), status (armed/near/fired), firedOn` | kill-switch checker over data releases (external calendar) + drivers |
 | `drivers.json` | Driver layer | `currency, driver, symbol, measure, move1m, corr20, corr60, effect (supports/neutral/conflict), secondOrder` | TradingView pull + rolling correlation |
 | `levels.json` | Key levels (draft layout) | `instrument, level, type, who, side, evidence, price, status, lastTouch, source` | manual + COT / flow later |
 | `indicators.json` | Indicator catalog (Economy Read Chain) | `layers, rates[], performance[], economies{CODE: {cb{name,url}, releases{inflation[],growth[],labour[]}, themes{...}}}` each {name, unit, impact, source}. impact `up` = a rise supports the currency, `down` = a fall does | hand-kept; live jobs fetch exactly this list |
@@ -42,3 +41,5 @@ Each economy is read in a fixed order: **Releases** (days) → **Themes** (weeks
 **Performance**. The indicator list per currency lives in `data/indicators.json`. Colour on each print = impact on
 the currency, not the economy: green = supportive / hawkish, red = negative / dovish (falling inflation is red,
 falling jobless claims green).
+
+No calendar page: Nathan uses a separate economic calendar (Events page removed 2026-11-09). The old V5 model board link was removed from the nav at the same time.

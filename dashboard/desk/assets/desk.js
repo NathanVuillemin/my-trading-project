@@ -7,7 +7,6 @@ const PAGES = [
   { id: 'hub', href: 'index.html', label: 'Hub' },
   { id: 'recap', href: 'weekly-recap.html', label: 'Weekly Recap' },
   { id: 'bias', href: 'bias.html', label: 'Bias' },
-  { id: 'events', href: 'events.html', label: 'Events' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
@@ -41,10 +40,7 @@ const EFFECT_TONE = { supports: 'bull', conflict: 'bear', neutral: 'flat' };
 const effectPill = (e) => `<span class="pill ${EFFECT_TONE[e] || 'flat'}">${esc(e)}</span>`;
 const TRIG_TONE = { fired: 'bear', near: 'warn', armed: 'flat' };
 const trigPill = (s) => `<span class="pill ${TRIG_TONE[s] || 'flat'}">${esc(s)}</span>`;
-const IMPACT_TONE = { high: 'bear', medium: 'warn', low: 'flat' };
-const impactPill = (i) => `<span class="pill ${IMPACT_TONE[i] || 'flat'}">${esc(i)}</span>`;
 const fmtDate = (iso) => new Date(iso + (iso.length === 10 ? 'T12:00:00Z' : '')).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 const bp = (n) => `${n > 0 ? '+' : ''}${n}bp`;
 const gapOf = (c) => c.cbPath.expectedBp - c.cbPath.pricedBp;
 const gapWord = (g) => (g > 0 ? 'hawkish' : g < 0 ? 'dovish' : 'none');
@@ -75,7 +71,7 @@ function shell(page, asOf, mock) {
   document.body.insertAdjacentHTML('afterbegin', `
     <header class="topbar"><div class="topbar-inner">
       <a class="brand" href="index.html">Trading <span>Desk</span></a>
-      <nav class="nav">${nav}<a class="ext" href="../bias.html" title="Old V5 model board">Model ↗</a></nav>
+      <nav class="nav">${nav}</nav>
       <span class="asof">${asOf ? 'as of ' + esc(asOf) : ''}</span>
     </div></header>
     ${mock ? '<div class="mockbar">MOCK DATA: architecture preview. Nothing here is live or real.</div>' : ''}`);
@@ -83,8 +79,8 @@ function shell(page, asOf, mock) {
 function head(title, blurb, right = '') {
   return `<div class="page-head"><div><h1>${esc(title)}</h1>${blurb ? `<p>${blurb}</p>` : ''}</div>${right}</div>`;
 }
-function panel(title, body, link) {
-  return `<section class="panel"><div class="panel-head"><h2>${esc(title)}</h2>${link ? `<a href="${link.href}">${esc(link.label)} →</a>` : ''}</div>${body}</section>`;
+function panel(title, body, link, cls = '') {
+  return `<section class="panel ${cls}"><div class="panel-head"><h2>${esc(title)}</h2>${link ? `<a href="${link.href}">${esc(link.label)} →</a>` : ''}</div>${body}</section>`;
 }
 
 function strengthBars(currencies) {
@@ -103,12 +99,10 @@ function strengthBars(currencies) {
 const render = {};
 
 render.hub = async (main) => {
-  const [brief, bias, events, killswitches, drivers, levels, history, recapIndex] = await Promise.all(
-    ['brief', 'bias', 'events', 'killswitches', 'drivers', 'levels', 'history', 'recaps/index'].map(load));
+  const [brief, bias, killswitches, drivers, levels, history, recapIndex] = await Promise.all(
+    ['brief', 'bias', 'killswitches', 'drivers', 'levels', 'history', 'recaps/index'].map(load));
   const latest = recapIndex.recaps[0];
   const recap = latest ? await load(`recaps/${latest.file.replace(/\.json$/, '')}`) : null;
-  const now = new Date(brief.date + 'T00:00:00Z');
-  const upcoming = events.events.filter((e) => new Date(e.time) >= now).sort((a, b) => a.time.localeCompare(b.time)).slice(0, 6);
   const hotKills = killswitches.killSwitches.filter((t) => t.status !== 'armed');
   const conflicts = drivers.drivers.filter((d) => d.effect === 'conflict');
   const regimeTone = { 'RISK-ON': 'bull', 'RISK-OFF': 'bear', CAUTION: 'warn' }[brief.regime] || 'flat';
@@ -127,11 +121,10 @@ render.hub = async (main) => {
       ${recap ? panel(`Weekly recap · ${fmtDate(recap.sunday)}`, `<p style="margin:0 0 10px">${esc(recap.overview.headline)}</p>
         <ul class="list">${['inflation', 'growth', 'both', 'neither'].map((s) => [s, recap.economies.filter((e) => e.scare === s)]).filter(([, l]) => l.length)
           .map(([s, l]) => `<li>${scarePill(s)}<span class="grow ccy small">${l.map((e) => e.code).join(' · ')}</span></li>`).join('')}</ul>`, { href: 'weekly-recap.html', label: 'Read' }) : ''}
-      ${panel('Next events', `<ul class="list">${upcoming.map((e) => `<li><span class="ccy">${e.currency}</span><span class="grow">${esc(e.name)}<div class="small faint">${fmtDate(e.time)} · ${fmtTime(e.time)}</div></span>${impactPill(e.impact)}</li>`).join('')}</ul>`, { href: 'events.html', label: 'Events' })}
       ${panel('Kill switches fired / near', `<ul class="list">${hotKills.map((t) => `<li><span class="ccy">${t.currency}</span><span class="grow">${esc(t.condition)}<div class="small faint">${esc(t.now)}</div></span>${trigPill(t.status)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
       ${panel('Driver conflicts', `<ul class="list">${conflicts.map((d) => `<li><span class="ccy">${d.currency}</span><span class="grow">${esc(d.driver)} <span class="num muted">${esc(d.move1m)}</span><div class="small faint">60d corr <span class="num">${d.corr60.toFixed(2)}</span></div></span>${effectPill(d.effect)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'drivers.html', label: 'Drivers' })}
       ${panel('Key levels', `<ul class="list">${levels.levels.slice(0, 4).map((l) => `<li><span class="ccy">${esc(l.instrument)}</span><span class="grow"><span class="num">${esc(l.level)}</span> · ${esc(l.type)}<div class="small faint">price <span class="num">${esc(l.price)}</span></div></span><span class="pill flat">${esc(l.status)}</span></li>`).join('')}</ul>`, { href: 'levels.html', label: 'Levels' })}
-      ${panel('Recent bias changes', `<ul class="list">${history.changes.slice(0, 4).map((h) => `<li><span class="ccy">${h.currency}</span><span class="grow">${esc(h.reason)}<div class="small faint">${fmtDate(h.date)} · ${esc(h.layer)}</div></span><span class="num small">${esc(String(h.from))} → ${esc(String(h.to))}</span></li>`).join('')}</ul>`, { href: 'review.html', label: 'Review' })}
+      ${panel('Recent bias changes', `<ul class="list">${history.changes.slice(0, 4).map((h) => `<li><span class="ccy">${h.currency}</span><span class="grow">${esc(h.reason)}<div class="small faint">${fmtDate(h.date)} · ${esc(h.layer)}</div></span><span class="num small">${esc(String(h.from))} → ${esc(String(h.to))}</span></li>`).join('')}</ul>`, { href: 'review.html', label: 'Review' }, 'span-2')}
     </div>`;
 };
 
@@ -202,66 +195,6 @@ render.bias = async (main) => {
     <div style="margin-top:14px">${panel('Pair matrix', matrix)}</div>`;
 };
 
-render.events = async (main) => {
-  const data = await load('events');
-  const brief = await load('brief');
-  const now = new Date(brief.date + 'T00:00:00Z');
-  const state = { ccys: new Set(), type: '', impact: '', when: 'upcoming' };
-  const params = new URLSearchParams(location.search);
-  if (params.get('ccy')) state.ccys.add(params.get('ccy'));
-
-  main.innerHTML = head('Events', 'Each release: what it is, which currencies it moves and how, and a link to the official page where it was (or will be) published.') +
-    `<div class="filters" id="f">
-      ${CCYS.map((c) => `<button class="chip" data-ccy="${c}">${c}</button>`).join('')}
-      <button class="chip" disabled title="Commodities come later">Commodities (soon)</button>
-      <span class="sep"></span>
-      <select id="ftype"><option value="">All types</option>${data.types.map((t) => `<option>${t}</option>`).join('')}</select>
-      <select id="fimp"><option value="">All impact</option><option>high</option><option>medium</option><option>low</option></select>
-      <span class="sep"></span>
-      ${['upcoming', 'past', 'all'].map((w) => `<button class="chip" data-when="${w}">${w}</button>`).join('')}
-    </div>
-    <section class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Ccy</th><th>Type</th><th>Event</th><th>Impact</th><th class="nowrap">Prev</th><th class="nowrap">Fcst</th><th class="nowrap">Actual</th><th>Source</th></tr></thead>
-      <tbody id="rows"></tbody></table></div></section>`;
-
-  const draw = () => {
-    $('#f').querySelectorAll('[data-ccy]').forEach((b) => b.classList.toggle('on', state.ccys.has(b.dataset.ccy)));
-    $('#f').querySelectorAll('[data-when]').forEach((b) => b.classList.toggle('on', state.when === b.dataset.when));
-    const rows = data.events
-      .filter((e) => !state.ccys.size || state.ccys.has(e.currency) || Object.keys(e.affects).some((k) => state.ccys.has(k)))
-      .filter((e) => !state.type || e.type === state.type)
-      .filter((e) => !state.impact || e.impact === state.impact)
-      .filter((e) => state.when === 'all' || (state.when === 'past') === (new Date(e.time) < now))
-      .sort((a, b) => (state.when === 'past' ? b.time.localeCompare(a.time) : a.time.localeCompare(b.time)));
-    $('#rows').innerHTML = rows.map((e) => {
-      const past = new Date(e.time) < now;
-      const surpriseTone = { beat: 'bull', miss: 'bear', inline: 'flat' }[e.surprise];
-      return `<tr class="${past ? 'past' : ''}">
-        <td class="nowrap">${fmtDate(e.time)}<div class="small faint">${fmtTime(e.time)}</div></td>
-        <td><span class="ccy">${e.currency}</span></td>
-        <td class="small">${esc(e.type)}</td>
-        <td>${esc(e.name)}${e.killSwitch ? ` <a class="pill warn" href="kill-switches.html" title="Linked to a kill switch">kill switch</a>` : ''}
-          <div class="affects">${Object.entries(e.affects).map(([k, v]) => `<span><b>${k}</b> ${esc(v)}</span>`).join('')}</div></td>
-        <td>${impactPill(e.impact)}</td>
-        <td class="num nowrap">${esc(e.previous ?? '—')}</td>
-        <td class="num nowrap">${esc(e.forecast ?? '—')}</td>
-        <td class="num nowrap">${e.actual ? `${esc(e.actual)} ${surpriseTone ? `<span class="pill ${surpriseTone}">${esc(e.surprise)}</span>` : ''}` : '<span class="faint">—</span>'}</td>
-        <td class="small">${e.source ? `<a href="${esc(e.source.url)}" target="_blank" rel="noopener">${past ? 'Release' : 'Where it publishes'} ↗</a><div class="faint">${esc(e.source.name)}</div>` : '—'}</td>
-      </tr>`;
-    }).join('') || '<tr><td colspan="9" class="empty">No events match.</td></tr>';
-  };
-  $('#f').addEventListener('click', (ev) => {
-    const b = ev.target.closest('button');
-    if (!b || b.disabled) return;
-    if (b.dataset.ccy) state.ccys.has(b.dataset.ccy) ? state.ccys.delete(b.dataset.ccy) : state.ccys.add(b.dataset.ccy);
-    if (b.dataset.when) state.when = b.dataset.when;
-    draw();
-  });
-  $('#ftype').addEventListener('change', (ev) => { state.type = ev.target.value; draw(); });
-  $('#fimp').addEventListener('change', (ev) => { state.impact = ev.target.value; draw(); });
-  draw();
-};
-
 render.levels = async (main) => {
   const data = await load('levels');
   main.innerHTML = head('Key Levels', 'Where big players have shown their hand. <span class="pill warn">draft layout</span>') +
@@ -292,7 +225,7 @@ render.killswitches = async (main) => {
       <tbody>${list.map((t) => `<tr>
         <td>${trigPill(t.status)}</td><td><span class="ccy">${t.currency}</span></td>
         <td class="small" title="${esc(data.kinds[t.kind])}">${esc(t.kind)}</td>
-        <td>${esc(t.condition)}${t.event ? ` <a class="small" href="events.html?ccy=${t.currency}">event</a>` : ''}</td>
+        <td>${esc(t.condition)}</td>
         <td class="small num muted">${esc(t.now)}</td>
         <td><span class="pill flat" title="${esc(data.effects[t.effect])}">${esc(t.effect)}</span></td>
         <td class="small nowrap">${t.firedOn ? fmtDate(t.firedOn) : '—'}</td>
@@ -459,7 +392,7 @@ render.recap = async (main) => {
       <section class="panel span-2"><div class="panel-head"><h2>Regime map · where each economy sits</h2></div>${regimeMap(recap.economies)}</section>
       ${panel('Economies', `<ul class="list">${recap.economies.map((e) => `<li><a class="ccy" href="#${e.code}">${e.code}</a><span class="grow small muted">${QUADS[quadrantOf(e.regime)].label}</span>${scarePill(e.scare)}</li>`).join('')}</ul>`)}
       ${panel('Kill switches fired', `<ul class="list">${o.killSwitchesFired.map((id) => { const k = kills[id]; return k ? `<li><span class="ccy">${k.currency}</span><span class="grow small">${esc(k.condition)}</span><span class="pill flat">${esc(k.effect)}</span></li>` : `<li class="small">${esc(id)}</li>`; }).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
-      ${panel('Next week · watch', `<ul class="list">${o.nextWeekTop.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`, { href: 'events.html', label: 'Events' })}
+      ${panel('Next week · watch', `<ul class="list">${o.nextWeekTop.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`)}
       ${panel(`Method · ${recap.process.status}`, steps)}
     </div>`;
   };
@@ -494,7 +427,7 @@ render.recap = async (main) => {
           <div><label>My path</label><span>${bp(cbp.myPathBp)}</span></div>
         </div><p class="small muted" style="margin:10px 0 0">Gap after the week: <span class="num ${tone(gap)}" style="background:none">${bp(gap)} ${gapWord(gap)}</span></p></section>
       ${panel('This week', `<ul class="bullets" style="margin:0;padding-left:18px">${e.week.takeaways.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`)}
-      ${panel('Next week', `<ul class="list">${e.nextWeek.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`, { href: `events.html?ccy=${e.code}`, label: 'Events' })}
+      ${panel('Next week', `<ul class="list">${e.nextWeek.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`)}
       <section class="panel span-3"><div class="panel-head"><h2>Method · ${esc(recap.process.status)}</h2></div>
         <ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}<div class="small faint">${esc(e.process?.[s.id] || 'Read goes here once the method is set.')}</div></li>`).join('')}</ol></section>
     </div>`;
