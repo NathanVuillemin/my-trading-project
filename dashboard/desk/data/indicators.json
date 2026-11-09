@@ -1,0 +1,1375 @@
+{
+  "about": "Nathan's Economy Read Chain: the fixed indicator set per economy. Releases (days) -> Themes (weeks) -> Rates & Yields (months) -> Performance. impact 'up' = a rise supports the currency (green); 'down' = a fall supports it (unemployment, claims). Live jobs fetch exactly these.",
+  "layers": {
+    "releases": "days",
+    "themes": "weeks",
+    "rates": "months",
+    "performance": "price"
+  },
+  "rates": [
+    "2Y yield",
+    "10Y yield",
+    "Policy rate",
+    "Policy statement: est. next move + conviction"
+  ],
+  "performance": [
+    "Strength rank (N of 8)",
+    "Currency % (week / 1M)",
+    "2Y vs policy spread (bp)"
+  ],
+  "economies": {
+    "USD": {
+      "cb": {
+        "name": "Fed",
+        "url": "https://www.federalreserve.gov/monetarypolicy.htm"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BLS PPI",
+              "url": "https://www.bls.gov/ppi/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "S&P Global PMI",
+              "url": "https://www.pmi.spglobal.com/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "U. Michigan",
+              "url": "https://www.sca.isr.umich.edu/"
+            }
+          },
+          {
+            "name": "CB Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "Conference Board",
+              "url": "https://www.conference-board.org/topics/consumer-confidence"
+            }
+          },
+          {
+            "name": "ISM Services PMI",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "ISM Manufacturing New Orders",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "Durable Goods",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Housing Starts",
+            "unit": "M",
+            "impact": "up",
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "NFP",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          },
+          {
+            "name": "Initial Jobless Claims",
+            "unit": "K",
+            "impact": "down",
+            "source": {
+              "name": "US DOL claims",
+              "url": "https://oui.doleta.gov/unemploy/claims.asp"
+            }
+          },
+          {
+            "name": "ADP Employment",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "ADP",
+              "url": "https://adpemploymentreport.com/"
+            }
+          },
+          {
+            "name": "JOLTS Openings",
+            "unit": "M",
+            "impact": "up",
+            "source": {
+              "name": "BLS JOLTS",
+              "url": "https://www.bls.gov/jlt/"
+            }
+          },
+          {
+            "name": "ISM Manufacturing Employment",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "Average Hourly Earnings",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          },
+          {
+            "name": "Employment Cost Index QoQ",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BLS ECI",
+              "url": "https://www.bls.gov/eci/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "PCE Price Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Core PCE",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BLS CPI",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BLS CPI",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Fed G.17",
+              "url": "https://www.federalreserve.gov/releases/g17/current/default.htm"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          },
+          {
+            "name": "Personal Spending",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          }
+        ]
+      }
+    },
+    "EUR": {
+      "cb": {
+        "name": "ECB",
+        "url": "https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI MoM",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Economic Sentiment",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Industrial Sentiment",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Services Sentiment",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "ZEW Economic Sentiment Index",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "ZEW",
+              "url": "https://www.zew.de/en/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Current Account s.a.",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Loans to Households YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Loans to Companies YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Wage Growth YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Employment Change QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY Flash",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Flash",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ]
+      }
+    },
+    "GBP": {
+      "cb": {
+        "name": "BoE",
+        "url": "https://www.bankofengland.co.uk/monetary-policy"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI Output",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "PPI Input",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "GfK / NIQ",
+              "url": "https://nielseniq.com/global/en/"
+            }
+          },
+          {
+            "name": "Factory Orders",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "CBI",
+              "url": "https://www.cbi.org.uk/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Claimant Count",
+            "unit": "K",
+            "impact": "down",
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          },
+          {
+            "name": "Average Earnings",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Prel",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Manufacturing Output",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "GDP MoM",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Goods Trade Balance",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          }
+        ]
+      }
+    },
+    "JPY": {
+      "cb": {
+        "name": "BoJ",
+        "url": "https://www.boj.or.jp/en/mopo/index.htm"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI MoM",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "BoJ statistics",
+              "url": "https://www.boj.or.jp/en/statistics/index.htm"
+            }
+          },
+          {
+            "name": "Average Cash Earnings YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "MHLW",
+              "url": "https://www.mhlw.go.jp/english/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Tankan Manufacturing Index",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "BoJ statistics",
+              "url": "https://www.boj.or.jp/en/statistics/index.htm"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Machinery Orders",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Jobs/Applications Ratio",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "MHLW",
+              "url": "https://www.mhlw.go.jp/english/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Inflation Rate ex-Food and Energy YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Tokyo Core CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "METI",
+              "url": "https://www.meti.go.jp/english/statistics/"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "METI",
+              "url": "https://www.meti.go.jp/english/statistics/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          },
+          {
+            "name": "Exports YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "Statistics Bureau labour",
+              "url": "https://www.stat.go.jp/english/data/roudou/index.html"
+            }
+          }
+        ]
+      }
+    },
+    "CAD": {
+      "cb": {
+        "name": "BoC",
+        "url": "https://www.bankofcanada.ca/core-functions/monetary-policy/"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "Ivey PMI",
+              "url": "https://www.ivey.uwo.ca/"
+            }
+          },
+          {
+            "name": "Housing Starts",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "CMHC",
+              "url": "https://www.cmhc-schl.gc.ca/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Average Hourly Wages YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "GDP MoM",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Retail Sales ex Autos",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ]
+      }
+    },
+    "AUD": {
+      "cb": {
+        "name": "RBA",
+        "url": "https://www.rba.gov.au/monetary-policy/"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Consumer Confidence",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Westpac",
+              "url": "https://www.westpac.com.au/"
+            }
+          },
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "NAB",
+              "url": "https://business.nab.com.au/"
+            }
+          },
+          {
+            "name": "Ai Group Manufacturing Index",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "Ai Group",
+              "url": "https://www.aigroup.com.au/"
+            }
+          },
+          {
+            "name": "Building Permits",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          },
+          {
+            "name": "Wage Price Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          },
+          {
+            "name": "RBA Trimmed Mean CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          },
+          {
+            "name": "RBA Weighted Median CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          },
+          {
+            "name": "Full-Time Employment",
+            "unit": "K",
+            "impact": "up",
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          }
+        ]
+      }
+    },
+    "NZD": {
+      "cb": {
+        "name": "RBNZ",
+        "url": "https://www.rbnz.govt.nz/monetary-policy"
+      },
+      "releases": {
+        "inflation": [
+          {
+            "name": "Business Inflation Expectations",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "ANZ NZ",
+              "url": "https://www.anz.co.nz/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "BusinessNZ",
+              "url": "https://businessnz.org.nz/"
+            }
+          },
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "ANZ NZ",
+              "url": "https://www.anz.co.nz/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "Westpac NZ",
+              "url": "https://www.westpac.co.nz/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Global Dairy Trade Price Index",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Global Dairy Trade",
+              "url": "https://www.globaldairytrade.info/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Labour Costs Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Inflation Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Retail Sales YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ]
+      }
+    },
+    "CHF": {
+      "cb": {
+        "name": "SNB",
+        "url": "https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy"
+      },
+      "releases": {
+        "inflation": [],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "procure.ch PMI",
+              "url": "https://www.procure.ch/"
+            }
+          },
+          {
+            "name": "KOF Leading Indicator",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "KOF",
+              "url": "https://kof.ethz.ch/en/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "SNB data portal",
+              "url": "https://data.snb.ch/en"
+            }
+          }
+        ],
+        "labour": []
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Flash",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home.html"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home.html"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -8,31 +8,27 @@
   },
   "process": {
     "status": "to define",
-    "note": "Nathan's step-by-step method for reading each economy goes here. Steps below are placeholders.",
+    "note": "Steps follow Nathan's Economy Read Chain (Releases -> Themes -> Rates & Yields -> Performance). How each print is weighed is still to come.",
     "steps": [
       {
-        "id": "growth",
-        "label": "Read growth: direction and trend of activity data"
+        "id": "releases",
+        "label": "Releases (days): what moved this week in inflation, growth and labour"
       },
       {
-        "id": "inflation",
-        "label": "Read inflation: level vs target and trend"
+        "id": "themes",
+        "label": "Themes (weeks): does the growth / inflation / labour diagnosis change"
       },
       {
         "id": "scare",
         "label": "Which is the scare: inflation, growth, both or neither"
       },
       {
-        "id": "trends",
-        "label": "Data trends: is the picture improving or worsening"
-      },
-      {
-        "id": "cb",
-        "label": "What the central bank is forced to do"
+        "id": "rates",
+        "label": "Rates & Yields (months): policy rate, 2Y / 10Y, what the central bank is forced to do"
       },
       {
         "id": "pricing",
-        "label": "Market pricing vs my path: the gap"
+        "label": "Performance: rank, 2Y vs policy, has price caught up with the read (the gap)"
       },
       {
         "id": "bias",
@@ -72,128 +68,6 @@
       },
       "scare": "inflation",
       "verdict": "Inflation is still the scare. Jobs beat pushed pricing toward my path but gap remains.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Composite PMI",
-            "unit": "",
-            "latest": 50.6,
-            "prior": 50.8,
-            "expected": 50.5,
-            "trend": [
-              52.1,
-              51.6,
-              51,
-              50.4,
-              50.8,
-              50.6
-            ],
-            "source": {
-              "name": "BLS",
-              "url": "https://www.bls.gov/cpi/"
-            }
-          },
-          {
-            "name": "Retail sales m/m",
-            "unit": "%",
-            "latest": 0.4,
-            "prior": 0.3,
-            "expected": 0.2,
-            "trend": [
-              0.6,
-              0.2,
-              0.4,
-              0.1,
-              0.3,
-              0.4
-            ],
-            "source": {
-              "name": "BLS",
-              "url": "https://www.bls.gov/cpi/"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "Core CPI y/y",
-            "unit": "%",
-            "latest": 3.2,
-            "prior": 3.2,
-            "expected": 3.1,
-            "trend": [
-              3,
-              3,
-              3.1,
-              3.1,
-              3.2,
-              3.2
-            ],
-            "source": {
-              "name": "BLS",
-              "url": "https://www.bls.gov/cpi/"
-            }
-          },
-          {
-            "name": "Core PCE y/y",
-            "unit": "%",
-            "latest": 3,
-            "prior": 2.9,
-            "expected": 2.9,
-            "trend": [
-              2.8,
-              2.8,
-              2.9,
-              2.9,
-              2.9,
-              3
-            ],
-            "source": {
-              "name": "BLS",
-              "url": "https://www.bls.gov/cpi/"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Non-farm payrolls",
-            "unit": "K",
-            "latest": 175,
-            "prior": 142,
-            "expected": 120,
-            "trend": [
-              110,
-              95,
-              160,
-              120,
-              142,
-              175
-            ],
-            "source": {
-              "name": "BLS Employment Situation",
-              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
-            }
-          },
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 4.3,
-            "prior": 4.3,
-            "expected": 4.3,
-            "trend": [
-              4.2,
-              4.3,
-              4.3,
-              4.4,
-              4.3,
-              4.3
-            ],
-            "source": {
-              "name": "BLS Employment Situation",
-              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "neutral",
         "pricedStartBp": -60,
@@ -214,7 +88,564 @@
         "CPI (Wed)",
         "Retail sales (Fri)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.4,
+            "prior": 1.4,
+            "expected": 1.3,
+            "trend": [
+              1.3,
+              1.3,
+              1.4,
+              1.4,
+              1.4,
+              1.4
+            ],
+            "source": {
+              "name": "BLS PPI",
+              "url": "https://www.bls.gov/ppi/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "latest": 57.6,
+            "prior": 56.1,
+            "expected": 56.6,
+            "trend": [
+              54.2,
+              53.7,
+              54.9,
+              55.5,
+              56.1,
+              57.6
+            ],
+            "source": {
+              "name": "S&P Global PMI",
+              "url": "https://www.pmi.spglobal.com/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 50.1,
+            "prior": 49.5,
+            "expected": 50.4,
+            "trend": [
+              46.6,
+              48.0,
+              48.0,
+              47.0,
+              49.5,
+              50.1
+            ],
+            "source": {
+              "name": "U. Michigan",
+              "url": "https://www.sca.isr.umich.edu/"
+            }
+          },
+          {
+            "name": "CB Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 91.8,
+            "prior": 91.3,
+            "expected": 92.2,
+            "trend": [
+              91.0,
+              94.8,
+              89.0,
+              86.3,
+              91.3,
+              91.8
+            ],
+            "source": {
+              "name": "Conference Board",
+              "url": "https://www.conference-board.org/topics/consumer-confidence"
+            }
+          },
+          {
+            "name": "ISM Services PMI",
+            "unit": "",
+            "impact": "up",
+            "latest": 51.4,
+            "prior": 54.5,
+            "expected": 50.8,
+            "trend": [
+              57.4,
+              55.4,
+              55.4,
+              51.6,
+              54.5,
+              51.4
+            ],
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "ISM Manufacturing New Orders",
+            "unit": "",
+            "impact": "up",
+            "latest": 55.9,
+            "prior": 56.2,
+            "expected": 56.0,
+            "trend": [
+              53.1,
+              55.3,
+              57.2,
+              59.1,
+              56.2,
+              55.9
+            ],
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "Durable Goods",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.8,
+            "prior": 1.8,
+            "expected": 1.7,
+            "trend": [
+              1.9,
+              1.9,
+              1.8,
+              1.8,
+              1.8,
+              1.8
+            ],
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": -241.8,
+            "prior": -239.1,
+            "expected": -240.7,
+            "trend": [
+              -248.9,
+              -246.0,
+              -242.2,
+              -240.2,
+              -239.1,
+              -241.8
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Housing Starts",
+            "unit": "M",
+            "impact": "up",
+            "latest": 1.197,
+            "prior": 1.158,
+            "expected": 1.182,
+            "trend": [
+              1.2,
+              1.236,
+              1.177,
+              1.146,
+              1.158,
+              1.197
+            ],
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "NFP",
+            "unit": "K",
+            "impact": "up",
+            "latest": 161.2,
+            "prior": 163.5,
+            "expected": 160.7,
+            "trend": [
+              168.2,
+              174.9,
+              169.1,
+              164.7,
+              163.5,
+              161.2
+            ],
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          },
+          {
+            "name": "Initial Jobless Claims",
+            "unit": "K",
+            "impact": "down",
+            "latest": 188.5,
+            "prior": 195.3,
+            "expected": 194.1,
+            "trend": [
+              187.4,
+              186.7,
+              190.6,
+              187.9,
+              195.3,
+              188.5
+            ],
+            "source": {
+              "name": "US DOL claims",
+              "url": "https://oui.doleta.gov/unemploy/claims.asp"
+            }
+          },
+          {
+            "name": "ADP Employment",
+            "unit": "K",
+            "impact": "up",
+            "latest": 87.3,
+            "prior": 86.0,
+            "expected": 88.4,
+            "trend": [
+              83.1,
+              82.4,
+              86.5,
+              86.8,
+              86.0,
+              87.3
+            ],
+            "source": {
+              "name": "ADP",
+              "url": "https://adpemploymentreport.com/"
+            }
+          },
+          {
+            "name": "JOLTS Openings",
+            "unit": "M",
+            "impact": "up",
+            "latest": 7.653,
+            "prior": 7.639,
+            "expected": 7.647,
+            "trend": [
+              7.683,
+              7.66,
+              7.594,
+              7.659,
+              7.639,
+              7.653
+            ],
+            "source": {
+              "name": "BLS JOLTS",
+              "url": "https://www.bls.gov/jlt/"
+            }
+          },
+          {
+            "name": "ISM Manufacturing Employment",
+            "unit": "",
+            "impact": "up",
+            "latest": 52.4,
+            "prior": 50.6,
+            "expected": 51.6,
+            "trend": [
+              49.6,
+              50.1,
+              50.1,
+              51.2,
+              50.6,
+              52.4
+            ],
+            "source": {
+              "name": "ISM",
+              "url": "https://www.ismworld.org/"
+            }
+          },
+          {
+            "name": "Average Hourly Earnings",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.1,
+            "prior": 3.0,
+            "expected": 3.2,
+            "trend": [
+              3.0,
+              3.0,
+              2.9,
+              2.9,
+              3.0,
+              3.1
+            ],
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          },
+          {
+            "name": "Employment Cost Index QoQ",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.8,
+            "prior": 0.9,
+            "expected": 0.8,
+            "trend": [
+              0.7,
+              0.8,
+              0.8,
+              0.8,
+              0.9,
+              0.8
+            ],
+            "source": {
+              "name": "BLS ECI",
+              "url": "https://www.bls.gov/eci/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "PCE Price Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.5,
+            "prior": 3.6,
+            "expected": 3.4,
+            "trend": [
+              3.8,
+              3.8,
+              3.7,
+              3.5,
+              3.6,
+              3.5
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Core PCE",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.1,
+            "prior": 3.0,
+            "expected": 3.1,
+            "trend": [
+              3.1,
+              3.0,
+              2.9,
+              3.0,
+              3.0,
+              3.1
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.6,
+            "prior": 3.5,
+            "expected": 3.6,
+            "trend": [
+              3.4,
+              3.5,
+              3.6,
+              3.6,
+              3.5,
+              3.6
+            ],
+            "source": {
+              "name": "BLS CPI",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.6,
+            "prior": 2.6,
+            "expected": 2.6,
+            "trend": [
+              2.3,
+              2.5,
+              2.7,
+              2.6,
+              2.6,
+              2.6
+            ],
+            "source": {
+              "name": "BLS CPI",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.4,
+            "prior": 3.3,
+            "expected": 3.3,
+            "trend": [
+              3.4,
+              3.4,
+              3.3,
+              3.3,
+              3.3,
+              3.4
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.6,
+            "prior": 0.6,
+            "expected": 0.7,
+            "trend": [
+              0.6,
+              0.6,
+              0.7,
+              0.7,
+              0.6,
+              0.6
+            ],
+            "source": {
+              "name": "Fed G.17",
+              "url": "https://www.federalreserve.gov/releases/g17/current/default.htm"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.8,
+            "prior": 0.7,
+            "expected": 0.9,
+            "trend": [
+              0.7,
+              0.8,
+              0.8,
+              0.8,
+              0.7,
+              0.8
+            ],
+            "source": {
+              "name": "Census Bureau",
+              "url": "https://www.census.gov/economic-indicators/"
+            }
+          },
+          {
+            "name": "Personal Spending",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.5,
+            "prior": 0.4,
+            "expected": 0.5,
+            "trend": [
+              0.4,
+              0.5,
+              0.4,
+              0.4,
+              0.4,
+              0.5
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": -105.6,
+            "prior": -106.4,
+            "expected": -105.0,
+            "trend": [
+              -100.8,
+              -103.6,
+              -106.5,
+              -104.2,
+              -106.4,
+              -105.6
+            ],
+            "source": {
+              "name": "BEA",
+              "url": "https://www.bea.gov/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 4.1,
+            "prior": 4.2,
+            "expected": 4.1,
+            "trend": [
+              4.1,
+              4.2,
+              4.3,
+              4.3,
+              4.2,
+              4.1
+            ],
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 4.47,
+          "chgBp": -8
+        },
+        "y10": {
+          "level": 4.83,
+          "chgBp": -3
+        },
+        "policy": 4.0,
+        "statement": {
+          "nextMove": "Hold",
+          "conviction": "Medium",
+          "url": "https://www.federalreserve.gov/monetarypolicy.htm"
+        }
+      },
+      "performance": {
+        "rank": 1,
+        "of": 8,
+        "spread2yPolicyBp": 47
+      }
     },
     {
       "code": "EUR",
@@ -226,109 +657,6 @@
       },
       "scare": "growth",
       "verdict": "Growth is the scare. Gas collapse muddies the picture short term.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Composite PMI",
-            "unit": "",
-            "latest": 48.6,
-            "prior": 48.8,
-            "expected": 48.9,
-            "trend": [
-              50.2,
-              49.8,
-              49.5,
-              49,
-              48.8,
-              48.6
-            ],
-            "source": {
-              "name": "Eurostat",
-              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
-            }
-          },
-          {
-            "name": "GDP q/q",
-            "unit": "%",
-            "latest": 0.1,
-            "prior": 0.1,
-            "expected": 0.1,
-            "trend": [
-              0.3,
-              0.2,
-              0.2,
-              0.1,
-              0.1,
-              0.1
-            ],
-            "source": {
-              "name": "Eurostat",
-              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "HICP y/y",
-            "unit": "%",
-            "latest": 1.9,
-            "prior": 2,
-            "expected": 2,
-            "trend": [
-              2.5,
-              2.4,
-              2.2,
-              2.1,
-              2,
-              1.9
-            ],
-            "source": {
-              "name": "Eurostat",
-              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
-            }
-          },
-          {
-            "name": "Core HICP y/y",
-            "unit": "%",
-            "latest": 2.4,
-            "prior": 2.4,
-            "expected": 2.4,
-            "trend": [
-              2.8,
-              2.7,
-              2.6,
-              2.5,
-              2.4,
-              2.4
-            ],
-            "source": {
-              "name": "Eurostat",
-              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 6.4,
-            "prior": 6.4,
-            "expected": 6.3,
-            "trend": [
-              6.3,
-              6.3,
-              6.3,
-              6.4,
-              6.4,
-              6.4
-            ],
-            "source": {
-              "name": "Eurostat",
-              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "dovish",
         "pricedStartBp": -5,
@@ -353,7 +681,424 @@
         "ZEW (Tue)",
         "GDP 2nd est. (Fri)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI MoM",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.6,
+            "prior": 2.5,
+            "expected": 2.5,
+            "trend": [
+              2.6,
+              2.5,
+              2.5,
+              2.5,
+              2.5,
+              2.6
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Economic Sentiment",
+            "unit": "",
+            "impact": "up",
+            "latest": 102.7,
+            "prior": 102.6,
+            "expected": 102.6,
+            "trend": [
+              93.7,
+              92.8,
+              96.0,
+              99.6,
+              102.6,
+              102.7
+            ],
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Industrial Sentiment",
+            "unit": "",
+            "impact": "up",
+            "latest": -3.3,
+            "prior": -3.4,
+            "expected": -3.3,
+            "trend": [
+              -3.3,
+              -3.4,
+              -3.5,
+              -3.4,
+              -3.4,
+              -3.3
+            ],
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": -17.7,
+            "prior": -18.1,
+            "expected": -17.4,
+            "trend": [
+              -18.1,
+              -18.3,
+              -17.6,
+              -17.5,
+              -18.1,
+              -17.7
+            ],
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "Services Sentiment",
+            "unit": "",
+            "impact": "up",
+            "latest": 5.2,
+            "prior": 5.3,
+            "expected": 5.2,
+            "trend": [
+              4.7,
+              4.9,
+              5.0,
+              5.1,
+              5.3,
+              5.2
+            ],
+            "source": {
+              "name": "EC business & consumer surveys",
+              "url": "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en"
+            }
+          },
+          {
+            "name": "ZEW Economic Sentiment Index",
+            "unit": "",
+            "impact": "up",
+            "latest": 17.9,
+            "prior": 18.3,
+            "expected": 17.6,
+            "trend": [
+              17.0,
+              17.6,
+              18.3,
+              18.9,
+              18.3,
+              17.9
+            ],
+            "source": {
+              "name": "ZEW",
+              "url": "https://www.zew.de/en/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": 7.8,
+            "prior": 8.0,
+            "expected": 7.975,
+            "trend": [
+              7.8,
+              8.1,
+              7.8,
+              7.9,
+              8.0,
+              7.8
+            ],
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Current Account s.a.",
+            "unit": "B",
+            "impact": "up",
+            "latest": 8.672,
+            "prior": 8.696,
+            "expected": 8.66,
+            "trend": [
+              8.369,
+              8.465,
+              8.778,
+              8.906,
+              8.696,
+              8.672
+            ],
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Loans to Households YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.1,
+            "prior": 3.1,
+            "expected": 3.2,
+            "trend": [
+              3.3,
+              3.2,
+              3.2,
+              3.1,
+              3.1,
+              3.1
+            ],
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Loans to Companies YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 4.4,
+            "prior": 4.2,
+            "expected": 4.5,
+            "trend": [
+              4.0,
+              4.1,
+              4.2,
+              4.0,
+              4.2,
+              4.4
+            ],
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Wage Growth YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.9,
+            "prior": 3.0,
+            "expected": 2.9,
+            "trend": [
+              3.2,
+              3.1,
+              3.2,
+              3.1,
+              3.0,
+              2.9
+            ],
+            "source": {
+              "name": "ECB Data Portal",
+              "url": "https://data.ecb.europa.eu/"
+            }
+          },
+          {
+            "name": "Employment Change QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.1,
+            "prior": 0.1,
+            "expected": 0.0,
+            "trend": [
+              0.2,
+              0.3,
+              0.2,
+              0.2,
+              0.1,
+              0.1
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY Flash",
+            "unit": "%",
+            "impact": "up",
+            "latest": 4.2,
+            "prior": 4.1,
+            "expected": 4.1,
+            "trend": [
+              4.0,
+              3.9,
+              3.8,
+              3.9,
+              4.1,
+              4.2
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.5,
+            "prior": 2.5,
+            "expected": 2.5,
+            "trend": [
+              2.5,
+              2.5,
+              2.6,
+              2.5,
+              2.5,
+              2.5
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Flash",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.4,
+            "prior": 0.4,
+            "expected": 0.3,
+            "trend": [
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.4,
+              0.4
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.6,
+            "prior": -0.5,
+            "expected": -0.6,
+            "trend": [
+              -0.6,
+              -0.5,
+              -0.5,
+              -0.4,
+              -0.5,
+              -0.6
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.7,
+            "prior": -0.8,
+            "expected": -0.6,
+            "trend": [
+              -1.0,
+              -0.9,
+              -0.9,
+              -0.8,
+              -0.8,
+              -0.7
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": -16.0,
+            "prior": -15.9,
+            "expected": -16.1,
+            "trend": [
+              -17.0,
+              -16.7,
+              -16.6,
+              -16.3,
+              -15.9,
+              -16.0
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 6.6,
+            "prior": 6.7,
+            "expected": 6.6,
+            "trend": [
+              6.2,
+              6.4,
+              6.6,
+              6.6,
+              6.7,
+              6.6
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 2.93,
+          "chgBp": 10
+        },
+        "y10": {
+          "level": 3.26,
+          "chgBp": -3
+        },
+        "policy": 2.5,
+        "statement": {
+          "nextMove": "Cut",
+          "conviction": "High",
+          "url": "https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html"
+        }
+      },
+      "performance": {
+        "rank": 6,
+        "of": 8,
+        "spread2yPolicyBp": 43
+      }
     },
     {
       "code": "GBP",
@@ -365,128 +1110,6 @@
       },
       "scare": "inflation",
       "verdict": "Inflation scare. BoE hold was hawkish; gap shrinking as market catches up.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Composite PMI",
-            "unit": "",
-            "latest": 51.3,
-            "prior": 51.1,
-            "expected": 51,
-            "trend": [
-              51,
-              50.8,
-              51.2,
-              50.9,
-              51.1,
-              51.3
-            ],
-            "source": {
-              "name": "ONS inflation",
-              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
-            }
-          },
-          {
-            "name": "GDP m/m",
-            "unit": "%",
-            "latest": 0.2,
-            "prior": 0.1,
-            "expected": 0.1,
-            "trend": [
-              0.1,
-              0,
-              0.2,
-              0.1,
-              0.1,
-              0.2
-            ],
-            "source": {
-              "name": "ONS inflation",
-              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "Services CPI y/y",
-            "unit": "%",
-            "latest": 4.7,
-            "prior": 4.6,
-            "expected": 4.6,
-            "trend": [
-              4.9,
-              4.8,
-              4.6,
-              4.5,
-              4.6,
-              4.7
-            ],
-            "source": {
-              "name": "ONS inflation",
-              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
-            }
-          },
-          {
-            "name": "Core CPI y/y",
-            "unit": "%",
-            "latest": 3.6,
-            "prior": 3.5,
-            "expected": 3.5,
-            "trend": [
-              3.6,
-              3.5,
-              3.5,
-              3.4,
-              3.5,
-              3.6
-            ],
-            "source": {
-              "name": "ONS inflation",
-              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Regular pay y/y",
-            "unit": "%",
-            "latest": 4.8,
-            "prior": 4.8,
-            "expected": 4.8,
-            "trend": [
-              5.2,
-              5,
-              4.9,
-              4.8,
-              4.8,
-              4.8
-            ],
-            "source": {
-              "name": "ONS labour market",
-              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
-            }
-          },
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 4.9,
-            "prior": 4.9,
-            "expected": 4.9,
-            "trend": [
-              4.7,
-              4.8,
-              4.8,
-              4.9,
-              4.9,
-              4.9
-            ],
-            "source": {
-              "name": "ONS labour market",
-              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "hawkish",
         "pricedStartBp": -55,
@@ -507,7 +1130,384 @@
         "Labour market (Tue)",
         "GDP (Thu)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI Output",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.8,
+            "prior": 0.7,
+            "expected": 0.9,
+            "trend": [
+              0.7,
+              0.7,
+              0.8,
+              0.7,
+              0.7,
+              0.8
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "PPI Input",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.5,
+            "prior": 1.5,
+            "expected": 1.5,
+            "trend": [
+              1.2,
+              1.4,
+              1.4,
+              1.6,
+              1.5,
+              1.5
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": -22.6,
+            "prior": -23.1,
+            "expected": -22.5,
+            "trend": [
+              -23.4,
+              -23.3,
+              -23.7,
+              -23.0,
+              -23.1,
+              -22.6
+            ],
+            "source": {
+              "name": "GfK / NIQ",
+              "url": "https://nielseniq.com/global/en/"
+            }
+          },
+          {
+            "name": "Factory Orders",
+            "unit": "",
+            "impact": "up",
+            "latest": -31.5,
+            "prior": -31.2,
+            "expected": -31.3,
+            "trend": [
+              -31.0,
+              -31.8,
+              -31.6,
+              -31.8,
+              -31.2,
+              -31.5
+            ],
+            "source": {
+              "name": "CBI",
+              "url": "https://www.cbi.org.uk/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": -19.7,
+            "prior": -20.2,
+            "expected": -20.0,
+            "trend": [
+              -20.8,
+              -20.1,
+              -20.0,
+              -19.7,
+              -20.2,
+              -19.7
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Claimant Count",
+            "unit": "K",
+            "impact": "down",
+            "latest": 29.8,
+            "prior": 29.5,
+            "expected": 30.0,
+            "trend": [
+              29.9,
+              28.7,
+              28.8,
+              28.4,
+              29.5,
+              29.8
+            ],
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          },
+          {
+            "name": "Average Earnings",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.6,
+            "prior": 3.9,
+            "expected": 3.7,
+            "trend": [
+              3.8,
+              3.9,
+              3.8,
+              3.8,
+              3.9,
+              3.6
+            ],
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.5,
+            "prior": 3.6,
+            "expected": 3.5,
+            "trend": [
+              3.6,
+              3.5,
+              3.6,
+              3.6,
+              3.6,
+              3.5
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.8,
+            "prior": 2.7,
+            "expected": 2.7,
+            "trend": [
+              2.8,
+              2.7,
+              2.6,
+              2.6,
+              2.7,
+              2.8
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Prel",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.5,
+            "prior": 0.5,
+            "expected": 0.6,
+            "trend": [
+              0.2,
+              0.3,
+              0.3,
+              0.4,
+              0.5,
+              0.5
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.9,
+            "prior": 0.8,
+            "expected": 0.9,
+            "trend": [
+              0.9,
+              0.9,
+              0.9,
+              0.8,
+              0.8,
+              0.9
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Manufacturing Output",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.2,
+            "prior": 1.2,
+            "expected": 1.2,
+            "trend": [
+              1.3,
+              1.4,
+              1.3,
+              1.2,
+              1.2,
+              1.2
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "GDP MoM",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.1,
+            "prior": 0.1,
+            "expected": 0.0,
+            "trend": [
+              0.2,
+              0.2,
+              0.1,
+              0.2,
+              0.1,
+              0.1
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.3,
+            "prior": -0.3,
+            "expected": -0.3,
+            "trend": [
+              -0.6,
+              -0.5,
+              -0.4,
+              -0.4,
+              -0.3,
+              -0.3
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": -0.879,
+            "prior": -0.884,
+            "expected": -0.881,
+            "trend": [
+              -0.89,
+              -0.885,
+              -0.874,
+              -0.895,
+              -0.884,
+              -0.879
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          },
+          {
+            "name": "Goods Trade Balance",
+            "unit": "B",
+            "impact": "up",
+            "latest": -17.3,
+            "prior": -17.4,
+            "expected": -17.2,
+            "trend": [
+              -17.1,
+              -17.5,
+              -17.5,
+              -17.0,
+              -17.4,
+              -17.3
+            ],
+            "source": {
+              "name": "ONS economy",
+              "url": "https://www.ons.gov.uk/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 4.7,
+            "prior": 4.8,
+            "expected": 4.7,
+            "trend": [
+              5.0,
+              5.1,
+              4.9,
+              4.9,
+              4.8,
+              4.7
+            ],
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 4.77,
+          "chgBp": -1
+        },
+        "y10": {
+          "level": 5.21,
+          "chgBp": 3
+        },
+        "policy": 4.0,
+        "statement": {
+          "nextMove": "Hike",
+          "conviction": "Low",
+          "url": "https://www.bankofengland.co.uk/monetary-policy"
+        }
+      },
+      "performance": {
+        "rank": 3,
+        "of": 8,
+        "spread2yPolicyBp": 77
+      }
     },
     {
       "code": "JPY",
@@ -519,109 +1519,6 @@
       },
       "scare": "inflation",
       "verdict": "Domestic story hawkish but US yields dominate the pair. No change.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Composite PMI",
-            "unit": "",
-            "latest": 51.6,
-            "prior": 51.4,
-            "expected": 51.2,
-            "trend": [
-              50.5,
-              50.9,
-              51.2,
-              51,
-              51.4,
-              51.6
-            ],
-            "source": {
-              "name": "Statistics Bureau of Japan",
-              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
-            }
-          },
-          {
-            "name": "Household spending y/y",
-            "unit": "%",
-            "latest": 1,
-            "prior": 1.1,
-            "expected": 0.8,
-            "trend": [
-              -0.5,
-              0.2,
-              0.8,
-              0.4,
-              1.1,
-              1
-            ],
-            "source": {
-              "name": "Statistics Bureau of Japan",
-              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "Core CPI y/y",
-            "unit": "%",
-            "latest": 2.9,
-            "prior": 2.9,
-            "expected": 2.8,
-            "trend": [
-              2.6,
-              2.7,
-              2.8,
-              2.9,
-              2.9,
-              2.9
-            ],
-            "source": {
-              "name": "Statistics Bureau of Japan",
-              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
-            }
-          },
-          {
-            "name": "Tokyo core CPI y/y",
-            "unit": "%",
-            "latest": 2.8,
-            "prior": 2.7,
-            "expected": 2.7,
-            "trend": [
-              2.4,
-              2.5,
-              2.6,
-              2.6,
-              2.7,
-              2.8
-            ],
-            "source": {
-              "name": "Statistics Bureau of Japan",
-              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 2.4,
-            "prior": 2.4,
-            "expected": 2.5,
-            "trend": [
-              2.6,
-              2.5,
-              2.5,
-              2.5,
-              2.4,
-              2.4
-            ],
-            "source": {
-              "name": "Statistics Bureau of Japan",
-              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "hawkish",
         "pricedStartBp": 10,
@@ -642,7 +1539,384 @@
         "GDP prelim (Mon)",
         "National CPI (Fri)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI MoM",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.3,
+            "prior": -0.4,
+            "expected": -0.2,
+            "trend": [
+              -0.4,
+              -0.4,
+              -0.3,
+              -0.4,
+              -0.4,
+              -0.3
+            ],
+            "source": {
+              "name": "BoJ statistics",
+              "url": "https://www.boj.or.jp/en/statistics/index.htm"
+            }
+          },
+          {
+            "name": "Average Cash Earnings YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 4.5,
+            "prior": 4.5,
+            "expected": 4.4,
+            "trend": [
+              4.4,
+              4.2,
+              4.3,
+              4.4,
+              4.5,
+              4.5
+            ],
+            "source": {
+              "name": "MHLW",
+              "url": "https://www.mhlw.go.jp/english/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Tankan Manufacturing Index",
+            "unit": "",
+            "impact": "up",
+            "latest": 23.8,
+            "prior": 22.7,
+            "expected": 24.5,
+            "trend": [
+              20.5,
+              21.2,
+              21.7,
+              21.9,
+              22.7,
+              23.8
+            ],
+            "source": {
+              "name": "BoJ statistics",
+              "url": "https://www.boj.or.jp/en/statistics/index.htm"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 36.5,
+            "prior": 35.2,
+            "expected": 37.4,
+            "trend": [
+              36.7,
+              35.5,
+              36.3,
+              35.4,
+              35.2,
+              36.5
+            ],
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Machinery Orders",
+            "unit": "%",
+            "impact": "up",
+            "latest": 4.9,
+            "prior": 5.2,
+            "expected": 5.1,
+            "trend": [
+              5.4,
+              5.4,
+              5.2,
+              5.3,
+              5.2,
+              4.9
+            ],
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": 3882.3,
+            "prior": 3999.9,
+            "expected": 3831.2,
+            "trend": [
+              3862.1,
+              3891.0,
+              3939.4,
+              3982.5,
+              3999.9,
+              3882.3
+            ],
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Jobs/Applications Ratio",
+            "unit": "",
+            "impact": "up",
+            "latest": 1.167,
+            "prior": 1.283,
+            "expected": 1.1,
+            "trend": [
+              1.238,
+              1.26,
+              1.259,
+              1.209,
+              1.283,
+              1.167
+            ],
+            "source": {
+              "name": "MHLW",
+              "url": "https://www.mhlw.go.jp/english/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.2,
+            "prior": 2.1,
+            "expected": 2.2,
+            "trend": [
+              2.1,
+              2.1,
+              2.1,
+              2.2,
+              2.1,
+              2.2
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Inflation Rate ex-Food and Energy YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.5,
+            "prior": 2.4,
+            "expected": 2.5,
+            "trend": [
+              2.5,
+              2.4,
+              2.6,
+              2.5,
+              2.4,
+              2.5
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.1,
+            "prior": 2.2,
+            "expected": 2.0,
+            "trend": [
+              2.1,
+              2.2,
+              2.3,
+              2.2,
+              2.2,
+              2.1
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Tokyo Core CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.6,
+            "prior": 2.7,
+            "expected": 2.6,
+            "trend": [
+              2.5,
+              2.5,
+              2.5,
+              2.6,
+              2.7,
+              2.6
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Final",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.5,
+            "prior": 0.4,
+            "expected": 0.5,
+            "trend": [
+              0.3,
+              0.4,
+              0.4,
+              0.4,
+              0.4,
+              0.5
+            ],
+            "source": {
+              "name": "Cabinet Office ESRI",
+              "url": "https://www.esri.cao.go.jp/index-e.html"
+            }
+          },
+          {
+            "name": "Industrial Production",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.1,
+            "prior": 2.2,
+            "expected": 2.2,
+            "trend": [
+              2.2,
+              2.2,
+              2.2,
+              2.2,
+              2.2,
+              2.1
+            ],
+            "source": {
+              "name": "METI",
+              "url": "https://www.meti.go.jp/english/statistics/"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.4,
+            "prior": 2.4,
+            "expected": 2.5,
+            "trend": [
+              2.3,
+              2.3,
+              2.4,
+              2.4,
+              2.4,
+              2.4
+            ],
+            "source": {
+              "name": "METI",
+              "url": "https://www.meti.go.jp/english/statistics/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": -502.6,
+            "prior": -504.5,
+            "expected": -503.0,
+            "trend": [
+              -558.2,
+              -564.9,
+              -541.2,
+              -519.8,
+              -504.5,
+              -502.6
+            ],
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          },
+          {
+            "name": "Exports YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 16.6,
+            "prior": 16.1,
+            "expected": 16.8,
+            "trend": [
+              16.4,
+              16.6,
+              16.0,
+              15.8,
+              16.1,
+              16.6
+            ],
+            "source": {
+              "name": "Ministry of Finance",
+              "url": "https://www.mof.go.jp/english/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 2.5,
+            "prior": 2.4,
+            "expected": 2.5,
+            "trend": [
+              2.3,
+              2.4,
+              2.4,
+              2.4,
+              2.4,
+              2.5
+            ],
+            "source": {
+              "name": "Statistics Bureau labour",
+              "url": "https://www.stat.go.jp/english/data/roudou/index.html"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 1.82,
+          "chgBp": -7
+        },
+        "y10": {
+          "level": 2.74,
+          "chgBp": -2
+        },
+        "policy": 1.25,
+        "statement": {
+          "nextMove": "Hike",
+          "conviction": "Low",
+          "url": "https://www.boj.or.jp/en/mopo/index.htm"
+        }
+      },
+      "performance": {
+        "rank": 7,
+        "of": 8,
+        "spread2yPolicyBp": 57
+      }
     },
     {
       "code": "CHF",
@@ -654,90 +1928,6 @@
       },
       "scare": "growth",
       "verdict": "Deflation risk + strong franc: SNB leaning dovish. Quiet week.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Manufacturing PMI",
-            "unit": "",
-            "latest": 48.2,
-            "prior": 48.5,
-            "expected": 48.6,
-            "trend": [
-              49.8,
-              49.2,
-              48.7,
-              48.9,
-              48.5,
-              48.2
-            ],
-            "source": {
-              "name": "Swiss FSO",
-              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
-            }
-          },
-          {
-            "name": "KOF barometer",
-            "unit": "",
-            "latest": 97.6,
-            "prior": 98,
-            "expected": 98,
-            "trend": [
-              101,
-              100,
-              99,
-              98.5,
-              98,
-              97.6
-            ],
-            "source": {
-              "name": "Swiss FSO",
-              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "CPI y/y",
-            "unit": "%",
-            "latest": 0.1,
-            "prior": 0.1,
-            "expected": 0.1,
-            "trend": [
-              0.6,
-              0.4,
-              0.3,
-              0.2,
-              0.1,
-              0.1
-            ],
-            "source": {
-              "name": "Swiss FSO",
-              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 3,
-            "prior": 2.9,
-            "expected": 2.9,
-            "trend": [
-              2.7,
-              2.8,
-              2.8,
-              2.9,
-              2.9,
-              3
-            ],
-            "source": {
-              "name": "Swiss FSO",
-              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "dovish",
         "pricedStartBp": -10,
@@ -757,7 +1947,222 @@
       "nextWeek": [
         "PPI (Thu)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "latest": 54.9,
+            "prior": 56.5,
+            "expected": 53.6,
+            "trend": [
+              55.2,
+              57.1,
+              58.0,
+              56.9,
+              56.5,
+              54.9
+            ],
+            "source": {
+              "name": "procure.ch PMI",
+              "url": "https://www.procure.ch/"
+            }
+          },
+          {
+            "name": "KOF Leading Indicator",
+            "unit": "",
+            "impact": "up",
+            "latest": 107.6,
+            "prior": 106.7,
+            "expected": 108.0,
+            "trend": [
+              105.8,
+              103.7,
+              106.9,
+              108.4,
+              106.7,
+              107.6
+            ],
+            "source": {
+              "name": "KOF",
+              "url": "https://kof.ethz.ch/en/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": -43.5,
+            "prior": -43.4,
+            "expected": -43.4,
+            "trend": [
+              -45.7,
+              -46.1,
+              -44.7,
+              -43.5,
+              -43.4,
+              -43.5
+            ],
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": 24.3,
+            "prior": 24.3,
+            "expected": 24.4,
+            "trend": [
+              22.6,
+              23.2,
+              22.9,
+              23.9,
+              24.3,
+              24.3
+            ],
+            "source": {
+              "name": "SNB data portal",
+              "url": "https://data.snb.ch/en"
+            }
+          }
+        ],
+        "labour": []
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.6,
+            "prior": 1.5,
+            "expected": 1.7,
+            "trend": [
+              1.5,
+              1.5,
+              1.5,
+              1.5,
+              1.5,
+              1.6
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ Flash",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.6,
+            "prior": 1.6,
+            "expected": 1.6,
+            "trend": [
+              1.7,
+              1.7,
+              1.7,
+              1.6,
+              1.6,
+              1.6
+            ],
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.6,
+            "prior": 1.6,
+            "expected": 1.7,
+            "trend": [
+              1.5,
+              1.5,
+              1.5,
+              1.5,
+              1.6,
+              1.6
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home.html"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": 1.4,
+            "prior": 1.3,
+            "expected": 1.468,
+            "trend": [
+              1.4,
+              1.3,
+              1.3,
+              1.3,
+              1.3,
+              1.4
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home.html"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 2.9,
+            "prior": 3.0,
+            "expected": 2.9,
+            "trend": [
+              3.1,
+              3.0,
+              3.0,
+              3.0,
+              3.0,
+              2.9
+            ],
+            "source": {
+              "name": "SECO",
+              "url": "https://www.seco.admin.ch/"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 0.18,
+          "chgBp": 9
+        },
+        "y10": {
+          "level": 0.43,
+          "chgBp": -5
+        },
+        "policy": 0.0,
+        "statement": {
+          "nextMove": "Cut",
+          "conviction": "Medium",
+          "url": "https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy"
+        }
+      },
+      "performance": {
+        "rank": 5,
+        "of": 8,
+        "spread2yPolicyBp": 18
+      }
     },
     {
       "code": "CAD",
@@ -769,128 +2174,6 @@
       },
       "scare": "growth",
       "verdict": "Growth is the scare and getting worse, but oil fights the CAD short.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "GDP m/m",
-            "unit": "%",
-            "latest": 0,
-            "prior": -0.1,
-            "expected": 0.1,
-            "trend": [
-              0.2,
-              0.1,
-              0,
-              0.1,
-              -0.1,
-              0
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          },
-          {
-            "name": "Ivey PMI",
-            "unit": "",
-            "latest": 49.1,
-            "prior": 49.5,
-            "expected": 49.8,
-            "trend": [
-              53,
-              52.1,
-              50.8,
-              50.2,
-              49.5,
-              49.1
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "CPI y/y",
-            "unit": "%",
-            "latest": 2.1,
-            "prior": 2.1,
-            "expected": 2.1,
-            "trend": [
-              2.5,
-              2.4,
-              2.3,
-              2.2,
-              2.1,
-              2.1
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          },
-          {
-            "name": "CPI trim y/y",
-            "unit": "%",
-            "latest": 2.5,
-            "prior": 2.6,
-            "expected": 2.6,
-            "trend": [
-              2.9,
-              2.8,
-              2.7,
-              2.6,
-              2.6,
-              2.5
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 7.1,
-            "prior": 6.9,
-            "expected": 7,
-            "trend": [
-              6.6,
-              6.7,
-              6.8,
-              6.9,
-              6.9,
-              7.1
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          },
-          {
-            "name": "Employment change",
-            "unit": "K",
-            "latest": -14,
-            "prior": -3,
-            "expected": 10,
-            "trend": [
-              22,
-              8,
-              -5,
-              12,
-              -3,
-              -14
-            ],
-            "source": {
-              "name": "Statistics Canada",
-              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "dovish",
         "pricedStartBp": -45,
@@ -915,7 +2198,324 @@
         "Housing starts (Mon)",
         "CPI (Tue 18th)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.1,
+            "prior": 2.1,
+            "expected": 2.0,
+            "trend": [
+              2.1,
+              2.0,
+              2.1,
+              2.1,
+              2.1,
+              2.1
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 59.7,
+            "prior": 59.9,
+            "expected": 59.8,
+            "trend": [
+              57.0,
+              56.3,
+              58.9,
+              57.7,
+              59.9,
+              59.7
+            ],
+            "source": {
+              "name": "Ivey PMI",
+              "url": "https://www.ivey.uwo.ca/"
+            }
+          },
+          {
+            "name": "Housing Starts",
+            "unit": "K",
+            "impact": "up",
+            "latest": 247.5,
+            "prior": 252.9,
+            "expected": 245.0,
+            "trend": [
+              251.7,
+              248.2,
+              252.2,
+              246.4,
+              252.9,
+              247.5
+            ],
+            "source": {
+              "name": "CMHC",
+              "url": "https://www.cmhc-schl.gc.ca/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": 8.5,
+            "prior": 8.2,
+            "expected": 8.407,
+            "trend": [
+              8.9,
+              8.7,
+              8.5,
+              8.1,
+              8.2,
+              8.5
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 6.9,
+            "prior": 6.8,
+            "expected": 6.9,
+            "trend": [
+              6.6,
+              6.9,
+              6.7,
+              6.8,
+              6.8,
+              6.9
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Average Hourly Wages YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.0,
+            "prior": 2.1,
+            "expected": 2.0,
+            "trend": [
+              2.1,
+              2.1,
+              2.0,
+              2.1,
+              2.1,
+              2.0
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.0,
+            "prior": 3.2,
+            "expected": 2.9,
+            "trend": [
+              3.2,
+              3.2,
+              3.0,
+              3.1,
+              3.2,
+              3.0
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Core CPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.1,
+            "prior": 2.2,
+            "expected": 2.0,
+            "trend": [
+              2.2,
+              2.2,
+              2.3,
+              2.3,
+              2.2,
+              2.1
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.8,
+            "prior": 0.9,
+            "expected": 0.8,
+            "trend": [
+              0.9,
+              1.0,
+              1.1,
+              1.0,
+              0.9,
+              0.8
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "GDP MoM",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.0,
+            "prior": -0.1,
+            "expected": -0.0,
+            "trend": [
+              -0.2,
+              -0.2,
+              -0.1,
+              -0.1,
+              -0.1,
+              -0.0
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Retail Sales",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.2,
+            "prior": 1.1,
+            "expected": 1.2,
+            "trend": [
+              1.1,
+              1.1,
+              1.1,
+              1.1,
+              1.1,
+              1.2
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Retail Sales ex Autos",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.2,
+            "prior": 1.3,
+            "expected": 1.2,
+            "trend": [
+              1.4,
+              1.4,
+              1.4,
+              1.4,
+              1.3,
+              1.2
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": 5.091,
+            "prior": 5.065,
+            "expected": 5.072,
+            "trend": [
+              5.305,
+              5.153,
+              5.203,
+              5.228,
+              5.065,
+              5.091
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "K",
+            "impact": "up",
+            "latest": -4.7,
+            "prior": -4.6,
+            "expected": -4.6,
+            "trend": [
+              -4.7,
+              -4.9,
+              -4.8,
+              -4.7,
+              -4.6,
+              -4.7
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 3.16,
+          "chgBp": 4
+        },
+        "y10": {
+          "level": 3.62,
+          "chgBp": -3
+        },
+        "policy": 2.5,
+        "statement": {
+          "nextMove": "Cut",
+          "conviction": "High",
+          "url": "https://www.bankofcanada.ca/core-functions/monetary-policy/"
+        }
+      },
+      "performance": {
+        "rank": 4,
+        "of": 8,
+        "spread2yPolicyBp": 66
+      }
     },
     {
       "code": "AUD",
@@ -927,109 +2527,6 @@
       },
       "scare": "inflation",
       "verdict": "Sticky inflation keeps RBA on hold. China is the swing factor.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "Composite PMI",
-            "unit": "",
-            "latest": 51.1,
-            "prior": 51,
-            "expected": 50.9,
-            "trend": [
-              50.4,
-              50.9,
-              51.2,
-              50.8,
-              51,
-              51.1
-            ],
-            "source": {
-              "name": "ABS",
-              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
-            }
-          },
-          {
-            "name": "Retail sales m/m",
-            "unit": "%",
-            "latest": 0.5,
-            "prior": 0.3,
-            "expected": 0.3,
-            "trend": [
-              0.3,
-              0.5,
-              0.2,
-              0.4,
-              0.3,
-              0.5
-            ],
-            "source": {
-              "name": "ABS",
-              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "Trimmed mean CPI y/y",
-            "unit": "%",
-            "latest": 3.2,
-            "prior": 3.2,
-            "expected": 3.1,
-            "trend": [
-              3,
-              3,
-              3.1,
-              3.1,
-              3.2,
-              3.2
-            ],
-            "source": {
-              "name": "ABS",
-              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 4,
-            "prior": 4,
-            "expected": 4.1,
-            "trend": [
-              4.1,
-              4.1,
-              4,
-              4.1,
-              4,
-              4
-            ],
-            "source": {
-              "name": "ABS Labour Force",
-              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
-            }
-          },
-          {
-            "name": "Employment change",
-            "unit": "K",
-            "latest": 22,
-            "prior": 15,
-            "expected": 20,
-            "trend": [
-              25,
-              18,
-              30,
-              12,
-              15,
-              22
-            ],
-            "source": {
-              "name": "ABS Labour Force",
-              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "hawkish",
         "pricedStartBp": -30,
@@ -1050,7 +2547,344 @@
         "Wage price index (Wed)",
         "Employment (Thu)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "PPI",
+            "unit": "%",
+            "impact": "up",
+            "latest": 1.1,
+            "prior": 1.1,
+            "expected": 1.2,
+            "trend": [
+              1.1,
+              1.2,
+              1.2,
+              1.1,
+              1.1,
+              1.1
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Consumer Confidence",
+            "unit": "%",
+            "impact": "up",
+            "latest": -4.8,
+            "prior": -4.7,
+            "expected": -4.9,
+            "trend": [
+              -4.9,
+              -4.8,
+              -4.9,
+              -4.7,
+              -4.7,
+              -4.8
+            ],
+            "source": {
+              "name": "Westpac",
+              "url": "https://www.westpac.com.au/"
+            }
+          },
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": -12.9,
+            "prior": -12.5,
+            "expected": -13.2,
+            "trend": [
+              -13.2,
+              -13.0,
+              -12.9,
+              -12.9,
+              -12.5,
+              -12.9
+            ],
+            "source": {
+              "name": "NAB",
+              "url": "https://business.nab.com.au/"
+            }
+          },
+          {
+            "name": "Ai Group Manufacturing Index",
+            "unit": "",
+            "impact": "up",
+            "latest": -19.6,
+            "prior": -19.0,
+            "expected": -19.1,
+            "trend": [
+              -19.3,
+              -18.5,
+              -18.0,
+              -18.8,
+              -19.0,
+              -19.6
+            ],
+            "source": {
+              "name": "Ai Group",
+              "url": "https://www.aigroup.com.au/"
+            }
+          },
+          {
+            "name": "Building Permits",
+            "unit": "%",
+            "impact": "up",
+            "latest": 5.2,
+            "prior": 5.1,
+            "expected": 5.1,
+            "trend": [
+              4.8,
+              5.0,
+              4.9,
+              5.0,
+              5.1,
+              5.2
+            ],
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": -28.4,
+            "prior": -27.6,
+            "expected": -27.8,
+            "trend": [
+              -26.5,
+              -27.5,
+              -27.3,
+              -26.5,
+              -27.6,
+              -28.4
+            ],
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 4.6,
+            "prior": 4.8,
+            "expected": 4.8,
+            "trend": [
+              4.9,
+              4.8,
+              4.8,
+              4.7,
+              4.8,
+              4.6
+            ],
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          },
+          {
+            "name": "Wage Price Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.1,
+            "prior": 3.2,
+            "expected": 3.0,
+            "trend": [
+              3.3,
+              3.3,
+              3.3,
+              3.3,
+              3.2,
+              3.1
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 4.3,
+            "prior": 4.3,
+            "expected": 4.3,
+            "trend": [
+              4.5,
+              4.4,
+              4.3,
+              4.4,
+              4.3,
+              4.3
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          },
+          {
+            "name": "RBA Trimmed Mean CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.6,
+            "prior": 3.5,
+            "expected": 3.5,
+            "trend": [
+              3.2,
+              3.2,
+              3.3,
+              3.4,
+              3.5,
+              3.6
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          },
+          {
+            "name": "RBA Weighted Median CPI YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.7,
+            "prior": 3.4,
+            "expected": 3.5,
+            "trend": [
+              3.3,
+              3.3,
+              3.3,
+              3.5,
+              3.4,
+              3.7
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.3,
+            "prior": 0.3,
+            "expected": 0.4,
+            "trend": [
+              0.2,
+              0.2,
+              0.1,
+              0.2,
+              0.3,
+              0.3
+            ],
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": 2.772,
+            "prior": 2.859,
+            "expected": 2.811,
+            "trend": [
+              2.983,
+              2.873,
+              2.844,
+              2.846,
+              2.859,
+              2.772
+            ],
+            "source": {
+              "name": "ABS economy",
+              "url": "https://www.abs.gov.au/statistics/economy"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "K",
+            "impact": "up",
+            "latest": -38.4,
+            "prior": -37.7,
+            "expected": -38.7,
+            "trend": [
+              -39.7,
+              -38.8,
+              -39.0,
+              -37.7,
+              -37.7,
+              -38.4
+            ],
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          },
+          {
+            "name": "Full-Time Employment",
+            "unit": "K",
+            "impact": "up",
+            "latest": 34.2,
+            "prior": 34.9,
+            "expected": 34.5,
+            "trend": [
+              33.2,
+              32.3,
+              33.4,
+              34.6,
+              34.9,
+              34.2
+            ],
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 4.87,
+          "chgBp": 9
+        },
+        "y10": {
+          "level": 5.01,
+          "chgBp": 3
+        },
+        "policy": 4.85,
+        "statement": {
+          "nextMove": "Hike",
+          "conviction": "High",
+          "url": "https://www.rba.gov.au/monetary-policy/"
+        }
+      },
+      "performance": {
+        "rank": 2,
+        "of": 8,
+        "spread2yPolicyBp": 2
+      }
     },
     {
       "code": "NZD",
@@ -1062,90 +2896,6 @@
       },
       "scare": "growth",
       "verdict": "Clear growth scare. RBNZ behind the curve: weakest economy on the board.",
-      "indicators": {
-        "growth": [
-          {
-            "name": "GDP q/q",
-            "unit": "%",
-            "latest": -0.2,
-            "prior": -0.3,
-            "expected": -0.1,
-            "trend": [
-              0.2,
-              -0.1,
-              -0.2,
-              0.1,
-              -0.3,
-              -0.2
-            ],
-            "source": {
-              "name": "Stats NZ",
-              "url": "https://www.stats.govt.nz/indicators/"
-            }
-          },
-          {
-            "name": "PMI (BNZ)",
-            "unit": "",
-            "latest": 45.9,
-            "prior": 46.2,
-            "expected": 46.5,
-            "trend": [
-              48.5,
-              47.9,
-              47.1,
-              46.8,
-              46.2,
-              45.9
-            ],
-            "source": {
-              "name": "Stats NZ",
-              "url": "https://www.stats.govt.nz/indicators/"
-            }
-          }
-        ],
-        "inflation": [
-          {
-            "name": "CPI y/y",
-            "unit": "%",
-            "latest": 2.2,
-            "prior": 2.3,
-            "expected": 2.3,
-            "trend": [
-              3,
-              2.8,
-              2.6,
-              2.4,
-              2.3,
-              2.2
-            ],
-            "source": {
-              "name": "Stats NZ",
-              "url": "https://www.stats.govt.nz/indicators/"
-            }
-          }
-        ],
-        "labour": [
-          {
-            "name": "Unemployment",
-            "unit": "%",
-            "latest": 5.4,
-            "prior": 5.3,
-            "expected": 5.3,
-            "trend": [
-              4.8,
-              5,
-              5.1,
-              5.2,
-              5.3,
-              5.4
-            ],
-            "source": {
-              "name": "Stats NZ",
-              "url": "https://www.stats.govt.nz/indicators/"
-            }
-          }
-        ]
-      },
       "centralBank": {
         "stance": "dovish",
         "pricedStartBp": -35,
@@ -1166,7 +2916,324 @@
         "GDT auction (Tue)",
         "Retail card spending (Fri)"
       ],
-      "process": {}
+      "process": {},
+      "releases": {
+        "inflation": [
+          {
+            "name": "Business Inflation Expectations",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.4,
+            "prior": 2.3,
+            "expected": 2.4,
+            "trend": [
+              2.3,
+              2.2,
+              2.3,
+              2.3,
+              2.3,
+              2.4
+            ],
+            "source": {
+              "name": "ANZ NZ",
+              "url": "https://www.anz.co.nz/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "impact": "up",
+            "latest": 55.7,
+            "prior": 55.3,
+            "expected": 56.0,
+            "trend": [
+              58.2,
+              57.7,
+              55.5,
+              57.4,
+              55.3,
+              55.7
+            ],
+            "source": {
+              "name": "BusinessNZ",
+              "url": "https://businessnz.org.nz/"
+            }
+          },
+          {
+            "name": "Business Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 50.1,
+            "prior": 51.1,
+            "expected": 50.3,
+            "trend": [
+              52.5,
+              53.0,
+              51.0,
+              52.1,
+              51.1,
+              50.1
+            ],
+            "source": {
+              "name": "ANZ NZ",
+              "url": "https://www.anz.co.nz/"
+            }
+          },
+          {
+            "name": "Consumer Confidence",
+            "unit": "",
+            "impact": "up",
+            "latest": 95.3,
+            "prior": 93.8,
+            "expected": 94.2,
+            "trend": [
+              94.4,
+              93.5,
+              90.2,
+              94.7,
+              93.8,
+              95.3
+            ],
+            "source": {
+              "name": "Westpac NZ",
+              "url": "https://www.westpac.co.nz/"
+            }
+          },
+          {
+            "name": "Current Account",
+            "unit": "B",
+            "impact": "up",
+            "latest": -1.713,
+            "prior": -1.728,
+            "expected": -1.706,
+            "trend": [
+              -1.661,
+              -1.712,
+              -1.689,
+              -1.747,
+              -1.728,
+              -1.713
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Global Dairy Trade Price Index",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.1,
+            "prior": 3.0,
+            "expected": 3.2,
+            "trend": [
+              3.0,
+              3.1,
+              3.2,
+              3.1,
+              3.0,
+              3.1
+            ],
+            "source": {
+              "name": "Global Dairy Trade",
+              "url": "https://www.globaldairytrade.info/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Employment Change",
+            "unit": "%",
+            "impact": "up",
+            "latest": -0.2,
+            "prior": -0.2,
+            "expected": -0.3,
+            "trend": [
+              -0.1,
+              -0.2,
+              -0.2,
+              -0.3,
+              -0.2,
+              -0.2
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Labour Costs Index YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 2.1,
+            "prior": 2.0,
+            "expected": 2.1,
+            "trend": [
+              2.0,
+              1.9,
+              2.0,
+              2.0,
+              2.0,
+              2.1
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ]
+      },
+      "themes": {
+        "inflation": [
+          {
+            "name": "Inflation Rate YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.9,
+            "prior": 3.8,
+            "expected": 3.9,
+            "trend": [
+              3.7,
+              3.8,
+              3.8,
+              3.8,
+              3.8,
+              3.9
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Inflation Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.7,
+            "prior": 0.6,
+            "expected": 0.8,
+            "trend": [
+              0.6,
+              0.7,
+              0.6,
+              0.7,
+              0.6,
+              0.7
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "growth": [
+          {
+            "name": "GDP Growth Rate QoQ",
+            "unit": "%",
+            "impact": "up",
+            "latest": 0.2,
+            "prior": 0.2,
+            "expected": 0.2,
+            "trend": [
+              0.2,
+              0.3,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Retail Sales YoY",
+            "unit": "%",
+            "impact": "up",
+            "latest": 3.3,
+            "prior": 3.4,
+            "expected": 3.4,
+            "trend": [
+              3.0,
+              3.1,
+              3.1,
+              3.2,
+              3.4,
+              3.3
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "Balance of Trade",
+            "unit": "B",
+            "impact": "up",
+            "latest": -2.085,
+            "prior": -2.129,
+            "expected": -2.11,
+            "trend": [
+              -1.959,
+              -1.938,
+              -1.955,
+              -2.035,
+              -2.129,
+              -2.085
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment Rate",
+            "unit": "%",
+            "impact": "down",
+            "latest": 5.8,
+            "prior": 5.6,
+            "expected": 6.0,
+            "trend": [
+              5.6,
+              5.8,
+              5.9,
+              5.8,
+              5.6,
+              5.8
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ]
+      },
+      "rates": {
+        "y2": {
+          "level": 3.9,
+          "chgBp": 6
+        },
+        "y10": {
+          "level": 4.67,
+          "chgBp": -8
+        },
+        "policy": 2.75,
+        "statement": {
+          "nextMove": "Cut",
+          "conviction": "High",
+          "url": "https://www.rbnz.govt.nz/monetary-policy"
+        }
+      },
+      "performance": {
+        "rank": 8,
+        "of": 8,
+        "spread2yPolicyBp": 115
+      }
     }
   ]
 }

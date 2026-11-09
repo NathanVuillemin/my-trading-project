@@ -382,19 +382,56 @@ function trendWord(values) {
   const d = recent - earlier, scale = Math.max(Math.abs(earlier), 1) * 0.02;
   return n < 4 ? '—' : d > scale ? '↑ rising' : d < -scale ? '↓ falling' : '→ flat';
 }
-function indicatorTable(title, rows) {
-  if (!rows?.length) return '';
+// Economy Read Chain: Releases (days) -> Themes (weeks) -> Rates & Yields (months) -> Performance.
+// Colour = impact on the currency, not the economy: impact "up" means a rise supports the currency,
+// "down" means a fall does (unemployment, claims). Green = supportive / hawkish, red = negative / dovish.
+const BUCKETS = [['inflation', 'Inflation'], ['growth', 'Growth'], ['labour', 'Labour']];
+function impactOf(r) {
+  const d = r.latest - r.prior;
+  if (r.prior == null || d === 0) return { cls: 'flat', arrow: '–' };
+  const good = r.impact === 'down' ? d < 0 : d > 0;
+  return { cls: good ? 'bull' : 'bear', arrow: d > 0 ? '▲' : '▼' };
+}
+function chainTable(title, horizon, layer) {
   const fmt = (v, u) => (v == null ? '—' : `${v}${u || ''}`);
-  return `<section class="panel"><div class="panel-head"><h2>${esc(title)}</h2></div><div class="table-wrap"><table>
+  const groups = BUCKETS.filter(([k]) => layer?.[k]?.length);
+  if (!groups.length) return '';
+  const body = groups.map(([k, label]) => `<tr class="group"><th colspan="7">${label}</th></tr>` + layer[k].map((r) => {
+    const d = r.expected == null ? null : +(r.latest - r.expected).toFixed(2);
+    const im = impactOf(r);
+    return `<tr><td>${esc(r.name)}</td><td class="num"><span class="pill ${im.cls}">${esc(fmt(r.latest, r.unit))} ${im.arrow}</span></td>
+      <td class="num muted">${esc(fmt(r.prior, r.unit))}</td><td class="num muted">${esc(fmt(r.expected, r.unit))}</td>
+      <td class="num">${d == null ? '—' : d === 0 ? '<span class="faint">inline</span>' : `${d > 0 ? '+' : ''}${d}`}</td>
+      <td class="nowrap">${sparkline(r.trend)} <span class="small muted">${trendWord(r.trend)}</span></td>
+      <td class="small">${r.source ? `<a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.name)} ↗</a>` : '—'}</td></tr>`;
+  }).join('')).join('');
+  return `<section class="panel span-3"><div class="panel-head"><h2>${esc(title)} <span class="faint small">· ${esc(horizon)}</span></h2></div><div class="table-wrap"><table class="chain">
     <thead><tr><th>Indicator</th><th>Latest</th><th>Prior</th><th>Expected</th><th>vs exp.</th><th>6-period trend</th><th>Source</th></tr></thead>
-    <tbody>${rows.map((r) => {
-      const d = r.expected == null ? null : +(r.latest - r.expected).toFixed(2);
-      return `<tr><td>${esc(r.name)}</td><td class="num">${esc(fmt(r.latest, r.unit))}</td><td class="num muted">${esc(fmt(r.prior, r.unit))}</td>
-        <td class="num muted">${esc(fmt(r.expected, r.unit))}</td>
-        <td class="num">${d == null ? '—' : d === 0 ? '<span class="faint">inline</span>' : `${d > 0 ? '+' : ''}${d}`}</td>
-        <td class="nowrap">${sparkline(r.trend)} <span class="small muted">${trendWord(r.trend)}</span></td>
-        <td class="small">${r.source ? `<a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.name)} ↗</a>` : '—'}</td></tr>`;
-    }).join('')}</tbody></table></div></section>`;
+    <tbody>${body}</tbody></table></div></section>`;
+}
+function ratesPanel(e) {
+  const r = e.rates; if (!r) return '';
+  const mv = r.statement.nextMove, mvCls = mv === 'Hike' ? 'bull' : mv === 'Cut' ? 'bear' : 'flat';
+  const chg = (n) => `<span class="small ${tone(n)}" style="background:none">${bp(n)}</span>`;
+  return `<section class="panel"><div class="panel-head"><h2>Rates &amp; Yields <span class="faint small">· months</span></h2></div>
+    <div class="kv" style="grid-template-columns:repeat(3,1fr)">
+      <div><label>2Y yield</label><span>${r.y2.level.toFixed(2)}% ${chg(r.y2.chgBp)}</span></div>
+      <div><label>10Y yield</label><span>${r.y10.level.toFixed(2)}% ${chg(r.y10.chgBp)}</span></div>
+      <div><label>Policy rate</label><span>${r.policy.toFixed(2)}%</span></div>
+    </div>
+    <p class="small" style="margin:10px 0 0">Policy statement: est. next move <span class="pill ${mvCls}">${esc(mv)}</span> · ${esc(r.statement.conviction)} conviction
+      ${r.statement.url ? ` · <a href="${esc(r.statement.url)}" target="_blank" rel="noopener">${esc(e.cb)} ↗</a>` : ''}</p></section>`;
+}
+function performancePanel(e) {
+  const p = e.performance; if (!p) return '';
+  const s = p.spread2yPolicyBp;
+  return `<section class="panel"><div class="panel-head"><h2>Performance</h2></div>
+    <div class="kv" style="grid-template-columns:repeat(3,1fr)">
+      <div><label>Strength rank</label><span>${p.rank} of ${p.of}</span></div>
+      <div><label>Currency (week)</label><span class="${tone(e.week.currencyPct)}" style="background:none">${e.week.currencyPct > 0 ? '+' : ''}${e.week.currencyPct.toFixed(1)}%</span></div>
+      <div><label>2Y vs policy</label><span class="${tone(s)}" style="background:none">${bp(s)}</span></div>
+    </div>
+    <p class="small muted" style="margin:10px 0 0">2Y above policy = market prices higher rates than today; below = cuts priced. Has price caught up with the read?</p></section>`;
 }
 
 render.recap = async (main) => {
@@ -444,7 +481,12 @@ render.recap = async (main) => {
         </div>
         ${bc ? `<p class="small muted" style="margin:10px 0 0">Bias: ${esc(bc.why)}</p>` : ''}</section>
       <section class="panel"><div class="panel-head"><h2>Regime</h2></div>${regimeMap(recap.economies, e.code)}</section>
-      <section class="panel"><div class="panel-head"><h2>Central bank</h2><span class="pill ${e.centralBank.stance === 'hawkish' ? 'bull' : e.centralBank.stance === 'dovish' ? 'bear' : 'flat'}">${esc(cbp.stance)}</span></div>
+      <div class="span-3 chain-flow small faint">Read in order: Releases (days) → Themes (weeks) → Rates &amp; Yields (months) → Performance. Green / red = impact on the currency.</div>
+      ${chainTable('Releases', 'days', e.releases)}
+      ${chainTable('Themes', 'weeks', e.themes)}
+      ${ratesPanel(e)}
+      ${performancePanel(e)}
+      <section class="panel"><div class="panel-head"><h2>Central bank · my path vs priced</h2><span class="pill ${e.centralBank.stance === 'hawkish' ? 'bull' : e.centralBank.stance === 'dovish' ? 'bear' : 'flat'}">${esc(cbp.stance)}</span></div>
         <div class="kv" style="grid-template-columns:repeat(2,1fr)">
           <div><label>Priced Mon</label><span>${bp(cbp.pricedStartBp)}</span></div>
           <div><label>Priced Fri</label><span>${bp(cbp.pricedEndBp)}</span></div>
@@ -453,11 +495,6 @@ render.recap = async (main) => {
         </div><p class="small muted" style="margin:10px 0 0">Gap after the week: <span class="num ${tone(gap)}" style="background:none">${bp(gap)} ${gapWord(gap)}</span></p></section>
       ${panel('This week', `<ul class="bullets" style="margin:0;padding-left:18px">${e.week.takeaways.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`)}
       ${panel('Next week', `<ul class="list">${e.nextWeek.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`, { href: `events.html?ccy=${e.code}`, label: 'Events' })}
-      <div class="span-3 grid">
-        ${indicatorTable('Growth', e.indicators.growth)}
-        ${indicatorTable('Inflation', e.indicators.inflation)}
-        ${indicatorTable('Labour', e.indicators.labour)}
-      </div>
       <section class="panel span-3"><div class="panel-head"><h2>Method · ${esc(recap.process.status)}</h2></div>
         <ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}<div class="small faint">${esc(e.process?.[s.id] || 'Read goes here once the method is set.')}</div></li>`).join('')}</ol></section>
     </div>`;
