@@ -1,17 +1,17 @@
 {
   "date": "2026-11-09",
-  "generatedAt": "2026-11-09T13:02:12.166Z",
+  "generatedAt": "2026-11-09T13:19:07.068Z",
   "usingPlaceholder": false,
   "account": {
-    "equity": 48.58658,
-    "grossNotional": 96.6704,
-    "marginUsed": 48.58658,
+    "equity": 48.48118,
+    "grossNotional": 96.565,
+    "marginUsed": 48.48118,
     "maintenanceMargin": 0,
     "withdrawable": 0,
-    "accountLeverage": 1.9896522867013897,
+    "accountLeverage": 1.9918038298572764,
     "cashTotal": 0,
     "manualTotal": 0,
-    "netWorth": 48.58658
+    "netWorth": 48.48118
   },
   "positions": [
     {
@@ -19,15 +19,15 @@
       "cls": "CRYPTO",
       "side": "long",
       "size": 31,
-      "notional": 96.6704,
+      "notional": 96.565,
       "entry": 3.0917,
-      "mark": 3.1184,
-      "uPnl": 0.8277,
-      "roe": 1.7272051,
+      "mark": 3.1149999999999998,
+      "uPnl": 0.7223,
+      "roe": 1.50726138,
       "leverage": 2,
-      "marginUsed": 48.58658,
+      "marginUsed": 48.48118,
       "liqPx": 1.7234344086,
-      "distToLiqPct": 44.733375814520265,
+      "distToLiqPct": 44.67305269341894,
       "fundingSinceOpen": -0.082305,
       "fundingAllTime": -0.082305,
       "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
@@ -37,21 +37,21 @@
   "manual": [],
   "cash": [],
   "risk": {
-    "gross": 96.6704,
-    "net": 96.6704,
-    "longUsd": 96.6704,
+    "gross": 96.565,
+    "net": 96.565,
+    "longUsd": 96.565,
     "shortUsd": 0,
     "byAsset": [
       {
         "key": "LIT",
-        "usd": 96.6704,
+        "usd": 96.565,
         "pct": 100
       }
     ],
     "byClass": [
       {
         "key": "CRYPTO",
-        "usd": 96.6704,
+        "usd": 96.565,
         "pct": 100
       }
     ],
@@ -59,9 +59,9 @@
       {
         "coin": "LIT",
         "side": "long",
-        "distPct": 44.733375814520265,
+        "distPct": 44.67305269341894,
         "liqPx": 1.7234344086,
-        "mark": 3.1184
+        "mark": 3.1149999999999998
       }
     ],
     "alerts": [
@@ -280,8 +280,8 @@
       66.910954
     ],
     [
-      1794229325343,
-      67.244561
+      1794230346151,
+      67.106549
     ]
   ],
   "pnlHistory": [
@@ -462,8 +462,8 @@
       0.359163
     ],
     [
-      1794229325343,
-      0.69277
+      1794230346151,
+      0.554758
     ]
   ]
 }
