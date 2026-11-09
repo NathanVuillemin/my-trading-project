@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-09T20:45:50.260Z",
+  "generatedAt": "2026-11-09T21:10:48.864Z",
   "invertCrowd": false,
   "minSources": 1,
   "connectors": [
@@ -67,10 +67,10 @@
     {
       "asset": "ETH",
       "cls": "CRYPTO",
-      "score": 0.6787198225111174,
-      "smartScore": 0.7993811242908716,
+      "score": 0.6999138830436243,
+      "smartScore": 0.7993127147766323,
       "sources": 3,
-      "bulls": 2,
+      "bulls": 3,
       "bears": 0,
       "agreement": true,
       "union": [
@@ -79,14 +79,14 @@
           "kind": "smart",
           "tier": "A",
           "score": 1,
-          "detail": "3L/4S wallets, net 12.2M"
+          "detail": "2L/6S wallets, net 11.9M"
         },
         {
           "source": "dydx",
           "kind": "crowd",
           "tier": "C",
-          "score": 0,
-          "detail": "OI $9.0M, funding 0.0000%"
+          "score": 0.141,
+          "detail": "OI $18.1M, funding 0.0070%"
         },
         {
           "source": "okx-top",
@@ -100,8 +100,8 @@
     {
       "asset": "DOGE",
       "cls": "CRYPTO",
-      "score": 0.3361344537815126,
-      "smartScore": 0.3361344537815126,
+      "score": 0.3347324239244491,
+      "smartScore": 0.3347324239244491,
       "sources": 1,
       "bulls": 1,
       "bears": 0,
@@ -111,94 +111,16 @@
           "source": "okx-top",
           "kind": "smart",
           "tier": "B",
-          "score": 0.336,
+          "score": 0.335,
           "detail": "top-trader L/S ratio 2.01"
-        }
-      ]
-    },
-    {
-      "asset": "SOL",
-      "cls": "CRYPTO",
-      "score": 0.17379882536674798,
-      "smartScore": 0.20038528320972537,
-      "sources": 3,
-      "bulls": 2,
-      "bears": 0,
-      "agreement": true,
-      "union": [
-        {
-          "source": "hyperliquid",
-          "kind": "smart",
-          "tier": "A",
-          "score": 0.205,
-          "detail": "4L/4S wallets, net 2.5M"
-        },
-        {
-          "source": "dydx",
-          "kind": "crowd",
-          "tier": "C",
-          "score": 0.024,
-          "detail": "OI $10.6M, funding 0.0012%"
-        },
-        {
-          "source": "okx-top",
-          "kind": "smart",
-          "tier": "B",
-          "score": 0.191,
-          "detail": "top-trader L/S ratio 1.47"
-        }
-      ]
-    },
-    {
-      "asset": "XRP",
-      "cls": "CRYPTO",
-      "score": 0.1334928353961925,
-      "smartScore": 0.1334928353961925,
-      "sources": 2,
-      "bulls": 2,
-      "bears": 0,
-      "agreement": true,
-      "union": [
-        {
-          "source": "hyperliquid",
-          "kind": "smart",
-          "tier": "A",
-          "score": 0.09,
-          "detail": "3L/4S wallets, net 1.1M"
-        },
-        {
-          "source": "okx-top",
-          "kind": "smart",
-          "tier": "B",
-          "score": 0.22,
-          "detail": "top-trader L/S ratio 1.56"
-        }
-      ]
-    },
-    {
-      "asset": "LINK",
-      "cls": "CRYPTO",
-      "score": -0.13223140495867763,
-      "smartScore": -0.13223140495867763,
-      "sources": 1,
-      "bulls": 0,
-      "bears": 1,
-      "agreement": false,
-      "union": [
-        {
-          "source": "okx-top",
-          "kind": "smart",
-          "tier": "B",
-          "score": -0.132,
-          "detail": "top-trader L/S ratio 0.77"
         }
       ]
     },
     {
       "asset": "HYPE",
       "cls": "CRYPTO",
-      "score": 0.11071732291006314,
-      "smartScore": 0.11071732291006314,
+      "score": 0.22428326206647484,
+      "smartScore": 0.22428326206647484,
       "sources": 2,
       "bulls": 2,
       "bears": 0,
@@ -208,61 +130,101 @@
           "source": "hyperliquid",
           "kind": "smart",
           "tier": "A",
-          "score": 0.1,
-          "detail": "2L/3S wallets, net 1.2M"
+          "score": 0.267,
+          "detail": "3L/5S wallets, net 3.2M"
         },
         {
           "source": "okx-top",
           "kind": "smart",
           "tier": "B",
-          "score": 0.133,
-          "detail": "top-trader L/S ratio 1.31"
+          "score": 0.14,
+          "detail": "top-trader L/S ratio 1.32"
         }
       ]
     },
     {
-      "asset": "AVAX",
+      "asset": "SOL",
       "cls": "CRYPTO",
-      "score": 0.07142857142857138,
-      "smartScore": 0.07142857142857138,
-      "sources": 1,
-      "bulls": 1,
+      "score": 0.18432605887352077,
+      "smartScore": 0.21151129762275278,
+      "sources": 3,
+      "bulls": 2,
       "bears": 0,
-      "agreement": false,
+      "agreement": true,
       "union": [
+        {
+          "source": "hyperliquid",
+          "kind": "smart",
+          "tier": "A",
+          "score": 0.222,
+          "detail": "4L/3S wallets, net 2.7M"
+        },
+        {
+          "source": "dydx",
+          "kind": "crowd",
+          "tier": "C",
+          "score": 0.031,
+          "detail": "OI $10.6M, funding 0.0016%"
+        },
         {
           "source": "okx-top",
           "kind": "smart",
           "tier": "B",
-          "score": 0.071,
-          "detail": "top-trader L/S ratio 1.15"
+          "score": 0.19,
+          "detail": "top-trader L/S ratio 1.47"
         }
       ]
     },
     {
-      "asset": "BNB",
+      "asset": "LINK",
       "cls": "CRYPTO",
-      "score": -0.04972375690607739,
-      "smartScore": -0.04972375690607739,
+      "score": -0.15226337448559674,
+      "smartScore": -0.15226337448559674,
       "sources": 1,
       "bulls": 0,
-      "bears": 0,
+      "bears": 1,
       "agreement": false,
       "union": [
         {
           "source": "okx-top",
           "kind": "smart",
           "tier": "B",
-          "score": -0.05,
-          "detail": "top-trader L/S ratio 0.91"
+          "score": -0.152,
+          "detail": "top-trader L/S ratio 0.74"
+        }
+      ]
+    },
+    {
+      "asset": "XRP",
+      "cls": "CRYPTO",
+      "score": 0.13075186324737445,
+      "smartScore": 0.13075186324737445,
+      "sources": 2,
+      "bulls": 2,
+      "bears": 0,
+      "agreement": true,
+      "union": [
+        {
+          "source": "hyperliquid",
+          "kind": "smart",
+          "tier": "A",
+          "score": 0.08,
+          "detail": "4L/3S wallets, net 1.0M"
+        },
+        {
+          "source": "okx-top",
+          "kind": "smart",
+          "tier": "B",
+          "score": 0.232,
+          "detail": "top-trader L/S ratio 1.60"
         }
       ]
     },
     {
       "asset": "BTC",
       "cls": "CRYPTO",
-      "score": -0.03706768148285231,
-      "smartScore": -0.043804351427629916,
+      "score": -0.08657047328945637,
+      "smartScore": -0.10196077965202638,
       "sources": 3,
       "bulls": 1,
       "bears": 1,
@@ -272,22 +234,60 @@
           "source": "hyperliquid",
           "kind": "smart",
           "tier": "A",
-          "score": -0.221,
-          "detail": "4L/7S wallets, net -2.7M"
+          "score": -0.307,
+          "detail": "3L/4S wallets, net -3.7M"
         },
         {
           "source": "dydx",
           "kind": "crowd",
           "tier": "C",
-          "score": 0.001,
+          "score": 0,
           "detail": "OI $16.8M, funding 0.0000%"
         },
         {
           "source": "okx-top",
           "kind": "smart",
           "tier": "B",
-          "score": 0.312,
-          "detail": "top-trader L/S ratio 1.90"
+          "score": 0.308,
+          "detail": "top-trader L/S ratio 1.89"
+        }
+      ]
+    },
+    {
+      "asset": "AVAX",
+      "cls": "CRYPTO",
+      "score": 0.05641025641025635,
+      "smartScore": 0.05641025641025635,
+      "sources": 1,
+      "bulls": 1,
+      "bears": 0,
+      "agreement": false,
+      "union": [
+        {
+          "source": "okx-top",
+          "kind": "smart",
+          "tier": "B",
+          "score": 0.056,
+          "detail": "top-trader L/S ratio 1.12"
+        }
+      ]
+    },
+    {
+      "asset": "BNB",
+      "cls": "CRYPTO",
+      "score": -0.04683195592286499,
+      "smartScore": -0.04683195592286499,
+      "sources": 1,
+      "bulls": 0,
+      "bears": 0,
+      "agreement": false,
+      "union": [
+        {
+          "source": "okx-top",
+          "kind": "smart",
+          "tier": "B",
+          "score": -0.047,
+          "detail": "top-trader L/S ratio 0.91"
         }
       ]
     }
