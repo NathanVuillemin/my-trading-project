@@ -1,17 +1,17 @@
 {
   "date": "2026-11-09",
-  "generatedAt": "2026-11-09T16:46:45.016Z",
+  "generatedAt": "2026-11-09T20:36:39.869Z",
   "usingPlaceholder": false,
   "account": {
-    "equity": 49.835699,
-    "grossNotional": 97.9228,
-    "marginUsed": 49.835699,
+    "equity": 53.705652,
+    "grossNotional": 101.7978,
+    "marginUsed": 53.705652,
     "maintenanceMargin": 0,
     "withdrawable": 0,
-    "accountLeverage": 1.964912742570341,
+    "accountLeverage": 1.8954764761072074,
     "cashTotal": 0,
     "manualTotal": 0,
-    "netWorth": 49.835699
+    "netWorth": 53.705652
   },
   "positions": [
     {
@@ -19,17 +19,17 @@
       "cls": "CRYPTO",
       "side": "long",
       "size": 31,
-      "notional": 97.9228,
+      "notional": 101.7978,
       "entry": 3.0917,
-      "mark": 3.1588,
-      "uPnl": 2.0801,
-      "roe": 4.34065401,
+      "mark": 3.2838,
+      "uPnl": 5.9551,
+      "roe": 12.4268202,
       "leverage": 2,
-      "marginUsed": 49.835699,
-      "liqPx": 1.7235520072,
-      "distToLiqPct": 45.43649464353552,
-      "fundingSinceOpen": -0.085586,
-      "fundingAllTime": -0.085586,
+      "marginUsed": 53.705652,
+      "liqPx": 1.7237329032,
+      "distToLiqPct": 47.507981509227115,
+      "fundingSinceOpen": -0.090633,
+      "fundingAllTime": -0.090633,
       "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
       "label": "Main (Hyperliquid)"
     }
@@ -37,21 +37,21 @@
   "manual": [],
   "cash": [],
   "risk": {
-    "gross": 97.9228,
-    "net": 97.9228,
-    "longUsd": 97.9228,
+    "gross": 101.7978,
+    "net": 101.7978,
+    "longUsd": 101.7978,
     "shortUsd": 0,
     "byAsset": [
       {
         "key": "LIT",
-        "usd": 97.9228,
+        "usd": 101.7978,
         "pct": 100
       }
     ],
     "byClass": [
       {
         "key": "CRYPTO",
-        "usd": 97.9228,
+        "usd": 101.7978,
         "pct": 100
       }
     ],
@@ -59,9 +59,9 @@
       {
         "coin": "LIT",
         "side": "long",
-        "distPct": 45.43649464353552,
-        "liqPx": 1.7235520072,
-        "mark": 3.1588
+        "distPct": 47.507981509227115,
+        "liqPx": 1.7237329032,
+        "mark": 3.2838
       }
     ],
     "alerts": [
@@ -72,22 +72,35 @@
     ]
   },
   "trades": {
-    "tradeCount": 0,
-    "openTrades": 0,
-    "closingFills": 0,
+    "tradeCount": 3,
+    "openTrades": 1,
+    "closingFills": 3,
     "fillsCapped": false,
-    "grossWin": 0,
-    "grossLoss": 0,
-    "totalFees": 0,
-    "byCoin": [],
-    "netRealised": 0,
-    "winRate": 0,
-    "expectancy": 0,
-    "profitFactor": null
+    "grossWin": 9.423495,
+    "grossLoss": 129.464574,
+    "totalFees": 4.953414,
+    "byCoin": [
+      {
+        "coin": "BTC",
+        "cls": "CRYPTO",
+        "realised": -120.041079,
+        "n": 3,
+        "wins": 1
+      }
+    ],
+    "netRealised": -120.041079,
+    "winRate": 33.33333333333333,
+    "expectancy": -40.013692999999996,
+    "profitFactor": 0.07278821309063281
   },
   "funding": {
-    "last30d": 0,
-    "byCoin": []
+    "last30d": -0.09063300000000006,
+    "byCoin": [
+      {
+        "coin": "LIT",
+        "usd": -0.09063300000000006
+      }
+    ]
   },
   "equityHistory": [
     [
@@ -267,8 +280,12 @@
       66.910954
     ],
     [
-      1794242778282,
-      68.461068
+      1794252720036,
+      70.822586
+    ],
+    [
+      1794256599461,
+      72.321721
     ]
   ],
   "pnlHistory": [
@@ -449,8 +466,12 @@
       0.359163
     ],
     [
-      1794242778282,
-      1.909277
+      1794252720036,
+      4.270795
+    ],
+    [
+      1794256599461,
+      5.76993
     ]
   ]
 }
