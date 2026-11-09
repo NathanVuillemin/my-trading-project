@@ -1,137 +1,387 @@
 {
   "mock": true,
   "asOf": "2026-11-07",
-  "types": ["inflation", "labour", "growth", "central-bank", "speech", "trade", "sentiment"],
+  "types": [
+    "inflation",
+    "labour",
+    "growth",
+    "central-bank",
+    "speech",
+    "trade",
+    "sentiment"
+  ],
   "events": [
     {
-      "id": "e-us-nfp-1106", "asset": "currency", "currency": "USD", "time": "2026-11-06T13:30:00Z",
-      "type": "labour", "name": "Non-farm payrolls", "impact": "high",
-      "previous": "142K", "forecast": "120K", "actual": "175K", "surprise": "beat",
-      "affects": { "USD": "Beat = fewer cuts priced, USD up", "JPY": "USDJPY up via US yields", "XAU": "Gold down on higher real yields" },
-      "source": { "name": "BLS Employment Situation", "url": "https://www.bls.gov/news.release/empsit.toc.htm" }
+      "id": "e-us-nfp-1106",
+      "asset": "currency",
+      "currency": "USD",
+      "time": "2026-11-06T13:30:00Z",
+      "type": "labour",
+      "name": "Non-farm payrolls",
+      "impact": "high",
+      "previous": "142K",
+      "forecast": "120K",
+      "actual": "175K",
+      "surprise": "beat",
+      "affects": {
+        "USD": "Beat = fewer cuts priced, USD up",
+        "JPY": "USDJPY up via US yields",
+        "XAU": "Gold down on higher real yields"
+      },
+      "source": {
+        "name": "BLS Employment Situation",
+        "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+      }
     },
     {
-      "id": "e-ca-lfs-1106", "asset": "currency", "currency": "CAD", "time": "2026-11-06T13:30:00Z",
-      "type": "labour", "name": "Labour Force Survey", "impact": "high",
-      "previous": "6.9%", "forecast": "7.0%", "actual": "7.1%", "surprise": "miss",
-      "affects": { "CAD": "Higher unemployment = more BoC cuts, CAD down" },
-      "trigger": "t-cad-lfs",
-      "source": { "name": "Statistics Canada, The Daily", "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm" }
+      "id": "e-ca-lfs-1106",
+      "asset": "currency",
+      "currency": "CAD",
+      "time": "2026-11-06T13:30:00Z",
+      "type": "labour",
+      "name": "Labour Force Survey",
+      "impact": "high",
+      "previous": "6.9%",
+      "forecast": "7.0%",
+      "actual": "7.1%",
+      "surprise": "miss",
+      "affects": {
+        "CAD": "Higher unemployment = more BoC cuts, CAD down"
+      },
+      "source": {
+        "name": "Statistics Canada, The Daily",
+        "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+      },
+      "killSwitch": "k-cad-lfs"
     },
     {
-      "id": "e-au-rba-1104", "asset": "currency", "currency": "AUD", "time": "2026-11-04T03:30:00Z",
-      "type": "central-bank", "name": "RBA rate decision", "impact": "high",
-      "previous": "3.60%", "forecast": "3.60%", "actual": "3.60%", "surprise": "inline",
-      "affects": { "AUD": "Hawkish hold supports AUD", "NZD": "AUDNZD moves on RBA vs RBNZ gap" },
-      "source": { "name": "Reserve Bank of Australia", "url": "https://www.rba.gov.au/monetary-policy/" }
+      "id": "e-au-rba-1104",
+      "asset": "currency",
+      "currency": "AUD",
+      "time": "2026-11-04T03:30:00Z",
+      "type": "central-bank",
+      "name": "RBA rate decision",
+      "impact": "high",
+      "previous": "3.60%",
+      "forecast": "3.60%",
+      "actual": "3.60%",
+      "surprise": "inline",
+      "affects": {
+        "AUD": "Hawkish hold supports AUD",
+        "NZD": "AUDNZD moves on RBA vs RBNZ gap"
+      },
+      "source": {
+        "name": "Reserve Bank of Australia",
+        "url": "https://www.rba.gov.au/monetary-policy/"
+      }
     },
     {
-      "id": "e-gb-boe-1105", "asset": "currency", "currency": "GBP", "time": "2026-11-05T12:00:00Z",
-      "type": "central-bank", "name": "BoE Bank Rate decision", "impact": "high",
-      "previous": "4.00%", "forecast": "4.00%", "actual": "4.00%", "surprise": "inline",
-      "affects": { "GBP": "Vote split shows how close cuts are" },
-      "source": { "name": "Bank of England", "url": "https://www.bankofengland.co.uk/monetary-policy/the-interest-rate-bank-rate" }
+      "id": "e-gb-boe-1105",
+      "asset": "currency",
+      "currency": "GBP",
+      "time": "2026-11-05T12:00:00Z",
+      "type": "central-bank",
+      "name": "BoE Bank Rate decision",
+      "impact": "high",
+      "previous": "4.00%",
+      "forecast": "4.00%",
+      "actual": "4.00%",
+      "surprise": "inline",
+      "affects": {
+        "GBP": "Vote split shows how close cuts are"
+      },
+      "source": {
+        "name": "Bank of England",
+        "url": "https://www.bankofengland.co.uk/monetary-policy/the-interest-rate-bank-rate"
+      }
     },
     {
-      "id": "e-cn-trade-1110", "asset": "currency", "currency": "AUD", "time": "2026-11-10T03:00:00Z",
-      "type": "trade", "name": "China trade balance (AUD driver)", "impact": "medium",
-      "previous": "$90B", "forecast": "$95B", "actual": null, "surprise": null,
-      "affects": { "AUD": "Weak China imports = iron ore down, AUD down", "NZD": "Dairy demand read" },
-      "source": { "name": "China General Administration of Customs", "url": "http://english.customs.gov.cn/" }
+      "id": "e-cn-trade-1110",
+      "asset": "currency",
+      "currency": "AUD",
+      "time": "2026-11-10T03:00:00Z",
+      "type": "trade",
+      "name": "China trade balance (AUD driver)",
+      "impact": "medium",
+      "previous": "$90B",
+      "forecast": "$95B",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "AUD": "Weak China imports = iron ore down, AUD down",
+        "NZD": "Dairy demand read"
+      },
+      "source": {
+        "name": "China General Administration of Customs",
+        "url": "http://english.customs.gov.cn/"
+      }
     },
     {
-      "id": "e-gb-lab-1111", "asset": "currency", "currency": "GBP", "time": "2026-11-11T07:00:00Z",
-      "type": "labour", "name": "UK labour market (wages + unemployment)", "impact": "high",
-      "previous": "4.8%", "forecast": "4.9%", "actual": null, "surprise": null,
-      "affects": { "GBP": "Hot wages = BoE stays on hold, GBP up" },
-      "source": { "name": "ONS, labour market", "url": "https://www.ons.gov.uk/employmentandlabourmarket" }
+      "id": "e-gb-lab-1111",
+      "asset": "currency",
+      "currency": "GBP",
+      "time": "2026-11-11T07:00:00Z",
+      "type": "labour",
+      "name": "UK labour market (wages + unemployment)",
+      "impact": "high",
+      "previous": "4.8%",
+      "forecast": "4.9%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "GBP": "Hot wages = BoE stays on hold, GBP up"
+      },
+      "source": {
+        "name": "ONS, labour market",
+        "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+      }
     },
     {
-      "id": "e-us-cpi-1112", "asset": "currency", "currency": "USD", "time": "2026-11-12T13:30:00Z",
-      "type": "inflation", "name": "CPI (core m/m)", "impact": "high",
-      "previous": "0.3%", "forecast": "0.3%", "actual": null, "surprise": null,
-      "affects": { "USD": "Hot core = hawkish gap widens, USD up", "JPY": "USDJPY toward 160 zone", "XAU": "Hot = gold down" },
-      "trigger": "t-usd-cpi",
-      "source": { "name": "BLS Consumer Price Index", "url": "https://www.bls.gov/cpi/" }
+      "id": "e-us-cpi-1112",
+      "asset": "currency",
+      "currency": "USD",
+      "time": "2026-11-12T13:30:00Z",
+      "type": "inflation",
+      "name": "CPI (core m/m)",
+      "impact": "high",
+      "previous": "0.3%",
+      "forecast": "0.3%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "USD": "Hot core = hawkish gap widens, USD up",
+        "JPY": "USDJPY toward 160 zone",
+        "XAU": "Hot = gold down"
+      },
+      "source": {
+        "name": "BLS Consumer Price Index",
+        "url": "https://www.bls.gov/cpi/"
+      },
+      "killSwitch": "k-usd-cpi"
     },
     {
-      "id": "e-au-lab-1113", "asset": "currency", "currency": "AUD", "time": "2026-11-13T00:30:00Z",
-      "type": "labour", "name": "Employment change", "impact": "high",
-      "previous": "15K", "forecast": "20K", "actual": null, "surprise": null,
-      "affects": { "AUD": "Strong jobs = RBA hold longer, AUD up" },
-      "source": { "name": "ABS Labour Force", "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment" }
+      "id": "e-au-lab-1113",
+      "asset": "currency",
+      "currency": "AUD",
+      "time": "2026-11-13T00:30:00Z",
+      "type": "labour",
+      "name": "Employment change",
+      "impact": "high",
+      "previous": "15K",
+      "forecast": "20K",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "AUD": "Strong jobs = RBA hold longer, AUD up"
+      },
+      "source": {
+        "name": "ABS Labour Force",
+        "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+      }
     },
     {
-      "id": "e-eu-gdp-1114", "asset": "currency", "currency": "EUR", "time": "2026-11-14T10:00:00Z",
-      "type": "growth", "name": "Euro area GDP (flash, 2nd est.)", "impact": "medium",
-      "previous": "0.1%", "forecast": "0.1%", "actual": null, "surprise": null,
-      "affects": { "EUR": "Weak growth = more ECB cuts, EUR down" },
-      "source": { "name": "Eurostat euro indicators", "url": "https://ec.europa.eu/eurostat/web/euro-indicators" }
+      "id": "e-eu-gdp-1114",
+      "asset": "currency",
+      "currency": "EUR",
+      "time": "2026-11-14T10:00:00Z",
+      "type": "growth",
+      "name": "Euro area GDP (flash, 2nd est.)",
+      "impact": "medium",
+      "previous": "0.1%",
+      "forecast": "0.1%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "EUR": "Weak growth = more ECB cuts, EUR down"
+      },
+      "source": {
+        "name": "Eurostat euro indicators",
+        "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+      }
     },
     {
-      "id": "e-jp-cpi-1121", "asset": "currency", "currency": "JPY", "time": "2026-11-20T23:30:00Z",
-      "type": "inflation", "name": "National core CPI", "impact": "medium",
-      "previous": "2.9%", "forecast": "2.8%", "actual": null, "surprise": null,
-      "affects": { "JPY": "Sticky core = BoJ hike odds up, JPY up" },
-      "source": { "name": "Statistics Bureau of Japan", "url": "https://www.stat.go.jp/english/data/cpi/index.html" }
+      "id": "e-jp-cpi-1121",
+      "asset": "currency",
+      "currency": "JPY",
+      "time": "2026-11-20T23:30:00Z",
+      "type": "inflation",
+      "name": "National core CPI",
+      "impact": "medium",
+      "previous": "2.9%",
+      "forecast": "2.8%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "JPY": "Sticky core = BoJ hike odds up, JPY up"
+      },
+      "source": {
+        "name": "Statistics Bureau of Japan",
+        "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+      }
     },
     {
-      "id": "e-ca-cpi-1118", "asset": "currency", "currency": "CAD", "time": "2026-11-18T13:30:00Z",
-      "type": "inflation", "name": "CPI", "impact": "high",
-      "previous": "2.1%", "forecast": "2.0%", "actual": null, "surprise": null,
-      "affects": { "CAD": "Soft CPI = room to cut, CAD down. Oil can lift headline." },
-      "source": { "name": "Statistics Canada, The Daily", "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm" }
+      "id": "e-ca-cpi-1118",
+      "asset": "currency",
+      "currency": "CAD",
+      "time": "2026-11-18T13:30:00Z",
+      "type": "inflation",
+      "name": "CPI",
+      "impact": "high",
+      "previous": "2.1%",
+      "forecast": "2.0%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "CAD": "Soft CPI = room to cut, CAD down. Oil can lift headline."
+      },
+      "source": {
+        "name": "Statistics Canada, The Daily",
+        "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+      }
     },
     {
-      "id": "e-gb-cpi-1119", "asset": "currency", "currency": "GBP", "time": "2026-11-19T07:00:00Z",
-      "type": "inflation", "name": "CPI (services)", "impact": "high",
-      "previous": "4.7%", "forecast": "4.6%", "actual": null, "surprise": null,
-      "affects": { "GBP": "Services below 4% would break my GBP thesis" },
-      "trigger": "t-gbp-cpi",
-      "source": { "name": "ONS, inflation and price indices", "url": "https://www.ons.gov.uk/economy/inflationandpriceindices" }
+      "id": "e-gb-cpi-1119",
+      "asset": "currency",
+      "currency": "GBP",
+      "time": "2026-11-19T07:00:00Z",
+      "type": "inflation",
+      "name": "CPI (services)",
+      "impact": "high",
+      "previous": "4.7%",
+      "forecast": "4.6%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "GBP": "Services below 4% would break my GBP thesis"
+      },
+      "source": {
+        "name": "ONS, inflation and price indices",
+        "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+      },
+      "killSwitch": "k-gbp-cpi"
     },
     {
-      "id": "e-ch-cpi-1203", "asset": "currency", "currency": "CHF", "time": "2026-12-03T07:30:00Z",
-      "type": "inflation", "name": "CPI", "impact": "medium",
-      "previous": "0.1%", "forecast": "0.1%", "actual": null, "surprise": null,
-      "affects": { "CHF": "Negative print = SNB cut pressure, CHF down" },
-      "source": { "name": "Swiss Federal Statistical Office", "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html" }
+      "id": "e-ch-cpi-1203",
+      "asset": "currency",
+      "currency": "CHF",
+      "time": "2026-12-03T07:30:00Z",
+      "type": "inflation",
+      "name": "CPI",
+      "impact": "medium",
+      "previous": "0.1%",
+      "forecast": "0.1%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "CHF": "Negative print = SNB cut pressure, CHF down"
+      },
+      "source": {
+        "name": "Swiss Federal Statistical Office",
+        "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+      }
     },
     {
-      "id": "e-nz-rbnz-1125", "asset": "currency", "currency": "NZD", "time": "2026-11-25T01:00:00Z",
-      "type": "central-bank", "name": "RBNZ OCR decision", "impact": "high",
-      "previous": "2.50%", "forecast": "2.25%", "actual": null, "surprise": null,
-      "affects": { "NZD": "50bp or dovish path = NZD down", "AUD": "AUDNZD up on dovish RBNZ" },
-      "trigger": "t-nzd-rbnz",
-      "source": { "name": "Reserve Bank of New Zealand", "url": "https://www.rbnz.govt.nz/monetary-policy" }
+      "id": "e-nz-rbnz-1125",
+      "asset": "currency",
+      "currency": "NZD",
+      "time": "2026-11-25T01:00:00Z",
+      "type": "central-bank",
+      "name": "RBNZ OCR decision",
+      "impact": "high",
+      "previous": "2.50%",
+      "forecast": "2.25%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "NZD": "50bp or dovish path = NZD down",
+        "AUD": "AUDNZD up on dovish RBNZ"
+      },
+      "source": {
+        "name": "Reserve Bank of New Zealand",
+        "url": "https://www.rbnz.govt.nz/monetary-policy"
+      },
+      "killSwitch": "k-nzd-rbnz"
     },
     {
-      "id": "e-us-fomc-1209", "asset": "currency", "currency": "USD", "time": "2026-12-09T19:00:00Z",
-      "type": "central-bank", "name": "FOMC rate decision + dots", "impact": "high",
-      "previous": "3.75%", "forecast": "3.50%", "actual": null, "surprise": null,
-      "affects": { "USD": "Fewer dots = hawkish gap realised", "XAU": "Hawkish = gold down" },
-      "source": { "name": "Federal Reserve FOMC calendar", "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" }
+      "id": "e-us-fomc-1209",
+      "asset": "currency",
+      "currency": "USD",
+      "time": "2026-12-09T19:00:00Z",
+      "type": "central-bank",
+      "name": "FOMC rate decision + dots",
+      "impact": "high",
+      "previous": "3.75%",
+      "forecast": "3.50%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "USD": "Fewer dots = hawkish gap realised",
+        "XAU": "Hawkish = gold down"
+      },
+      "source": {
+        "name": "Federal Reserve FOMC calendar",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      }
     },
     {
-      "id": "e-ca-boc-1210", "asset": "currency", "currency": "CAD", "time": "2026-12-10T14:45:00Z",
-      "type": "central-bank", "name": "BoC rate decision", "impact": "high",
-      "previous": "2.25%", "forecast": "2.00%", "actual": null, "surprise": null,
-      "affects": { "CAD": "Cut + easing bias = thesis confirmed" },
-      "source": { "name": "Bank of Canada", "url": "https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/" }
+      "id": "e-ca-boc-1210",
+      "asset": "currency",
+      "currency": "CAD",
+      "time": "2026-12-10T14:45:00Z",
+      "type": "central-bank",
+      "name": "BoC rate decision",
+      "impact": "high",
+      "previous": "2.25%",
+      "forecast": "2.00%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "CAD": "Cut + easing bias = thesis confirmed"
+      },
+      "source": {
+        "name": "Bank of Canada",
+        "url": "https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/"
+      }
     },
     {
-      "id": "e-eu-ecb-1217", "asset": "currency", "currency": "EUR", "time": "2026-12-17T13:15:00Z",
-      "type": "central-bank", "name": "ECB monetary policy decision", "impact": "high",
-      "previous": "2.00%", "forecast": "2.00%", "actual": null, "surprise": null,
-      "affects": { "EUR": "Cut signal = EUR down" },
-      "source": { "name": "European Central Bank", "url": "https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html" }
+      "id": "e-eu-ecb-1217",
+      "asset": "currency",
+      "currency": "EUR",
+      "time": "2026-12-17T13:15:00Z",
+      "type": "central-bank",
+      "name": "ECB monetary policy decision",
+      "impact": "high",
+      "previous": "2.00%",
+      "forecast": "2.00%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "EUR": "Cut signal = EUR down"
+      },
+      "source": {
+        "name": "European Central Bank",
+        "url": "https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html"
+      }
     },
     {
-      "id": "e-jp-boj-1219", "asset": "currency", "currency": "JPY", "time": "2026-12-19T03:00:00Z",
-      "type": "central-bank", "name": "BoJ policy decision", "impact": "high",
-      "previous": "0.75%", "forecast": "0.75%", "actual": null, "surprise": null,
-      "affects": { "JPY": "Surprise hike = JPY up hard" },
-      "source": { "name": "Bank of Japan", "url": "https://www.boj.or.jp/en/mopo/mpmdeci/index.htm" }
+      "id": "e-jp-boj-1219",
+      "asset": "currency",
+      "currency": "JPY",
+      "time": "2026-12-19T03:00:00Z",
+      "type": "central-bank",
+      "name": "BoJ policy decision",
+      "impact": "high",
+      "previous": "0.75%",
+      "forecast": "0.75%",
+      "actual": null,
+      "surprise": null,
+      "affects": {
+        "JPY": "Surprise hike = JPY up hard"
+      },
+      "source": {
+        "name": "Bank of Japan",
+        "url": "https://www.boj.or.jp/en/mopo/mpmdeci/index.htm"
+      }
     }
   ]
 }

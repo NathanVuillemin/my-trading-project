@@ -9,11 +9,11 @@
       "from": -1,
       "to": -2,
       "kind": "data",
-      "trigger": "t-cad-lfs",
       "reason": "Unemployment 7.1%: BoC must cut more. Net stays -1 while oil conflicts.",
       "grade1w": null,
       "grade4w": null,
-      "layer": "structural"
+      "layer": "structural",
+      "killSwitch": "k-cad-lfs"
     },
     {
       "date": "2026-11-05",
@@ -21,11 +21,11 @@
       "from": "ACTIVE",
       "to": "FROZEN",
       "kind": "driver",
-      "trigger": "t-cad-oil",
       "reason": "Oil rally with strong correlation: no new CAD shorts until review",
       "grade1w": null,
       "grade4w": null,
-      "layer": "status"
+      "layer": "status",
+      "killSwitch": "k-cad-oil"
     },
     {
       "date": "2026-11-04",
@@ -33,11 +33,11 @@
       "from": -1,
       "to": 0,
       "kind": "driver",
-      "trigger": "t-eur-gas",
       "reason": "Gas collapse props EUR: net cut to 0 and frozen until review",
       "grade1w": null,
       "grade4w": null,
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": "k-eur-gas"
     },
     {
       "date": "2026-10-30",
@@ -45,11 +45,11 @@
       "from": 1,
       "to": 2,
       "kind": "data",
-      "trigger": null,
       "reason": "Services CPI re-accelerated",
       "grade1w": "hit",
       "grade4w": null,
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": null
     },
     {
       "date": "2026-10-24",
@@ -57,11 +57,11 @@
       "from": -1,
       "to": -2,
       "kind": "cb",
-      "trigger": null,
       "reason": "RBNZ minutes opened door to 50bp",
       "grade1w": "hit",
       "grade4w": null,
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": null
     },
     {
       "date": "2026-10-17",
@@ -69,11 +69,11 @@
       "from": 2,
       "to": 1,
       "kind": "driver",
-      "trigger": null,
       "reason": "US 10Y breakout keeps USDJPY bid",
       "grade1w": "miss",
       "grade4w": "hit",
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": null
     },
     {
       "date": "2026-10-10",
@@ -81,11 +81,11 @@
       "from": 0,
       "to": 1,
       "kind": "cb",
-      "trigger": null,
       "reason": "RBA hawkish hold",
       "grade1w": "hit",
       "grade4w": "hit",
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": null
     },
     {
       "date": "2026-10-03",
@@ -93,11 +93,11 @@
       "from": 0,
       "to": 1,
       "kind": "pricing",
-      "trigger": null,
       "reason": "Market priced too many cuts vs data",
       "grade1w": "miss",
       "grade4w": "hit",
-      "layer": "net"
+      "layer": "net",
+      "killSwitch": null
     }
   ]
 }

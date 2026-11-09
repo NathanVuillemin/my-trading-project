@@ -1,0 +1,1172 @@
+{
+  "mock": true,
+  "sunday": "2026-11-08",
+  "week": "2026-W45",
+  "period": {
+    "start": "2026-11-02",
+    "end": "2026-11-06"
+  },
+  "process": {
+    "status": "to define",
+    "note": "Nathan's step-by-step method for reading each economy goes here. Steps below are placeholders.",
+    "steps": [
+      {
+        "id": "growth",
+        "label": "Read growth: direction and trend of activity data"
+      },
+      {
+        "id": "inflation",
+        "label": "Read inflation: level vs target and trend"
+      },
+      {
+        "id": "scare",
+        "label": "Which is the scare: inflation, growth, both or neither"
+      },
+      {
+        "id": "trends",
+        "label": "Data trends: is the picture improving or worsening"
+      },
+      {
+        "id": "cb",
+        "label": "What the central bank is forced to do"
+      },
+      {
+        "id": "pricing",
+        "label": "Market pricing vs my path: the gap"
+      },
+      {
+        "id": "bias",
+        "label": "Bias for the week ahead"
+      }
+    ]
+  },
+  "overview": {
+    "headline": "Divergence widening: inflation-scare economies vs growth-scare economies. NZD weakest, GBP strongest.",
+    "globalScare": "mixed",
+    "riskMood": "CAUTION",
+    "bullets": [
+      "Inflation scare: USD, GBP, AUD, JPY. Growth scare: EUR, CAD, NZD, CHF.",
+      "Divergence trade: hawkish-gap currencies vs growth-scare currencies.",
+      "Oil and gas moves are the main driver conflicts (CAD, EUR)."
+    ],
+    "killSwitchesFired": [
+      "k-cad-oil",
+      "k-cad-lfs",
+      "k-eur-gas"
+    ],
+    "nextWeekTop": [
+      "US CPI (Wed)",
+      "UK labour market (Tue)",
+      "AU employment (Thu)",
+      "JP CPI (Fri)"
+    ]
+  },
+  "economies": [
+    {
+      "code": "USD",
+      "name": "United States",
+      "cb": "Fed",
+      "regime": {
+        "growth": "flat",
+        "inflation": "up"
+      },
+      "scare": "inflation",
+      "verdict": "Inflation is still the scare. Jobs beat pushed pricing toward my path but gap remains.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Composite PMI",
+            "unit": "",
+            "latest": 50.6,
+            "prior": 50.8,
+            "expected": 50.5,
+            "trend": [
+              52.1,
+              51.6,
+              51,
+              50.4,
+              50.8,
+              50.6
+            ],
+            "source": {
+              "name": "BLS",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          },
+          {
+            "name": "Retail sales m/m",
+            "unit": "%",
+            "latest": 0.4,
+            "prior": 0.3,
+            "expected": 0.2,
+            "trend": [
+              0.6,
+              0.2,
+              0.4,
+              0.1,
+              0.3,
+              0.4
+            ],
+            "source": {
+              "name": "BLS",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "Core CPI y/y",
+            "unit": "%",
+            "latest": 3.2,
+            "prior": 3.2,
+            "expected": 3.1,
+            "trend": [
+              3,
+              3,
+              3.1,
+              3.1,
+              3.2,
+              3.2
+            ],
+            "source": {
+              "name": "BLS",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          },
+          {
+            "name": "Core PCE y/y",
+            "unit": "%",
+            "latest": 3,
+            "prior": 2.9,
+            "expected": 2.9,
+            "trend": [
+              2.8,
+              2.8,
+              2.9,
+              2.9,
+              2.9,
+              3
+            ],
+            "source": {
+              "name": "BLS",
+              "url": "https://www.bls.gov/cpi/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Non-farm payrolls",
+            "unit": "K",
+            "latest": 175,
+            "prior": 142,
+            "expected": 120,
+            "trend": [
+              110,
+              95,
+              160,
+              120,
+              142,
+              175
+            ],
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          },
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 4.3,
+            "prior": 4.3,
+            "expected": 4.3,
+            "trend": [
+              4.2,
+              4.3,
+              4.3,
+              4.4,
+              4.3,
+              4.3
+            ],
+            "source": {
+              "name": "BLS Employment Situation",
+              "url": "https://www.bls.gov/news.release/empsit.toc.htm"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "neutral",
+        "pricedStartBp": -60,
+        "pricedEndBp": -50,
+        "myPathBp": -25,
+        "nextMeeting": "2026-12-09"
+      },
+      "week": {
+        "currencyPct": 0.6,
+        "takeaways": [
+          "NFP beat, wages firm",
+          "Pricing cut 10bp of easing",
+          "ISM services prices paid still elevated"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "CPI (Wed)",
+        "Retail sales (Fri)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "EUR",
+      "name": "Euro area",
+      "cb": "ECB",
+      "regime": {
+        "growth": "down",
+        "inflation": "down"
+      },
+      "scare": "growth",
+      "verdict": "Growth is the scare. Gas collapse muddies the picture short term.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Composite PMI",
+            "unit": "",
+            "latest": 48.6,
+            "prior": 48.8,
+            "expected": 48.9,
+            "trend": [
+              50.2,
+              49.8,
+              49.5,
+              49,
+              48.8,
+              48.6
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "GDP q/q",
+            "unit": "%",
+            "latest": 0.1,
+            "prior": 0.1,
+            "expected": 0.1,
+            "trend": [
+              0.3,
+              0.2,
+              0.2,
+              0.1,
+              0.1,
+              0.1
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "HICP y/y",
+            "unit": "%",
+            "latest": 1.9,
+            "prior": 2,
+            "expected": 2,
+            "trend": [
+              2.5,
+              2.4,
+              2.2,
+              2.1,
+              2,
+              1.9
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          },
+          {
+            "name": "Core HICP y/y",
+            "unit": "%",
+            "latest": 2.4,
+            "prior": 2.4,
+            "expected": 2.4,
+            "trend": [
+              2.8,
+              2.7,
+              2.6,
+              2.5,
+              2.4,
+              2.4
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 6.4,
+            "prior": 6.4,
+            "expected": 6.3,
+            "trend": [
+              6.3,
+              6.3,
+              6.3,
+              6.4,
+              6.4,
+              6.4
+            ],
+            "source": {
+              "name": "Eurostat",
+              "url": "https://ec.europa.eu/eurostat/web/euro-indicators"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "dovish",
+        "pricedStartBp": -5,
+        "pricedEndBp": -10,
+        "myPathBp": -25,
+        "nextMeeting": "2026-12-17"
+      },
+      "week": {
+        "currencyPct": -0.2,
+        "takeaways": [
+          "German PMI weakest in 4 months",
+          "TTF gas -18% on the month",
+          "ECB speakers open to December cut"
+        ],
+        "biasChange": {
+          "from": -1,
+          "to": 0,
+          "why": "Gas collapse props EUR: frozen"
+        }
+      },
+      "nextWeek": [
+        "ZEW (Tue)",
+        "GDP 2nd est. (Fri)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "GBP",
+      "name": "United Kingdom",
+      "cb": "BoE",
+      "regime": {
+        "growth": "flat",
+        "inflation": "up"
+      },
+      "scare": "inflation",
+      "verdict": "Inflation scare. BoE hold was hawkish; gap shrinking as market catches up.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Composite PMI",
+            "unit": "",
+            "latest": 51.3,
+            "prior": 51.1,
+            "expected": 51,
+            "trend": [
+              51,
+              50.8,
+              51.2,
+              50.9,
+              51.1,
+              51.3
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "GDP m/m",
+            "unit": "%",
+            "latest": 0.2,
+            "prior": 0.1,
+            "expected": 0.1,
+            "trend": [
+              0.1,
+              0,
+              0.2,
+              0.1,
+              0.1,
+              0.2
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "Services CPI y/y",
+            "unit": "%",
+            "latest": 4.7,
+            "prior": 4.6,
+            "expected": 4.6,
+            "trend": [
+              4.9,
+              4.8,
+              4.6,
+              4.5,
+              4.6,
+              4.7
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          },
+          {
+            "name": "Core CPI y/y",
+            "unit": "%",
+            "latest": 3.6,
+            "prior": 3.5,
+            "expected": 3.5,
+            "trend": [
+              3.6,
+              3.5,
+              3.5,
+              3.4,
+              3.5,
+              3.6
+            ],
+            "source": {
+              "name": "ONS inflation",
+              "url": "https://www.ons.gov.uk/economy/inflationandpriceindices"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Regular pay y/y",
+            "unit": "%",
+            "latest": 4.8,
+            "prior": 4.8,
+            "expected": 4.8,
+            "trend": [
+              5.2,
+              5,
+              4.9,
+              4.8,
+              4.8,
+              4.8
+            ],
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          },
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 4.9,
+            "prior": 4.9,
+            "expected": 4.9,
+            "trend": [
+              4.7,
+              4.8,
+              4.8,
+              4.9,
+              4.9,
+              4.9
+            ],
+            "source": {
+              "name": "ONS labour market",
+              "url": "https://www.ons.gov.uk/employmentandlabourmarket"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "hawkish",
+        "pricedStartBp": -55,
+        "pricedEndBp": -40,
+        "myPathBp": 0,
+        "nextMeeting": "2026-12-18"
+      },
+      "week": {
+        "currencyPct": 0.4,
+        "takeaways": [
+          "BoE held, vote 7-2",
+          "Services inflation re-accelerating",
+          "GBP crowded long: pricing kill switch near"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "Labour market (Tue)",
+        "GDP (Thu)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "JPY",
+      "name": "Japan",
+      "cb": "BoJ",
+      "regime": {
+        "growth": "up",
+        "inflation": "up"
+      },
+      "scare": "inflation",
+      "verdict": "Domestic story hawkish but US yields dominate the pair. No change.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Composite PMI",
+            "unit": "",
+            "latest": 51.6,
+            "prior": 51.4,
+            "expected": 51.2,
+            "trend": [
+              50.5,
+              50.9,
+              51.2,
+              51,
+              51.4,
+              51.6
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Household spending y/y",
+            "unit": "%",
+            "latest": 1,
+            "prior": 1.1,
+            "expected": 0.8,
+            "trend": [
+              -0.5,
+              0.2,
+              0.8,
+              0.4,
+              1.1,
+              1
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "Core CPI y/y",
+            "unit": "%",
+            "latest": 2.9,
+            "prior": 2.9,
+            "expected": 2.8,
+            "trend": [
+              2.6,
+              2.7,
+              2.8,
+              2.9,
+              2.9,
+              2.9
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          },
+          {
+            "name": "Tokyo core CPI y/y",
+            "unit": "%",
+            "latest": 2.8,
+            "prior": 2.7,
+            "expected": 2.7,
+            "trend": [
+              2.4,
+              2.5,
+              2.6,
+              2.6,
+              2.7,
+              2.8
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 2.4,
+            "prior": 2.4,
+            "expected": 2.5,
+            "trend": [
+              2.6,
+              2.5,
+              2.5,
+              2.5,
+              2.4,
+              2.4
+            ],
+            "source": {
+              "name": "Statistics Bureau of Japan",
+              "url": "https://www.stat.go.jp/english/data/cpi/index.html"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "hawkish",
+        "pricedStartBp": 10,
+        "pricedEndBp": 10,
+        "myPathBp": 25,
+        "nextMeeting": "2026-12-19"
+      },
+      "week": {
+        "currencyPct": -0.5,
+        "takeaways": [
+          "Tokyo CPI firm",
+          "USDJPY 157.8: 160 zone near",
+          "MoF verbal warnings stepped up"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "GDP prelim (Mon)",
+        "National CPI (Fri)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "CHF",
+      "name": "Switzerland",
+      "cb": "SNB",
+      "regime": {
+        "growth": "down",
+        "inflation": "down"
+      },
+      "scare": "growth",
+      "verdict": "Deflation risk + strong franc: SNB leaning dovish. Quiet week.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Manufacturing PMI",
+            "unit": "",
+            "latest": 48.2,
+            "prior": 48.5,
+            "expected": 48.6,
+            "trend": [
+              49.8,
+              49.2,
+              48.7,
+              48.9,
+              48.5,
+              48.2
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          },
+          {
+            "name": "KOF barometer",
+            "unit": "",
+            "latest": 97.6,
+            "prior": 98,
+            "expected": 98,
+            "trend": [
+              101,
+              100,
+              99,
+              98.5,
+              98,
+              97.6
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "CPI y/y",
+            "unit": "%",
+            "latest": 0.1,
+            "prior": 0.1,
+            "expected": 0.1,
+            "trend": [
+              0.6,
+              0.4,
+              0.3,
+              0.2,
+              0.1,
+              0.1
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 3,
+            "prior": 2.9,
+            "expected": 2.9,
+            "trend": [
+              2.7,
+              2.8,
+              2.8,
+              2.9,
+              2.9,
+              3
+            ],
+            "source": {
+              "name": "Swiss FSO",
+              "url": "https://www.bfs.admin.ch/bfs/en/home/statistics/prices.html"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "dovish",
+        "pricedStartBp": -10,
+        "pricedEndBp": -10,
+        "myPathBp": -25,
+        "nextMeeting": "2026-12-11"
+      },
+      "week": {
+        "currencyPct": 0.1,
+        "takeaways": [
+          "CPI near zero",
+          "Franc near highs vs EUR",
+          "Bias review due: expires 10 Nov"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "PPI (Thu)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "CAD",
+      "name": "Canada",
+      "cb": "BoC",
+      "regime": {
+        "growth": "down",
+        "inflation": "down"
+      },
+      "scare": "growth",
+      "verdict": "Growth is the scare and getting worse, but oil fights the CAD short.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "GDP m/m",
+            "unit": "%",
+            "latest": 0,
+            "prior": -0.1,
+            "expected": 0.1,
+            "trend": [
+              0.2,
+              0.1,
+              0,
+              0.1,
+              -0.1,
+              0
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Ivey PMI",
+            "unit": "",
+            "latest": 49.1,
+            "prior": 49.5,
+            "expected": 49.8,
+            "trend": [
+              53,
+              52.1,
+              50.8,
+              50.2,
+              49.5,
+              49.1
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "CPI y/y",
+            "unit": "%",
+            "latest": 2.1,
+            "prior": 2.1,
+            "expected": 2.1,
+            "trend": [
+              2.5,
+              2.4,
+              2.3,
+              2.2,
+              2.1,
+              2.1
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "CPI trim y/y",
+            "unit": "%",
+            "latest": 2.5,
+            "prior": 2.6,
+            "expected": 2.6,
+            "trend": [
+              2.9,
+              2.8,
+              2.7,
+              2.6,
+              2.6,
+              2.5
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 7.1,
+            "prior": 6.9,
+            "expected": 7,
+            "trend": [
+              6.6,
+              6.7,
+              6.8,
+              6.9,
+              6.9,
+              7.1
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          },
+          {
+            "name": "Employment change",
+            "unit": "K",
+            "latest": -14,
+            "prior": -3,
+            "expected": 10,
+            "trend": [
+              22,
+              8,
+              -5,
+              12,
+              -3,
+              -14
+            ],
+            "source": {
+              "name": "Statistics Canada",
+              "url": "https://www150.statcan.gc.ca/n1/dai-quo/index-eng.htm"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "dovish",
+        "pricedStartBp": -45,
+        "pricedEndBp": -50,
+        "myPathBp": -75,
+        "nextMeeting": "2026-12-10"
+      },
+      "week": {
+        "currencyPct": 0.3,
+        "takeaways": [
+          "Unemployment 7.1%, job losses",
+          "WTI +8% on the month (corr 0.62)",
+          "Kill switch fired: CAD frozen"
+        ],
+        "biasChange": {
+          "from": -1,
+          "to": -2,
+          "why": "Structural: unemployment 7.1% (net stays -1, oil)"
+        }
+      },
+      "nextWeek": [
+        "Housing starts (Mon)",
+        "CPI (Tue 18th)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "AUD",
+      "name": "Australia",
+      "cb": "RBA",
+      "regime": {
+        "growth": "flat",
+        "inflation": "up"
+      },
+      "scare": "inflation",
+      "verdict": "Sticky inflation keeps RBA on hold. China is the swing factor.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "Composite PMI",
+            "unit": "",
+            "latest": 51.1,
+            "prior": 51,
+            "expected": 50.9,
+            "trend": [
+              50.4,
+              50.9,
+              51.2,
+              50.8,
+              51,
+              51.1
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          },
+          {
+            "name": "Retail sales m/m",
+            "unit": "%",
+            "latest": 0.5,
+            "prior": 0.3,
+            "expected": 0.3,
+            "trend": [
+              0.3,
+              0.5,
+              0.2,
+              0.4,
+              0.3,
+              0.5
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "Trimmed mean CPI y/y",
+            "unit": "%",
+            "latest": 3.2,
+            "prior": 3.2,
+            "expected": 3.1,
+            "trend": [
+              3,
+              3,
+              3.1,
+              3.1,
+              3.2,
+              3.2
+            ],
+            "source": {
+              "name": "ABS",
+              "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 4,
+            "prior": 4,
+            "expected": 4.1,
+            "trend": [
+              4.1,
+              4.1,
+              4,
+              4.1,
+              4,
+              4
+            ],
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          },
+          {
+            "name": "Employment change",
+            "unit": "K",
+            "latest": 22,
+            "prior": 15,
+            "expected": 20,
+            "trend": [
+              25,
+              18,
+              30,
+              12,
+              15,
+              22
+            ],
+            "source": {
+              "name": "ABS Labour Force",
+              "url": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "hawkish",
+        "pricedStartBp": -30,
+        "pricedEndBp": -25,
+        "myPathBp": 0,
+        "nextMeeting": "2026-12-08"
+      },
+      "week": {
+        "currencyPct": 0.5,
+        "takeaways": [
+          "RBA hawkish hold",
+          "Iron ore +1.4% on the month",
+          "Short AUD positioning crowded"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "Wage price index (Wed)",
+        "Employment (Thu)"
+      ],
+      "process": {}
+    },
+    {
+      "code": "NZD",
+      "name": "New Zealand",
+      "cb": "RBNZ",
+      "regime": {
+        "growth": "down",
+        "inflation": "down"
+      },
+      "scare": "growth",
+      "verdict": "Clear growth scare. RBNZ behind the curve: weakest economy on the board.",
+      "indicators": {
+        "growth": [
+          {
+            "name": "GDP q/q",
+            "unit": "%",
+            "latest": -0.2,
+            "prior": -0.3,
+            "expected": -0.1,
+            "trend": [
+              0.2,
+              -0.1,
+              -0.2,
+              0.1,
+              -0.3,
+              -0.2
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          },
+          {
+            "name": "PMI (BNZ)",
+            "unit": "",
+            "latest": 45.9,
+            "prior": 46.2,
+            "expected": 46.5,
+            "trend": [
+              48.5,
+              47.9,
+              47.1,
+              46.8,
+              46.2,
+              45.9
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "inflation": [
+          {
+            "name": "CPI y/y",
+            "unit": "%",
+            "latest": 2.2,
+            "prior": 2.3,
+            "expected": 2.3,
+            "trend": [
+              3,
+              2.8,
+              2.6,
+              2.4,
+              2.3,
+              2.2
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ],
+        "labour": [
+          {
+            "name": "Unemployment",
+            "unit": "%",
+            "latest": 5.4,
+            "prior": 5.3,
+            "expected": 5.3,
+            "trend": [
+              4.8,
+              5,
+              5.1,
+              5.2,
+              5.3,
+              5.4
+            ],
+            "source": {
+              "name": "Stats NZ",
+              "url": "https://www.stats.govt.nz/indicators/"
+            }
+          }
+        ]
+      },
+      "centralBank": {
+        "stance": "dovish",
+        "pricedStartBp": -35,
+        "pricedEndBp": -40,
+        "myPathBp": -75,
+        "nextMeeting": "2026-11-25"
+      },
+      "week": {
+        "currencyPct": -0.9,
+        "takeaways": [
+          "Unemployment 5.4%, rising",
+          "GDT dairy -4.5% on the month",
+          "Market prices 40bp, I expect 75bp"
+        ],
+        "biasChange": null
+      },
+      "nextWeek": [
+        "GDT auction (Tue)",
+        "Retail card spending (Fri)"
+      ],
+      "process": {}
+    }
+  ]
+}

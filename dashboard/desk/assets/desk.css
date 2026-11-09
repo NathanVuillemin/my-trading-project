@@ -177,3 +177,24 @@ select {
 .note { background: var(--panel-2); border-left: 3px solid var(--accent); border-radius: 6px; padding: 9px 12px; color: var(--muted); font-size: 13px; margin-bottom: 14px; }
 .empty { color: var(--faint); padding: 12px 0; }
 .error { color: var(--bear); }
+
+/* ---------- weekly recap ---------- */
+.tabs { position: sticky; top: 52px; z-index: 5; background: var(--bg); padding: 8px 0; margin: -4px 0 10px; }
+.tabs .chip { text-decoration: none; font-family: var(--mono); font-weight: 600; }
+.tabs .chip:first-child { font-family: inherit; }
+.regime { display: grid; grid-template-columns: 18px 1fr; grid-template-rows: 1fr auto; gap: 6px; }
+.axis-y { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--faint); text-align: center; }
+.axis-x { grid-column: 2; font-size: 11px; color: var(--faint); text-align: center; }
+.quads { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.quad { border-radius: 8px; padding: 8px 10px; min-height: 74px; border: 1px solid var(--line); }
+.quad-label { font-size: 12px; font-weight: 600; }
+.quad-label span { display: block; font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.quad-ccys { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.quad-ccys a { color: var(--text); background: var(--panel-2); padding: 2px 7px; border-radius: 5px; font-size: 12px; }
+.quad-ccys a.dim { opacity: 0.3; }
+.bear-q { background: rgba(240, 96, 106, 0.07); }
+.warn-q { background: rgba(231, 176, 74, 0.07); }
+.bull-q { background: rgba(52, 195, 122, 0.07); }
+.steps { margin: 0; padding-left: 20px; }
+.steps li { margin: 6px 0; }
+.spark { vertical-align: middle; }

@@ -5,10 +5,11 @@
 
 const PAGES = [
   { id: 'hub', href: 'index.html', label: 'Hub' },
+  { id: 'recap', href: 'weekly-recap.html', label: 'Weekly Recap' },
   { id: 'bias', href: 'bias.html', label: 'Bias' },
   { id: 'events', href: 'events.html', label: 'Events' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
-  { id: 'triggers', href: 'triggers.html', label: 'Triggers' },
+  { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
@@ -102,11 +103,13 @@ function strengthBars(currencies) {
 const render = {};
 
 render.hub = async (main) => {
-  const [brief, bias, events, triggers, drivers, levels, history] = await Promise.all(
-    ['brief', 'bias', 'events', 'triggers', 'drivers', 'levels', 'history'].map(load));
+  const [brief, bias, events, killswitches, drivers, levels, history, recapIndex] = await Promise.all(
+    ['brief', 'bias', 'events', 'killswitches', 'drivers', 'levels', 'history', 'recaps/index'].map(load));
+  const latest = recapIndex.recaps[0];
+  const recap = latest ? await load(`recaps/${latest.file.replace(/\.json$/, '')}`) : null;
   const now = new Date(brief.date + 'T00:00:00Z');
   const upcoming = events.events.filter((e) => new Date(e.time) >= now).sort((a, b) => a.time.localeCompare(b.time)).slice(0, 6);
-  const hotTriggers = triggers.triggers.filter((t) => t.status !== 'armed');
+  const hotKills = killswitches.killSwitches.filter((t) => t.status !== 'armed');
   const conflicts = drivers.drivers.filter((d) => d.effect === 'conflict');
   const regimeTone = { 'RISK-ON': 'bull', 'RISK-OFF': 'bear', CAUTION: 'warn' }[brief.regime] || 'flat';
 
@@ -121,8 +124,11 @@ render.hub = async (main) => {
           ${brief.avoid.map((f) => `<div class="item"><b>${esc(f.pair)}</b> <span class="pill warn">avoid</span><div class="small muted">${esc(f.why)}</div></div>`).join('')}</div>
       </section>
       ${panel('Currency strength', strengthBars(bias.currencies), { href: 'bias.html', label: 'Bias' })}
+      ${recap ? panel(`Weekly recap · ${fmtDate(recap.sunday)}`, `<p style="margin:0 0 10px">${esc(recap.overview.headline)}</p>
+        <ul class="list">${['inflation', 'growth', 'both', 'neither'].map((s) => [s, recap.economies.filter((e) => e.scare === s)]).filter(([, l]) => l.length)
+          .map(([s, l]) => `<li>${scarePill(s)}<span class="grow ccy small">${l.map((e) => e.code).join(' · ')}</span></li>`).join('')}</ul>`, { href: 'weekly-recap.html', label: 'Read' }) : ''}
       ${panel('Next events', `<ul class="list">${upcoming.map((e) => `<li><span class="ccy">${e.currency}</span><span class="grow">${esc(e.name)}<div class="small faint">${fmtDate(e.time)} · ${fmtTime(e.time)}</div></span>${impactPill(e.impact)}</li>`).join('')}</ul>`, { href: 'events.html', label: 'Events' })}
-      ${panel('Triggers fired / near', `<ul class="list">${hotTriggers.map((t) => `<li><span class="ccy">${t.currency}</span><span class="grow">${esc(t.condition)}<div class="small faint">${esc(t.now)}</div></span>${trigPill(t.status)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'triggers.html', label: 'Triggers' })}
+      ${panel('Kill switches fired / near', `<ul class="list">${hotKills.map((t) => `<li><span class="ccy">${t.currency}</span><span class="grow">${esc(t.condition)}<div class="small faint">${esc(t.now)}</div></span>${trigPill(t.status)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
       ${panel('Driver conflicts', `<ul class="list">${conflicts.map((d) => `<li><span class="ccy">${d.currency}</span><span class="grow">${esc(d.driver)} <span class="num muted">${esc(d.move1m)}</span><div class="small faint">60d corr <span class="num">${d.corr60.toFixed(2)}</span></div></span>${effectPill(d.effect)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'drivers.html', label: 'Drivers' })}
       ${panel('Key levels', `<ul class="list">${levels.levels.slice(0, 4).map((l) => `<li><span class="ccy">${esc(l.instrument)}</span><span class="grow"><span class="num">${esc(l.level)}</span> · ${esc(l.type)}<div class="small faint">price <span class="num">${esc(l.price)}</span></div></span><span class="pill flat">${esc(l.status)}</span></li>`).join('')}</ul>`, { href: 'levels.html', label: 'Levels' })}
       ${panel('Recent bias changes', `<ul class="list">${history.changes.slice(0, 4).map((h) => `<li><span class="ccy">${h.currency}</span><span class="grow">${esc(h.reason)}<div class="small faint">${fmtDate(h.date)} · ${esc(h.layer)}</div></span><span class="num small">${esc(String(h.from))} → ${esc(String(h.to))}</span></li>`).join('')}</ul>`, { href: 'review.html', label: 'Review' })}
@@ -155,7 +161,7 @@ render.bias = async (main) => {
         <dt>Driver</dt><dd>${esc(c.driver.name)} (<a href="drivers.html">drivers</a>)</dd>
         <dt>Positioning</dt><dd>${esc(c.positioning)}</dd>
         <dt>Invalidation</dt><dd>${esc(c.invalidation)}</dd>
-        <dt>Triggers</dt><dd>${c.triggers.length ? `<a href="triggers.html?ccy=${c.code}">${c.triggers.length} linked</a>` : '<span class="faint">none</span>'}</dd>
+        <dt>Kill switches</dt><dd>${c.killSwitches.length ? `<a href="kill-switches.html?ccy=${c.code}">${c.killSwitches.length} linked</a>` : '<span class="faint">none</span>'}</dd>
         <dt>Reviewed</dt><dd>${fmtDate(c.reviewed)} · expires ${fmtDate(c.expires)}</dd>
       </dl></details>
     </article>`;
@@ -234,7 +240,7 @@ render.events = async (main) => {
         <td class="nowrap">${fmtDate(e.time)}<div class="small faint">${fmtTime(e.time)}</div></td>
         <td><span class="ccy">${e.currency}</span></td>
         <td class="small">${esc(e.type)}</td>
-        <td>${esc(e.name)}${e.trigger ? ` <a class="pill warn" href="triggers.html" title="Linked to a bias trigger">trigger</a>` : ''}
+        <td>${esc(e.name)}${e.killSwitch ? ` <a class="pill warn" href="kill-switches.html" title="Linked to a kill switch">kill switch</a>` : ''}
           <div class="affects">${Object.entries(e.affects).map(([k, v]) => `<span><b>${k}</b> ${esc(v)}</span>`).join('')}</div></td>
         <td>${impactPill(e.impact)}</td>
         <td class="num nowrap">${esc(e.previous ?? '—')}</td>
@@ -275,12 +281,12 @@ render.levels = async (main) => {
     <div style="margin-top:14px">${panel('Level types', `<ul class="list">${Object.entries(data.types).map(([k, v]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`)}</div>`;
 };
 
-render.triggers = async (main) => {
-  const data = await load('triggers');
+render.killswitches = async (main) => {
+  const data = await load('killswitches');
   const want = new URLSearchParams(location.search).get('ccy');
   const order = { fired: 0, near: 1, armed: 2 };
-  const list = data.triggers.filter((t) => !want || t.currency === want).sort((a, b) => order[a.status] - order[b.status]);
-  main.innerHTML = head('Triggers', 'What would change my mind. Each trigger = condition + effect on the bias.' + (want ? ` Showing <b>${esc(want)}</b> · <a href="triggers.html">show all</a>` : '')) +
+  const list = data.killSwitches.filter((t) => !want || t.currency === want).sort((a, b) => order[a.status] - order[b.status]);
+  main.innerHTML = head('Kill Switches', 'What kills or changes my bias. Each kill switch = condition + effect on the bias.' + (want ? ` Showing <b>${esc(want)}</b> · <a href="kill-switches.html">show all</a>` : '')) +
     `<section class="panel"><div class="table-wrap"><table>
       <thead><tr><th>Status</th><th>Ccy</th><th>Kind</th><th>Condition</th><th>Now</th><th>Effect</th><th>Fired</th></tr></thead>
       <tbody>${list.map((t) => `<tr>
@@ -292,7 +298,7 @@ render.triggers = async (main) => {
         <td class="small nowrap">${t.firedOn ? fmtDate(t.firedOn) : '—'}</td>
       </tr>`).join('')}</tbody></table></div></section>
     <div class="grid hub-grid" style="margin-top:14px">
-      ${panel('Trigger kinds', `<ul class="list">${Object.entries(data.kinds).map(([k, v]) => `<li><b class="small">${esc(k)}</b><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`)}
+      ${panel('Kill switch kinds', `<ul class="list">${Object.entries(data.kinds).map(([k, v]) => `<li><b class="small">${esc(k)}</b><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`)}
       ${panel('Effects', `<ul class="list">${Object.entries(data.effects).map(([k, v]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`)}
     </div>`;
 };
@@ -337,6 +343,138 @@ render.review = async (main) => {
         <thead><tr><th>Ccy</th><th>Changes</th><th>1w</th><th>4w</th></tr></thead>
         <tbody>${CCYS.filter((c) => stats[c]).map((c) => `<tr><td><span class="ccy">${c}</span></td><td class="num">${stats[c].n}</td><td class="num">${rate(stats[c].hit1, stats[c].g1)}</td><td class="num">${rate(stats[c].hit4, stats[c].g4)}</td></tr>`).join('')}</tbody></table></section>
     </div>`;
+};
+
+// ---------- weekly recap ----------
+const SCARE_TONE = { inflation: 'bear', growth: 'warn', both: 'bear', neither: 'bull', mixed: 'flat' };
+const scarePill = (s) => `<span class="pill ${SCARE_TONE[s] || 'flat'}">${esc(s === 'neither' ? 'no scare' : s === 'both' ? 'both scares' : s === 'mixed' ? 'mixed' : s + ' scare')}</span>`;
+// Regime quadrant from direction of growth and inflation ("flat" counts as not up / not down).
+const QUADS = {
+  overheating: { label: 'Overheating', scare: 'inflation', row: 0, col: 1 },
+  stagflation: { label: 'Stagflation', scare: 'both', row: 0, col: 0 },
+  slowdown: { label: 'Slowdown', scare: 'growth', row: 1, col: 0 },
+  goldilocks: { label: 'Goldilocks', scare: 'neither', row: 1, col: 1 },
+};
+function quadrantOf(regime) {
+  const infUp = regime.inflation === 'up' || regime.inflation === 'sticky';
+  const growthDown = regime.growth === 'down';
+  return infUp ? (growthDown ? 'stagflation' : 'overheating') : (growthDown ? 'slowdown' : 'goldilocks');
+}
+function regimeMap(economies, highlight) {
+  const cells = Object.entries(QUADS).sort((a, b) => a[1].row - b[1].row || a[1].col - b[1].col).map(([id, q]) => {
+    const here = economies.filter((e) => quadrantOf(e.regime) === id);
+    return `<div class="quad ${SCARE_TONE[q.scare]}-q">
+      <div class="quad-label">${q.label}<span>${q.scare === 'neither' ? 'no scare' : q.scare === 'both' ? 'both scares' : q.scare + ' scare'}</span></div>
+      <div class="quad-ccys">${here.map((e) => `<a href="#${e.code}" class="ccy ${highlight && highlight !== e.code ? 'dim' : ''}">${e.code}</a>`).join('')}</div></div>`;
+  }).join('');
+  return `<div class="regime"><div class="axis-y">Inflation ↑</div><div class="quads">${cells}</div><div class="axis-x">Growth weak ← → Growth firm</div></div>`;
+}
+function sparkline(values, w = 92, h = 26) {
+  const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
+  const pts = values.map((v, i) => [(i / (values.length - 1)) * (w - 4) + 2, h - 3 - ((v - min) / span) * (h - 6)]);
+  const [lx, ly] = pts.at(-1);
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    <polyline points="${pts.map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.5" fill="var(--accent)"/></svg>`;
+}
+function trendWord(values) {
+  const n = values.length, recent = values.slice(-3).reduce((a, b) => a + b, 0) / 3, earlier = values.slice(0, 3).reduce((a, b) => a + b, 0) / 3;
+  const d = recent - earlier, scale = Math.max(Math.abs(earlier), 1) * 0.02;
+  return n < 4 ? '—' : d > scale ? '↑ rising' : d < -scale ? '↓ falling' : '→ flat';
+}
+function indicatorTable(title, rows) {
+  if (!rows?.length) return '';
+  const fmt = (v, u) => (v == null ? '—' : `${v}${u || ''}`);
+  return `<section class="panel"><div class="panel-head"><h2>${esc(title)}</h2></div><div class="table-wrap"><table>
+    <thead><tr><th>Indicator</th><th>Latest</th><th>Prior</th><th>Expected</th><th>vs exp.</th><th>6-period trend</th><th>Source</th></tr></thead>
+    <tbody>${rows.map((r) => {
+      const d = r.expected == null ? null : +(r.latest - r.expected).toFixed(2);
+      return `<tr><td>${esc(r.name)}</td><td class="num">${esc(fmt(r.latest, r.unit))}</td><td class="num muted">${esc(fmt(r.prior, r.unit))}</td>
+        <td class="num muted">${esc(fmt(r.expected, r.unit))}</td>
+        <td class="num">${d == null ? '—' : d === 0 ? '<span class="faint">inline</span>' : `${d > 0 ? '+' : ''}${d}`}</td>
+        <td class="nowrap">${sparkline(r.trend)} <span class="small muted">${trendWord(r.trend)}</span></td>
+        <td class="small">${r.source ? `<a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.name)} ↗</a>` : '—'}</td></tr>`;
+    }).join('')}</tbody></table></div></section>`;
+}
+
+render.recap = async (main) => {
+  const index = await load('recaps/index');
+  if (!index.recaps.length) { main.innerHTML = head('Weekly Recap', '') + '<p class="empty">No recaps yet.</p>'; return; }
+  const params = new URLSearchParams(location.search);
+  const chosen = index.recaps.find((r) => r.sunday === params.get('week')) || index.recaps[0];
+  const [recap, ks] = await Promise.all([load(`recaps/${chosen.file.replace(/\.json$/, '')}`), load('killswitches')]);
+  const kills = Object.fromEntries(ks.killSwitches.map((k) => [k.id, k]));
+  const weekPicker = `<select id="week">${index.recaps.map((r) => `<option value="${r.sunday}" ${r === chosen ? 'selected' : ''}>${esc(r.week)} · Sun ${fmtDate(r.sunday)}</option>`).join('')}</select>`;
+
+  const overview = () => {
+    const o = recap.overview;
+    const perf = [...recap.economies].sort((a, b) => b.week.currencyPct - a.week.currencyPct);
+    const maxAbs = Math.max(...perf.map((e) => Math.abs(e.week.currencyPct)), 0.1);
+    const perfBars = `<div class="bars">${perf.map((e) => {
+      const v = e.week.currencyPct, pct = (Math.abs(v) / maxAbs) * 50;
+      return `<div class="bar-row"><a class="ccy" href="#${e.code}">${e.code}</a><div class="bar-track"><div class="bar-fill" style="left:${v >= 0 ? 50 : 50 - pct}%;width:${Math.max(pct, 1)}%;background:${v >= 0 ? 'var(--bull)' : 'var(--bear)'}"></div></div><span class="num small">${v > 0 ? '+' : ''}${v.toFixed(1)}%</span></div>`;
+    }).join('')}</div><p class="small faint">Currency vs basket of the other majors, Mon open to Fri close.</p>`;
+    const steps = `<div class="note">${esc(recap.process.note)}</div><ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}</li>`).join('')}</ol>`;
+    return `<div class="grid hub-grid">
+      <section class="panel brief span-2"><div class="panel-head"><h2>The week · ${fmtDate(recap.period.start)} – ${fmtDate(recap.period.end)}</h2>${scarePill(o.globalScare)}</div>
+        <h2 class="headline">${esc(o.headline)}</h2><ul class="bullets">${o.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></section>
+      ${panel('Currency performance', perfBars)}
+      <section class="panel span-2"><div class="panel-head"><h2>Regime map · where each economy sits</h2></div>${regimeMap(recap.economies)}</section>
+      ${panel('Economies', `<ul class="list">${recap.economies.map((e) => `<li><a class="ccy" href="#${e.code}">${e.code}</a><span class="grow small muted">${QUADS[quadrantOf(e.regime)].label}</span>${scarePill(e.scare)}</li>`).join('')}</ul>`)}
+      ${panel('Kill switches fired', `<ul class="list">${o.killSwitchesFired.map((id) => { const k = kills[id]; return k ? `<li><span class="ccy">${k.currency}</span><span class="grow small">${esc(k.condition)}</span><span class="pill flat">${esc(k.effect)}</span></li>` : `<li class="small">${esc(id)}</li>`; }).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
+      ${panel('Next week · watch', `<ul class="list">${o.nextWeekTop.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`, { href: 'events.html', label: 'Events' })}
+      ${panel(`Method · ${recap.process.status}`, steps)}
+    </div>`;
+  };
+
+  const economy = (e) => {
+    const cbp = e.centralBank, moved = cbp.pricedEndBp - cbp.pricedStartBp, gap = cbp.myPathBp - cbp.pricedEndBp;
+    const q = QUADS[quadrantOf(e.regime)];
+    const bc = e.week.biasChange;
+    return `<div class="grid hub-grid">
+      <section class="panel brief span-2"><div class="panel-head"><h2>${esc(e.name)} · ${esc(e.cb)}</h2>${scarePill(e.scare)}</div>
+        <h2 class="headline">${esc(e.verdict)}</h2>
+        <div class="kv">
+          <div><label>Growth</label><span>${esc(e.regime.growth)}</span></div>
+          <div><label>Inflation</label><span>${esc(e.regime.inflation)}</span></div>
+          <div><label>Regime</label><span>${q.label}</span></div>
+          <div><label>Currency (week)</label><span class="${e.week.currencyPct >= 0 ? 'bull' : 'bear'}" style="background:none">${e.week.currencyPct > 0 ? '+' : ''}${e.week.currencyPct.toFixed(1)}%</span></div>
+          <div><label>Bias change</label><span>${bc ? `${sign(bc.from)} → ${sign(bc.to)}` : 'none'}</span></div>
+          <div><label>Next ${esc(e.cb)}</label><span>${fmtDate(cbp.nextMeeting)}</span></div>
+        </div>
+        ${bc ? `<p class="small muted" style="margin:10px 0 0">Bias: ${esc(bc.why)}</p>` : ''}</section>
+      <section class="panel"><div class="panel-head"><h2>Regime</h2></div>${regimeMap(recap.economies, e.code)}</section>
+      <section class="panel"><div class="panel-head"><h2>Central bank</h2><span class="pill ${e.centralBank.stance === 'hawkish' ? 'bull' : e.centralBank.stance === 'dovish' ? 'bear' : 'flat'}">${esc(cbp.stance)}</span></div>
+        <div class="kv" style="grid-template-columns:repeat(2,1fr)">
+          <div><label>Priced Mon</label><span>${bp(cbp.pricedStartBp)}</span></div>
+          <div><label>Priced Fri</label><span>${bp(cbp.pricedEndBp)}</span></div>
+          <div><label>Repricing</label><span class="${tone(moved)}" style="background:none">${bp(moved)} ${gapWord(moved)}</span></div>
+          <div><label>My path</label><span>${bp(cbp.myPathBp)}</span></div>
+        </div><p class="small muted" style="margin:10px 0 0">Gap after the week: <span class="num ${tone(gap)}" style="background:none">${bp(gap)} ${gapWord(gap)}</span></p></section>
+      ${panel('This week', `<ul class="bullets" style="margin:0;padding-left:18px">${e.week.takeaways.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`)}
+      ${panel('Next week', `<ul class="list">${e.nextWeek.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`, { href: `events.html?ccy=${e.code}`, label: 'Events' })}
+      <div class="span-3 grid">
+        ${indicatorTable('Growth', e.indicators.growth)}
+        ${indicatorTable('Inflation', e.indicators.inflation)}
+        ${indicatorTable('Labour', e.indicators.labour)}
+      </div>
+      <section class="panel span-3"><div class="panel-head"><h2>Method · ${esc(recap.process.status)}</h2></div>
+        <ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}<div class="small faint">${esc(e.process?.[s.id] || 'Read goes here once the method is set.')}</div></li>`).join('')}</ol></section>
+    </div>`;
+  };
+
+  const tabs = () => `<div class="filters tabs">${['Overview', ...recap.economies.map((e) => e.code)].map((t) => `<a class="chip" data-tab="${t}" href="#${t === 'Overview' ? '' : t}">${t}</a>`).join('')}</div><div id="recap-body"></div>`;
+  main.innerHTML = head(`Weekly Recap · ${recap.week}`, `Sunday read: ${fmtDate(recap.period.start)} – ${fmtDate(recap.period.end)}. Overview first, then one tab per economy.`, weekPicker) + tabs();
+
+  const draw = () => {
+    const code = location.hash.slice(1);
+    const e = recap.economies.find((x) => x.code === code);
+    main.querySelectorAll('[data-tab]').forEach((a) => a.classList.toggle('on', a.dataset.tab === (e ? e.code : 'Overview')));
+    $('#recap-body').innerHTML = e ? economy(e) : overview();
+  };
+  window.addEventListener('hashchange', () => { draw(); window.scrollTo(0, 0); });
+  $('#week').addEventListener('change', (ev) => { location.search = `?week=${ev.target.value}`; });
+  draw();
 };
 
 // ---------- boot ----------
