@@ -1,0 +1,21 @@
+{
+  "mock": true,
+  "date": "2026-11-07",
+  "regime": "CAUTION",
+  "headline": "GBP and AUD strongest, NZD weakest. CAD short on hold: oil fighting the thesis.",
+  "bullets": [
+    "NFP beat lifts US 2Y: supports the USD hawkish gap.",
+    "Canada unemployment 7.1% confirms the CAD growth problem, but WTI +8% with strong correlation: freeze CAD shorts.",
+    "GBP crowded long and pricing has moved: gap shrinking, watch the BoE pricing trigger.",
+    "USDJPY 157.8: 160 intervention zone close, no new USDJPY longs near it."
+  ],
+  "focus": [
+    { "pair": "GBPNZD", "direction": "LONG", "why": "Strongest vs weakest, no driver conflict" },
+    { "pair": "AUDNZD", "direction": "LONG", "why": "RBA hold vs RBNZ cuts, both drivers clean" },
+    { "pair": "USDCHF", "direction": "LONG", "why": "Hawkish Fed gap vs SNB leaning on franc" }
+  ],
+  "avoid": [
+    { "pair": "USDCAD", "why": "CAD driver conflict (oil)" },
+    { "pair": "USDJPY", "why": "Into the 160 intervention zone" }
+  ]
+}

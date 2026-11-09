@@ -1,0 +1,42 @@
+{
+  "mock": true,
+  "asOf": "2026-11-07",
+  "kinds": {
+    "data": "Data surprise changes the growth / inflation read",
+    "cb": "Central-bank guidance shifts",
+    "pricing": "Market pricing catches up: gap closed, edge gone",
+    "driver": "Driver moves hard while correlation is strong",
+    "price": "Price invalidation (weekly close beyond level)",
+    "expiry": "Bias unreviewed 7 days"
+  },
+  "effects": {
+    "flip": "Reverse the bias",
+    "downgrade": "Move one notch toward FLAT",
+    "upgrade": "Move one notch away from FLAT",
+    "freeze": "Keep the bias, no new trades until reviewed",
+    "flat": "Go FLAT"
+  },
+  "triggers": [
+    { "id": "t-cad-oil", "currency": "CAD", "kind": "driver", "effect": "freeze", "status": "fired",
+      "condition": "WTI up more than 5% in a month while CAD-oil 60d correlation is 0.5 or more",
+      "now": "WTI +8.2% / corr 0.62", "firedOn": "2026-11-05" },
+    { "id": "t-cad-lfs", "currency": "CAD", "kind": "data", "effect": "upgrade", "status": "fired",
+      "condition": "Unemployment prints 7.1% or higher", "now": "7.1%", "firedOn": "2026-11-06", "event": "e-ca-lfs-1106" },
+    { "id": "t-usd-cpi", "currency": "USD", "kind": "data", "effect": "downgrade", "status": "armed",
+      "condition": "Core CPI 0.2% m/m or lower", "now": "Next print 12 Nov", "event": "e-us-cpi-1112" },
+    { "id": "t-gbp-cpi", "currency": "GBP", "kind": "data", "effect": "flip", "status": "armed",
+      "condition": "Services CPI below 4.0%", "now": "4.7%, next print 19 Nov", "event": "e-gb-cpi-1119" },
+    { "id": "t-gbp-crowd", "currency": "GBP", "kind": "pricing", "effect": "flat", "status": "near",
+      "condition": "Market prices less than 15bp of BoE cuts (gap closed)", "now": "Priced -40bp, was -60bp" },
+    { "id": "t-jpy-160", "currency": "JPY", "kind": "price", "effect": "upgrade", "status": "near",
+      "condition": "USDJPY trades into 160 intervention zone", "now": "USDJPY 157.8" },
+    { "id": "t-eur-gas", "currency": "EUR", "kind": "driver", "effect": "freeze", "status": "fired",
+      "condition": "TTF gas down 15% in a month (eases EUR growth fears)", "now": "TTF -18%", "firedOn": "2026-11-04" },
+    { "id": "t-aud-cpi", "currency": "AUD", "kind": "cb", "effect": "downgrade", "status": "armed",
+      "condition": "RBA minutes open the door to a cut", "now": "Minutes 18 Nov" },
+    { "id": "t-nzd-rbnz", "currency": "NZD", "kind": "pricing", "effect": "flat", "status": "armed",
+      "condition": "Market prices 75bp of cuts (my path fully priced)", "now": "Priced -40bp", "event": "e-nz-rbnz-1125" },
+    { "id": "t-chf-exp", "currency": "CHF", "kind": "expiry", "effect": "flat", "status": "near",
+      "condition": "Not reviewed by 10 Nov", "now": "Expires in 3 days" }
+  ]
+}

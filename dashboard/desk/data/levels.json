@@ -1,0 +1,30 @@
+{
+  "mock": true,
+  "asOf": "2026-11-07",
+  "status": "draft",
+  "note": "Layout is a first pass. Levels where big players have shown their hand: central-bank intervention, defended option strikes, positioning extremes, heavy flow reactions.",
+  "types": {
+    "intervention": "Central bank / finance ministry stepped in or warned here",
+    "options": "Large option strike or barrier being defended",
+    "positioning": "COT / flow extreme marked here",
+    "flow": "Heavy institutional buying or selling reaction",
+    "cb-floor": "Stated or implied central-bank floor or cap"
+  },
+  "levels": [
+    { "id": "l-usdjpy-160", "instrument": "USDJPY", "level": "160.00", "type": "intervention", "who": "Japan MoF / BoJ",
+      "side": "cap", "evidence": "Past intervention zone; officials' verbal warnings rise into it", "price": "157.80",
+      "status": "untested", "lastTouch": "—", "source": { "name": "Japan MoF intervention data", "url": "https://www.mof.go.jp/english/policy/international_policy/reference/feio/index.html" } },
+    { "id": "l-eurusd-opt", "instrument": "EURUSD", "level": "1.1500", "type": "options", "who": "Option desks",
+      "side": "magnet", "evidence": "Large expiry cluster, mock", "price": "1.1420",
+      "status": "untested", "lastTouch": "2026-10-29", "source": null },
+    { "id": "l-gbpusd-cot", "instrument": "GBPUSD", "level": "1.3200", "type": "positioning", "who": "Leveraged funds",
+      "side": "support", "evidence": "Longs added heavily here (COT), mock", "price": "1.3350",
+      "status": "defended", "lastTouch": "2026-10-31", "source": null },
+    { "id": "l-xau-flow", "instrument": "XAUUSD", "level": "3950", "type": "flow", "who": "Central-bank / ETF buyers",
+      "side": "support", "evidence": "Fast rejection, heavy volume, mock", "price": "4060",
+      "status": "defended", "lastTouch": "2026-10-22", "source": null },
+    { "id": "l-usdcad-flow", "instrument": "USDCAD", "level": "1.4000", "type": "flow", "who": "Real money",
+      "side": "resistance", "evidence": "Repeated sell-off from round number, mock", "price": "1.3920",
+      "status": "untested", "lastTouch": "2026-10-15", "source": null }
+  ]
+}

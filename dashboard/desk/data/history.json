@@ -1,0 +1,103 @@
+{
+  "mock": true,
+  "asOf": "2026-11-07",
+  "method": "Each bias is graded later against the currency's move 1 week and 4 weeks after the change (vs a basket of the other majors). Hit = moved the way the bias said.",
+  "changes": [
+    {
+      "date": "2026-11-06",
+      "currency": "CAD",
+      "from": -1,
+      "to": -2,
+      "kind": "data",
+      "trigger": "t-cad-lfs",
+      "reason": "Unemployment 7.1%: BoC must cut more. Net stays -1 while oil conflicts.",
+      "grade1w": null,
+      "grade4w": null,
+      "layer": "structural"
+    },
+    {
+      "date": "2026-11-05",
+      "currency": "CAD",
+      "from": "ACTIVE",
+      "to": "FROZEN",
+      "kind": "driver",
+      "trigger": "t-cad-oil",
+      "reason": "Oil rally with strong correlation: no new CAD shorts until review",
+      "grade1w": null,
+      "grade4w": null,
+      "layer": "status"
+    },
+    {
+      "date": "2026-11-04",
+      "currency": "EUR",
+      "from": -1,
+      "to": 0,
+      "kind": "driver",
+      "trigger": "t-eur-gas",
+      "reason": "Gas collapse props EUR: net cut to 0 and frozen until review",
+      "grade1w": null,
+      "grade4w": null,
+      "layer": "net"
+    },
+    {
+      "date": "2026-10-30",
+      "currency": "GBP",
+      "from": 1,
+      "to": 2,
+      "kind": "data",
+      "trigger": null,
+      "reason": "Services CPI re-accelerated",
+      "grade1w": "hit",
+      "grade4w": null,
+      "layer": "net"
+    },
+    {
+      "date": "2026-10-24",
+      "currency": "NZD",
+      "from": -1,
+      "to": -2,
+      "kind": "cb",
+      "trigger": null,
+      "reason": "RBNZ minutes opened door to 50bp",
+      "grade1w": "hit",
+      "grade4w": null,
+      "layer": "net"
+    },
+    {
+      "date": "2026-10-17",
+      "currency": "JPY",
+      "from": 2,
+      "to": 1,
+      "kind": "driver",
+      "trigger": null,
+      "reason": "US 10Y breakout keeps USDJPY bid",
+      "grade1w": "miss",
+      "grade4w": "hit",
+      "layer": "net"
+    },
+    {
+      "date": "2026-10-10",
+      "currency": "AUD",
+      "from": 0,
+      "to": 1,
+      "kind": "cb",
+      "trigger": null,
+      "reason": "RBA hawkish hold",
+      "grade1w": "hit",
+      "grade4w": "hit",
+      "layer": "net"
+    },
+    {
+      "date": "2026-10-03",
+      "currency": "USD",
+      "from": 0,
+      "to": 1,
+      "kind": "pricing",
+      "trigger": null,
+      "reason": "Market priced too many cuts vs data",
+      "grade1w": "miss",
+      "grade4w": "hit",
+      "layer": "net"
+    }
+  ]
+}

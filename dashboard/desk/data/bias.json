@@ -1,0 +1,310 @@
+{
+  "mock": true,
+  "asOf": "2026-11-07",
+  "scale": "Scores run -2 (strong bearish) to +2 (strong bullish). Gap = my expected central-bank path minus market-priced path, bp over next ~3 meetings.",
+  "currencies": [
+    {
+      "code": "USD",
+      "name": "US dollar",
+      "cb": "Fed",
+      "nextMeeting": "2026-12-09",
+      "net": 1,
+      "structural": 1,
+      "conviction": 3,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "flat",
+        "note": "PMIs near 50, consumer holding up"
+      },
+      "inflation": {
+        "dir": "sticky",
+        "vsTarget": "above",
+        "note": "Core sticky above 2%"
+      },
+      "cbPath": {
+        "expectedBp": -25,
+        "pricedBp": -50
+      },
+      "thesis": "Market prices two cuts; data only supports one. Hawkish gap.",
+      "driver": {
+        "name": "US 2Y yield",
+        "status": "supports"
+      },
+      "positioning": "neutral",
+      "invalidation": "Core CPI below 0.2% m/m two prints in a row",
+      "triggers": [
+        "t-usd-cpi"
+      ],
+      "reviewed": "2026-11-06",
+      "expires": "2026-11-13"
+    },
+    {
+      "code": "EUR",
+      "name": "Euro",
+      "cb": "ECB",
+      "nextMeeting": "2026-12-17",
+      "net": 0,
+      "structural": -1,
+      "conviction": 2,
+      "status": "FROZEN",
+      "growth": {
+        "dir": "down",
+        "note": "German manufacturing still contracting"
+      },
+      "inflation": {
+        "dir": "down",
+        "vsTarget": "at",
+        "note": "Headline back near 2%"
+      },
+      "cbPath": {
+        "expectedBp": -25,
+        "pricedBp": -10
+      },
+      "thesis": "ECB has room to cut more than priced as growth fades.",
+      "driver": {
+        "name": "TTF gas",
+        "status": "conflict"
+      },
+      "positioning": "neutral",
+      "invalidation": "Composite PMI back above 52",
+      "triggers": [
+        "t-eur-gas"
+      ],
+      "reviewed": "2026-11-05",
+      "expires": "2026-11-12"
+    },
+    {
+      "code": "GBP",
+      "name": "British pound",
+      "cb": "BoE",
+      "nextMeeting": "2026-12-18",
+      "net": 2,
+      "structural": 2,
+      "conviction": 4,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "flat",
+        "note": "Services steady"
+      },
+      "inflation": {
+        "dir": "sticky",
+        "vsTarget": "above",
+        "note": "Services CPI well above target"
+      },
+      "cbPath": {
+        "expectedBp": 0,
+        "pricedBp": -40
+      },
+      "thesis": "BoE can't cut with services inflation this high; market too dovish.",
+      "driver": {
+        "name": "Gilt 10Y / fiscal risk",
+        "status": "neutral"
+      },
+      "positioning": "crowded long",
+      "invalidation": "Services CPI below 4% or weekly close GBPUSD below swing low",
+      "triggers": [
+        "t-gbp-cpi",
+        "t-gbp-crowd"
+      ],
+      "reviewed": "2026-11-06",
+      "expires": "2026-11-13"
+    },
+    {
+      "code": "JPY",
+      "name": "Japanese yen",
+      "cb": "BoJ",
+      "nextMeeting": "2026-12-19",
+      "net": 0,
+      "structural": 1,
+      "conviction": 2,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "up",
+        "note": "Wage growth firm"
+      },
+      "inflation": {
+        "dir": "sticky",
+        "vsTarget": "above",
+        "note": "Core above 2% for many months"
+      },
+      "cbPath": {
+        "expectedBp": 25,
+        "pricedBp": 10
+      },
+      "thesis": "BoJ hike under-priced, but US yields rising keep USDJPY bid.",
+      "driver": {
+        "name": "US 10Y yield",
+        "status": "conflict"
+      },
+      "positioning": "short JPY crowded",
+      "invalidation": "BoJ signals no hike before spring",
+      "triggers": [
+        "t-jpy-160"
+      ],
+      "reviewed": "2026-11-04",
+      "expires": "2026-11-11"
+    },
+    {
+      "code": "CHF",
+      "name": "Swiss franc",
+      "cb": "SNB",
+      "nextMeeting": "2026-12-11",
+      "net": -1,
+      "structural": -1,
+      "conviction": 2,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "flat",
+        "note": "Exporters squeezed by strong franc"
+      },
+      "inflation": {
+        "dir": "down",
+        "vsTarget": "below",
+        "note": "Near zero"
+      },
+      "cbPath": {
+        "expectedBp": -25,
+        "pricedBp": -10
+      },
+      "thesis": "SNB forced to lean against franc strength.",
+      "driver": {
+        "name": "Risk mood (haven)",
+        "status": "neutral"
+      },
+      "positioning": "neutral",
+      "invalidation": "Risk-off spike (VIX above 30)",
+      "triggers": [],
+      "reviewed": "2026-11-03",
+      "expires": "2026-11-10"
+    },
+    {
+      "code": "CAD",
+      "name": "Canadian dollar",
+      "cb": "BoC",
+      "nextMeeting": "2026-12-10",
+      "net": -1,
+      "structural": -2,
+      "conviction": 2,
+      "status": "FROZEN",
+      "growth": {
+        "dir": "down",
+        "note": "Unemployment rising, GDP soft"
+      },
+      "inflation": {
+        "dir": "down",
+        "vsTarget": "at",
+        "note": "Core easing toward 2%"
+      },
+      "cbPath": {
+        "expectedBp": -75,
+        "pricedBp": -50
+      },
+      "thesis": "Growth is the problem; BoC must cut more than priced.",
+      "driver": {
+        "name": "WTI oil",
+        "status": "conflict"
+      },
+      "positioning": "neutral",
+      "invalidation": "Oil keeps rallying AND BoC drops easing bias",
+      "triggers": [
+        "t-cad-oil",
+        "t-cad-lfs"
+      ],
+      "reviewed": "2026-11-06",
+      "expires": "2026-11-13"
+    },
+    {
+      "code": "AUD",
+      "name": "Australian dollar",
+      "cb": "RBA",
+      "nextMeeting": "2026-12-08",
+      "net": 1,
+      "structural": 1,
+      "conviction": 3,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "flat",
+        "note": "Labour market tight"
+      },
+      "inflation": {
+        "dir": "sticky",
+        "vsTarget": "above",
+        "note": "Trimmed mean above band"
+      },
+      "cbPath": {
+        "expectedBp": 0,
+        "pricedBp": -25
+      },
+      "thesis": "RBA on hold longer than priced.",
+      "driver": {
+        "name": "Iron ore / China",
+        "status": "neutral"
+      },
+      "positioning": "short AUD crowded",
+      "invalidation": "China data rolls over hard",
+      "triggers": [
+        "t-aud-cpi"
+      ],
+      "reviewed": "2026-11-05",
+      "expires": "2026-11-12"
+    },
+    {
+      "code": "NZD",
+      "name": "New Zealand dollar",
+      "cb": "RBNZ",
+      "nextMeeting": "2026-11-25",
+      "net": -2,
+      "structural": -2,
+      "conviction": 4,
+      "status": "ACTIVE",
+      "growth": {
+        "dir": "down",
+        "note": "Recession-like activity"
+      },
+      "inflation": {
+        "dir": "down",
+        "vsTarget": "at",
+        "note": "Back inside band"
+      },
+      "cbPath": {
+        "expectedBp": -75,
+        "pricedBp": -40
+      },
+      "thesis": "RBNZ behind the curve; deeper cuts than priced.",
+      "driver": {
+        "name": "Dairy (GDT)",
+        "status": "supports"
+      },
+      "positioning": "neutral",
+      "invalidation": "GDT auction jumps two in a row",
+      "triggers": [
+        "t-nzd-rbnz"
+      ],
+      "reviewed": "2026-11-06",
+      "expires": "2026-11-13"
+    }
+  ],
+  "gold": {
+    "net": 1,
+    "conviction": 3,
+    "status": "ACTIVE",
+    "thesis": "Real yields drifting lower, central-bank buying steady.",
+    "drivers": [
+      {
+        "name": "US 10Y real yield",
+        "status": "supports"
+      },
+      {
+        "name": "Dollar (DXY)",
+        "status": "conflict"
+      },
+      {
+        "name": "Central-bank buying",
+        "status": "supports"
+      }
+    ],
+    "invalidation": "Real yield up 25bp in a month",
+    "reviewed": "2026-11-06",
+    "expires": "2026-11-13"
+  }
+}

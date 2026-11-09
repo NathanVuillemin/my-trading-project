@@ -1,0 +1,32 @@
+{
+  "mock": true,
+  "asOf": "2026-11-07",
+  "rule": "Correlation counts as strong when |r| is 0.5 or more on the 60-day window (starting threshold, untested). Measured, never assumed.",
+  "drivers": [
+    { "currency": "USD", "driver": "US 2Y yield", "symbol": "US02Y", "measure": "DXY vs US 2Y",
+      "move1m": "+18bp", "corr20": 0.71, "corr60": 0.64, "effect": "supports",
+      "secondOrder": "Higher 2Y also tightens financial conditions, can slow growth later." },
+    { "currency": "EUR", "driver": "TTF gas", "symbol": "TTF", "measure": "EURUSD vs TTF (inverse)",
+      "move1m": "-18%", "corr20": -0.48, "corr60": -0.55, "effect": "conflict",
+      "secondOrder": "Cheaper gas lowers inflation, which gives ECB room to cut (helps thesis long term)." },
+    { "currency": "GBP", "driver": "Gilt 10Y / fiscal risk", "symbol": "GB10Y", "measure": "GBPUSD vs UK-US 10Y spread",
+      "move1m": "+6bp", "corr20": 0.22, "corr60": 0.31, "effect": "neutral",
+      "secondOrder": "Gilt selloff on fiscal fear can flip to GBP-negative (risk premium)." },
+    { "currency": "JPY", "driver": "US 10Y yield", "symbol": "US10Y", "measure": "USDJPY vs US10Y",
+      "move1m": "+21bp", "corr20": 0.78, "corr60": 0.69, "effect": "conflict",
+      "secondOrder": "Oil up also hurts JPY (importer). Near 160 the MoF can override everything." },
+    { "currency": "CHF", "driver": "Risk mood (VIX)", "symbol": "VIX", "measure": "USDCHF vs VIX (inverse)",
+      "move1m": "-2.1", "corr20": -0.18, "corr60": -0.29, "effect": "neutral",
+      "secondOrder": "A risk-off spike pulls haven money into CHF against the thesis." },
+    { "currency": "CAD", "driver": "WTI oil", "symbol": "USOIL", "measure": "CAD vs WTI (USDCAD inverted)",
+      "move1m": "+8.2%", "corr20": 0.58, "corr60": 0.62, "effect": "conflict",
+      "secondOrder": "Oil up lifts Canada's terms of trade + headline CPI, so BoC may cut less: hits the thesis, not just price." },
+    { "currency": "AUD", "driver": "Iron ore / China", "symbol": "SGX iron ore", "measure": "AUDUSD vs iron ore",
+      "move1m": "+1.4%", "corr20": 0.41, "corr60": 0.47, "effect": "neutral",
+      "secondOrder": "China stimulus headlines can gap AUD regardless of RBA." },
+    { "currency": "NZD", "driver": "Dairy (GDT)", "symbol": "GDT index", "measure": "NZDUSD vs GDT",
+      "move1m": "-4.5%", "corr20": 0.36, "corr60": 0.51, "effect": "supports",
+      "secondOrder": "Falling dairy hits farm incomes, adds to RBNZ cut pressure." }
+  ],
+  "commodities": { "status": "planned", "note": "Commodities get their own bias + driver rows later (oil, gold, copper)." }
+}

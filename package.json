@@ -22,7 +22,8 @@
     "bias": "node scripts/bias-engine.mjs",
     "bias:test": "node scripts/bias-engine.mjs --selftest",
     "bias:fred": "node scripts/fred-macro.mjs",
-    "bias:dash": "node scripts/build-bias-dashboard.mjs"
+    "bias:dash": "node scripts/build-bias-dashboard.mjs",
+    "desk": "node scripts/serve-desk.mjs"
   },
   "devDependencies": {
     "pinets": "^0.9.29"
