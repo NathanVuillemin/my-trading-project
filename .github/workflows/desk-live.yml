@@ -1,13 +1,14 @@
 name: Desk live prices
 
-# Every 5 minutes while FX trades: pull the seven USD pairs, derive crosses and currency baskets,
-# and publish one JSON file to the `desk-live` branch. That branch holds a single commit that is
-# replaced on every run, so main's history stays clean. The Trading Desk reads the file from
-# raw.githubusercontent.com. GitHub may start scheduled runs late; the page shows the data's age.
+# Publishes the desk's reference closes (three months of daily closes for the seven USD pairs) as one
+# JSON file on the `desk-live` branch. That branch holds a single commit that is replaced on every run,
+# so main's history stays clean. The closes change once a day; live quotes are fetched by the desk
+# itself in the browser. GitHub starts this repo's scheduled jobs hours late, so the daily whale-flow
+# job publishes the file too; this hourly schedule is a second chance, not something the desk relies on.
 on:
   schedule:
-    - cron: '*/5 * * * 1-5'      # Monday to Friday, all day (UTC)
-    - cron: '*/5 21-23 * * 0'    # Sunday evening: the week's open
+    - cron: '7 * * * 1-5'       # hourly, Monday to Friday (UTC)
+    - cron: '7 21-23 * * 0'     # Sunday evening: the week's open
   workflow_dispatch:
 
 permissions:
@@ -31,7 +32,7 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Pull prices
+      - name: Pull reference closes
         run: node scripts/desk-live.mjs --out "$RUNNER_TEMP/live.json"
 
       - name: Publish to the desk-live branch (one commit, force-pushed)
@@ -43,5 +44,5 @@ jobs:
           cp "$RUNNER_TEMP/live.json" live.json
           git add live.json
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "live prices $(date -u +%Y-%m-%dT%H:%MZ)"
+            commit -q -m "reference closes $(date -u +%Y-%m-%dT%H:%MZ)"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" desk-live

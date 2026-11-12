@@ -36,16 +36,27 @@ Everything Nathan types is one JSON file per domain in `data/`, committed throug
 | `correlations.json` | Not used by any page. Still written daily by `scripts/correlations.mjs` until Nathan decides whether to keep that job | |
 
 ## Live prices
-`scripts/desk-live.mjs` pulls the seven USD pairs from Yahoo Finance (keyless), derives all 28 crosses and a
-basket move per currency (each currency against the other seven, averaged), and writes one file:
-`asOf, priceTime, week{monday, ref, prevClose, monthRef}, pairs{PAIR: {last, dayPct, wtdPct, m1Pct, typicalPct, x, hi20, lo20}},
-currencies{CCY: {dayPct, wtdPct, m1Pct, rankDay, rankWtd, rankM1}}, history{dates[], usd{CCY: []}}` (three months of daily
-closes, used by Review).
+Two inputs, combined in the browser (`derivePrices` in `assets/desk.js`):
 
-`.github/workflows/desk-live.yml` runs it every 5 minutes while FX trades and force-pushes the file to the
-`desk-live` branch (a single commit, replaced each run, so main's history stays clean). Pages read it from
-`raw.githubusercontent.com/…/desk-live/live.json` and re-read it every minute; a pill shows its age.
-GitHub can start scheduled runs late and its CDN caches for a few minutes, so "live" here means minutes, not ticks.
+1. **Live quotes.** Every page that shows prices fetches Coinbase's public exchange-rates endpoint
+   (`api.coinbase.com/v2/exchange-rates?currency=USD`, keyless, open to browsers) once a minute. These are
+   reference rates that update every minute or two and sit within about 0.02% of the interbank quote: good for
+   moves and distances, not an executable price. A pill shows the quote's age; if the fetch fails, pages fall
+   back to the newest reference value and say so.
+2. **Reference closes.** `scripts/desk-live.mjs` pulls three months of daily closes for the seven USD pairs from
+   Yahoo Finance (keyless) and writes `asOf, priceTime, source, history{dates[], usd{CCY: []}}` (USD per unit of
+   each currency; the last bar is the session in progress). CI force-pushes the file to the `desk-live` branch
+   (a single commit, replaced each time, so main's history stays clean) and pages read it from
+   `raw.githubusercontent.com/…/desk-live/live.json`.
+
+From those the browser works out, for all 28 pairs and for each currency against the other seven: last, today,
+week to date, one month, the typical daily move over the last 20 sessions, and ranks.
+
+The closes only change once a day, which matters because **GitHub starts this repo's scheduled jobs hours
+late** (the 22:00 UTC daily job has started between 00:46 and 03:58). So nothing live depends on a schedule:
+the daily `whale-flow.yml` job publishes the closes at its end, and `desk-live.yml` tries again hourly. If the
+published file predates yesterday's final close, pages flag the day change as approximate.
+
 The TradingView mini charts on Today are the only tick-live element.
 Local: `npm run desk:live` writes `data/live.json` (git-ignored), which the local preview also reads.
 

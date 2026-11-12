@@ -119,35 +119,93 @@ async function loadLive(name, optional = false) {
 }
 
 // ---------- live prices (read-only) ----------
-// scripts/desk-live.mjs runs in CI every 5 minutes and publishes one file to the `desk-live` branch.
-// The desk only uses prices to hold Nathan's own entries against the market: are his pairs moving his
-// way, how far is price from his levels, how did past calls work out. Pages re-read it every minute.
-const PRICES_URL = `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/desk-live/live.json`;
+// The desk uses prices only to hold Nathan's own entries against the market: are his pairs moving his
+// way, how far is price from his levels, how did past calls work out. Two inputs, combined in the browser:
+//  1. Live quotes, fetched straight from a public keyless endpoint every minute (Coinbase's exchange
+//     rates: reference rates that update every minute or two and sit within about 0.02% of the
+//     interbank quote. Fine for moves and distances, not an executable price).
+//  2. Reference closes: three months of daily closes for the seven USD pairs, written by
+//     scripts/desk-live.mjs in CI onto the `desk-live` branch. They only change once a day, so it does
+//     not matter that GitHub starts scheduled jobs hours late.
+const REF_URL = `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/desk-live/live.json`;
+const QUOTES_URL = 'https://api.coinbase.com/v2/exchange-rates?currency=USD';
 const IS_LOCALHOST = ['localhost', '127.0.0.1'].includes(location.hostname);
-let prices = null;
-// Sources, newest wins: the GitHub API when a token is connected (no CDN delay), the raw file (cached by
-// GitHub's CDN for up to five minutes), and on a local preview the file written by `npm run desk:live`.
-async function loadPrices() {
+const ALL_PAIRS = PAIR_ORDER.flatMap((b, i) => PAIR_ORDER.slice(i + 1).map((q) => b + q));
+let prices = null;   // what pages read: { pairs, currencies, history, liveUsd, quoteTime, refAsOf, refStale }
+let refData = null, refLoadedAt = 0, quotes = null;
+
+// Sources for the reference file, newest wins: the GitHub API when a token is connected (no CDN delay),
+// the raw file (cached by GitHub's CDN for up to five minutes), and on a local preview the file written
+// by `npm run desk:live`.
+async function loadRef() {
   const get = (u, init = {}) => fetch(u, { cache: 'no-store', ...init }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const got = await Promise.all([
-    get(`${PRICES_URL}?t=${Date.now()}`),
+    get(`${REF_URL}?t=${Date.now()}`),
     ghToken.get() ? get(`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/live.json?ref=desk-live&t=${Date.now()}`, { headers: { ...ghHeaders(), Accept: 'application/vnd.github.raw+json' } }) : null,
     IS_LOCALHOST ? get(`data/live.json?t=${Date.now()}`) : null,
   ]);
-  const best = got.filter(Boolean).sort((a, b) => (a.asOf < b.asOf ? 1 : -1))[0];
-  if (best && (!prices || best.asOf >= prices.asOf)) prices = best;
+  const best = got.filter((j) => j?.history?.dates?.length).sort((a, b) => (a.asOf < b.asOf ? 1 : -1))[0];
+  if (best && (!refData || best.asOf >= refData.asOf)) refData = best;
+  refLoadedAt = Date.now();
+}
+// Rates come as units of each currency per USD; the desk works in USD per unit.
+async function loadQuotes() {
+  try {
+    const r = await fetch(QUOTES_URL, { cache: 'no-store' });
+    if (!r.ok) return;
+    const rates = (await r.json())?.data?.rates || {}, usd = { USD: 1 };
+    for (const c of CCYS) if (c !== 'USD') { const v = Number(rates[c]); if (!(v > 0)) return; usd[c] = 1 / v; }
+    quotes = { t: Date.now(), usd };
+  } catch { /* keep the last quotes */ }
+}
+// Every figure the pages show is worked out here from the reference closes and the latest quotes.
+function derivePrices() {
+  const H = refData?.history, dates = H?.dates || [], N = dates.length;
+  if (N < 25) { prices = null; return; }
+  const hv = (c, i) => (c === 'USD' ? 1 : H.usd[c][i]);
+  const pct = (a, b) => (a / b - 1) * 100, mean = (xs) => xs.reduce((a, b) => a + b, 0) / xs.length;
+  const now = new Date(), todayUtc = now.toISOString().slice(0, 10);
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7))).toISOString().slice(0, 10);
+  let prev = N - 1; while (prev > 0 && dates[prev] >= todayUtc) prev--;   // last session before today
+  let wk = prev; while (wk > 0 && dates[wk] >= monday) wk--;               // last close before this week
+  const mo = Math.max(0, prev - 20), lo = Math.max(1, prev - 19);
+  // Without live quotes, fall back to the newest value in the reference file.
+  const liveUsd = quotes?.usd || Object.fromEntries(CCYS.map((c) => [c, hv(c, N - 1)]));
+  const stat = (b, q) => {
+    const s = (i) => hv(b, i) / hv(q, i), px = liveUsd[b] / liveUsd[q];
+    const moves = [], win = [];
+    for (let k = lo; k <= prev; k++) { moves.push(Math.abs(pct(s(k), s(k - 1)))); win.push(s(k)); }
+    const typicalPct = mean(moves), dayPct = pct(px, s(prev));
+    return { last: px, dayPct, wtdPct: pct(px, s(wk)), m1Pct: pct(px, s(mo)), typicalPct, x: Number((Math.abs(dayPct) / typicalPct).toFixed(1)), hi20: Math.max(...win), lo20: Math.min(...win) };
+  };
+  const pairs = Object.fromEntries(ALL_PAIRS.map((p) => [p, stat(p.slice(0, 3), p.slice(3))]));
+  const currencies = {};
+  for (const c of CCYS) {
+    const o = CCYS.filter((x) => x !== c).map((x) => stat(c, x));
+    currencies[c] = { dayPct: mean(o.map((s) => s.dayPct)), wtdPct: mean(o.map((s) => s.wtdPct)), m1Pct: mean(o.map((s) => s.m1Pct)) };
+  }
+  for (const [key, rank] of [['dayPct', 'rankDay'], ['wtdPct', 'rankWtd'], ['m1Pct', 'rankM1']]) {
+    [...CCYS].sort((a, b) => currencies[b][key] - currencies[a][key]).forEach((c, i) => { currencies[c][rank] = i + 1; });
+  }
+  // The close for `prev` is final only if the file was written after that day ended.
+  const refStale = refData.asOf.slice(0, 10) <= dates[prev];
+  prices = { pairs, currencies, history: H, liveUsd, quoteTime: quotes?.t || null, refAsOf: refData.asOf, refStale };
+}
+async function loadPrices() {
+  await Promise.all([Date.now() - refLoadedAt > 10 * 60000 ? loadRef() : null, loadQuotes()]);
+  derivePrices();
   return prices;
 }
-const ALL_PAIRS = PAIR_ORDER.flatMap((b, i) => PAIR_ORDER.slice(i + 1).map((q) => b + q));
 const pxFmt = (pair, v) => (v == null ? '—' : Number(v).toFixed(String(pair).endsWith('JPY') ? 3 : 5));
-const pctHtml = (n, d = 2) => (n == null ? '<span class="faint">—</span>' : `<span class="num ${n > 0 ? 'up' : n < 0 ? 'down' : 'muted'}">${n > 0 ? '+' : ''}${Number(n).toFixed(d)}%</span>`);
+const pctHtml = (n, d = 2) => (n == null ? '<span class="faint">—</span>' : `<span class="num ${n > 0.004 ? 'up' : n < -0.004 ? 'down' : 'muted'}">${n > 0.004 ? '+' : ''}${Number(n).toFixed(d)}%</span>`);
 function priceAge() {
-  if (!prices) return '<span class="pill warn">price feed not reachable</span>';
-  const min = Math.max(0, Math.round((Date.now() - Date.parse(prices.asOf)) / 60000));
-  if (min > 180) return `<span class="pill flat" title="The feed runs while FX trades">prices as of ${new Date(prices.asOf).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>`;
-  return `<span class="pill ${min > 45 ? 'warn' : 'flat'}" title="Refreshed every 5 minutes; this page re-reads it every minute">prices ${min < 1 ? 'just now' : `${min} min ago`}</span>`;
+  if (!prices) return '<span class="pill warn">prices not reachable</span>';
+  const stale = prices.refStale ? ' <span class="pill warn" title="Yesterday\'s final close has not been published yet, so the day change is measured from an earlier price">day change approximate</span>' : '';
+  if (!prices.quoteTime) return `<span class="pill warn" title="Live quotes could not be fetched; showing the last published prices">live quotes unreachable · prices from ${new Date(prices.refAsOf).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>${stale}`;
+  const min = Math.max(0, Math.round((Date.now() - prices.quoteTime) / 60000));
+  return `<span class="pill ${min > 5 ? 'warn' : 'flat'}" title="Quotes are re-read every minute; the source updates every minute or two">quotes ${min < 1 ? 'just now' : `${min} min ago`}</span>${stale}`;
 }
-// Value of one unit of a currency in USD on history day i (daily closes, last = session in progress).
+// Value of one unit of a currency in USD on reference day i (daily closes).
 const histUsd = (c, i) => (c === 'USD' ? 1 : prices.history.usd[c][i]);
 
 // ---------- small shared pieces ----------
@@ -867,10 +925,13 @@ render.review = async (main) => {
     let ref = -1, end = -1;
     dates.forEach((d, i) => { if (d < w.monday) ref = i; if (d >= w.monday && d <= friday) end = i; });
     if (ref < 0 || end < 0) return { state: ref < 0 ? 'too old for the price history' : 'not started', pairs: [], calls: [] };
-    const px = (b, q, i) => histUsd(b, i) / histUsd(q, i);
+    const running = Date.now() <= Date.parse(friday + 'T22:00:00Z');
+    // While the week runs, its end is the live quote; afterwards, its Friday close.
+    const val = (c, i) => (running && i === end ? prices.liveUsd[c] : histUsd(c, i));
+    const px = (b, q, i) => val(b, i) / val(q, i);
     const basket = (c) => { const o = CCYS.filter((x) => x !== c); return o.reduce((s, x) => s + (px(c, x, end) / px(c, x, ref) - 1) * 100, 0) / o.length; };
     return {
-      state: Date.now() > Date.parse(friday + 'T22:00:00Z') ? 'closed' : 'running', from: dates[ref], to: dates[end],
+      state: running ? 'running' : 'closed', from: dates[ref], to: dates[end],
       pairs: (w.pairs || []).map((p) => { const b = p.pair.slice(0, 3), q = p.pair.slice(3); const move = (px(b, q, end) / px(b, q, ref) - 1) * 100; return { ...p, move, mine: move * (p.dir === 'LONG' ? 1 : -1) }; }),
       calls: Object.entries(w.scores || {}).filter(([, s]) => s !== 0).map(([c, s]) => { const move = basket(c); return { c, s, move, mine: move * Math.sign(s) }; }),
     };

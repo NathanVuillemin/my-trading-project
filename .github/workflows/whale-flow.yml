@@ -161,6 +161,22 @@ jobs:
           echo "Could not push after 3 attempts." >&2
           exit 1
 
+      # The Trading Desk's reference closes live on the `desk-live` branch (one commit, replaced each
+      # time). Publishing them here guarantees a daily refresh, since this job runs every day.
+      - name: Desk reference closes
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/desk-live.mjs --out "$RUNNER_TEMP/live.json"
+          mkdir "$RUNNER_TEMP/pub" && cd "$RUNNER_TEMP/pub"
+          git init -q -b desk-live
+          cp "$RUNNER_TEMP/live.json" live.json
+          git add live.json
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "reference closes $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" desk-live
+
       - name: Upload dashboard for Pages
         uses: actions/upload-pages-artifact@v5
         with:
