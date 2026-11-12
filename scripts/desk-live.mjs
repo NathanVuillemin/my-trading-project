@@ -6,7 +6,7 @@
 // his levels, how did his past calls work out. It is not a data board.
 //
 // Usage: node scripts/desk-live.mjs [--out path]   (default: dashboard/desk/data/live.json, git-ignored)
-// CI:    .github/workflows/desk-live.yml runs it every 15 minutes and force-pushes the file to the
+// CI:    .github/workflows/desk-live.yml runs it every 5 minutes and force-pushes the file to the
 //        `desk-live` branch (one commit, no history), which the desk reads from raw.githubusercontent.
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -100,7 +100,7 @@ async function main() {
   const data = {
     asOf: new Date().toISOString(),
     priceTime: priceTime ? new Date(priceTime * 1000).toISOString() : null,
-    source: 'Yahoo Finance quotes for the seven USD pairs; crosses and baskets derived. Refreshed every 15 minutes by CI.',
+    source: 'Yahoo Finance quotes for the seven USD pairs; crosses and baskets derived. Refreshed every 5 minutes by CI.',
     week: { monday: mondayIso, ref: dates[weekRef], prevClose: dates[n - 1], monthRef: dates[monthRef] },
     pairs, currencies,
     history: { dates, usd: Object.fromEntries(codes.map((c) => [c, hist[c].map((v) => round(v, 6))])) },

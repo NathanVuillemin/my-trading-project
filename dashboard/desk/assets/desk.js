@@ -119,15 +119,21 @@ async function loadLive(name, optional = false) {
 }
 
 // ---------- live prices (read-only) ----------
-// scripts/desk-live.mjs runs in CI every 15 minutes and publishes one file to the `desk-live` branch.
+// scripts/desk-live.mjs runs in CI every 5 minutes and publishes one file to the `desk-live` branch.
 // The desk only uses prices to hold Nathan's own entries against the market: are his pairs moving his
 // way, how far is price from his levels, how did past calls work out. Pages re-read it every minute.
 const PRICES_URL = `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/desk-live/live.json`;
 const IS_LOCALHOST = ['localhost', '127.0.0.1'].includes(location.hostname);
 let prices = null;
+// Sources, newest wins: the GitHub API when a token is connected (no CDN delay), the raw file (cached by
+// GitHub's CDN for up to five minutes), and on a local preview the file written by `npm run desk:live`.
 async function loadPrices() {
-  const urls = [`${PRICES_URL}?t=${Date.now()}`, ...(IS_LOCALHOST ? [`data/live.json?t=${Date.now()}`] : [])];
-  const got = await Promise.all(urls.map((u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)));
+  const get = (u, init = {}) => fetch(u, { cache: 'no-store', ...init }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const got = await Promise.all([
+    get(`${PRICES_URL}?t=${Date.now()}`),
+    ghToken.get() ? get(`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/live.json?ref=desk-live&t=${Date.now()}`, { headers: { ...ghHeaders(), Accept: 'application/vnd.github.raw+json' } }) : null,
+    IS_LOCALHOST ? get(`data/live.json?t=${Date.now()}`) : null,
+  ]);
   const best = got.filter(Boolean).sort((a, b) => (a.asOf < b.asOf ? 1 : -1))[0];
   if (best && (!prices || best.asOf >= prices.asOf)) prices = best;
   return prices;
@@ -139,7 +145,7 @@ function priceAge() {
   if (!prices) return '<span class="pill warn">price feed not reachable</span>';
   const min = Math.max(0, Math.round((Date.now() - Date.parse(prices.asOf)) / 60000));
   if (min > 180) return `<span class="pill flat" title="The feed runs while FX trades">prices as of ${new Date(prices.asOf).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>`;
-  return `<span class="pill ${min > 45 ? 'warn' : 'flat'}" title="Refreshed every 15 minutes; this page re-reads it every minute">prices ${min < 1 ? 'just now' : `${min} min ago`}</span>`;
+  return `<span class="pill ${min > 45 ? 'warn' : 'flat'}" title="Refreshed every 5 minutes; this page re-reads it every minute">prices ${min < 1 ? 'just now' : `${min} min ago`}</span>`;
 }
 // Value of one unit of a currency in USD on history day i (daily closes, last = session in progress).
 const histUsd = (c, i) => (c === 'USD' ? 1 : prices.history.usd[c][i]);

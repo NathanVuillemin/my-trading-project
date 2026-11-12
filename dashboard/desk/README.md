@@ -42,7 +42,7 @@ basket move per currency (each currency against the other seven, averaged), and 
 currencies{CCY: {dayPct, wtdPct, m1Pct, rankDay, rankWtd, rankM1}}, history{dates[], usd{CCY: []}}` (three months of daily
 closes, used by Review).
 
-`.github/workflows/desk-live.yml` runs it every 15 minutes while FX trades and force-pushes the file to the
+`.github/workflows/desk-live.yml` runs it every 5 minutes while FX trades and force-pushes the file to the
 `desk-live` branch (a single commit, replaced each run, so main's history stays clean). Pages read it from
 `raw.githubusercontent.com/…/desk-live/live.json` and re-read it every minute; a pill shows its age.
 GitHub can start scheduled runs late and its CDN caches for a few minutes, so "live" here means minutes, not ticks.

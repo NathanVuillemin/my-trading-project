@@ -1,13 +1,13 @@
 name: Desk live prices
 
-# Every 15 minutes while FX trades: pull the seven USD pairs, derive crosses and currency baskets,
+# Every 5 minutes while FX trades: pull the seven USD pairs, derive crosses and currency baskets,
 # and publish one JSON file to the `desk-live` branch. That branch holds a single commit that is
 # replaced on every run, so main's history stays clean. The Trading Desk reads the file from
 # raw.githubusercontent.com. GitHub may start scheduled runs late; the page shows the data's age.
 on:
   schedule:
-    - cron: '*/15 * * * 1-5'      # Monday to Friday, all day (UTC)
-    - cron: '*/15 21-23 * * 0'    # Sunday evening: the week's open
+    - cron: '*/5 * * * 1-5'      # Monday to Friday, all day (UTC)
+    - cron: '*/5 21-23 * * 0'    # Sunday evening: the week's open
   workflow_dispatch:
 
 permissions:
