@@ -1,57 +1,76 @@
 # Trading Desk
 
-Multi-page bias dashboard. Hub (morning brief) + Weekly Recap, Bias, Key Levels, Kill Switches,
-Drivers, Review, with a top nav bar. The Weekly Recap is the Sunday read: one overview plus one tab per economy. Market Context covers raw data (calendar, flow, news, positioning, notes); this desk
-holds Nathan's own bias, what changes it, and whether it was right.
+Nathan's own layer on top of what he already receives. Market Context and his coach's briefs give him
+the data; this desk holds what he does with it: his weekly scorecard and pairs, his if/then lines, kill
+switches, key levels, daily notes, ideas, and a review of whether his calls were right.
 
-**Status: architecture only. Every JSON file is mock (`"mock": true` shows a banner).** Live pipelines
-later overwrite the same files in the same shape; the pages don't change.
+**Rule: the desk shows no data he is sent elsewhere.** The one thing it reads is a small live price file,
+used only to hold his own entries against the market.
 
-Preview locally: `npm run desk`, then open http://localhost:8787/desk/ (pages fetch JSON, so file:// won't work).
-Deploys with the rest of `dashboard/` via `whale-flow.yml` (live at `/my-trading-project/desk/`).
+Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://localhost:8787/desk/
+(pages fetch JSON, so file:// won't work). Deploys with the rest of `dashboard/` via `whale-flow.yml`
+(daily, or a manual run; a push alone does not publish).
 
-## Files
-- `index.html`, `weekly-recap.html`, `bias.html`, `levels.html`, `kill-switches.html`,
-  `drivers.html`, `review.html`: thin shells, `<body data-page="…">`.
-- `assets/desk.js`: nav bar + one renderer per page. `assets/desk.css`: styles.
-- `data/*.json`: one file per page domain. `data/recaps/`: one file per Sunday + `index.json` (newest first).
+## Pages
+| Page | File | Holds |
+|---|---|---|
+| Today | `index.html` | This week's confirmed pairs against live prices (last, today, week, 1 month, with or against his call, a live TradingView mini chart, his events, levels and kill switches for the pair); every currency's score against its move; the seven-question daily read with links; the three-line daily note |
+| Scorecard | `scorecard.html` | The weekly build: his read per currency, his call, score, ranking, pair proposals, week-ahead events with if/then |
+| Kill Switches | `kill-switches.html` | Conditions that change or end a bias |
+| Key Levels | `levels.html` | His own levels, sorted by distance from the live price |
+| Ideas | `ideas.html` | Inbox for ideas from podcasts, videos, calls: open, kept or dropped |
+| Review | `review.html` | Each saved week graded from prices: pairs by their move in his direction, currency calls by the currency against the other seven |
 
-## Data shapes
-| File | Holds | Key fields | Live source (later) |
-|---|---|---|---|
-| `brief.json` | Morning brief | `date, regime, headline, bullets[], focus[{pair,direction,why}], avoid[]` | morning-debrief agent |
-| `bias.json` | Bias per currency + gold | `code, cb, nextMeeting, net, structural (-2..+2), conviction (1-5), status (ACTIVE/FROZEN/EXPIRED), growth, inflation, cbPath{expectedBp, pricedBp}, thesis, driver{name,status}, positioning, invalidation, killSwitches[], reviewed, expires` | Nathan's input (shared store TBD); `pricedBp` from OIS / Market Context |
-| `killswitches.json` | What kills or changes a bias | `id, currency, kind (data/cb/pricing/driver/price/expiry), condition, now, effect (flip/downgrade/upgrade/freeze/flat), status (armed/near/fired), firedOn, by? ('manual' = typed on the desk), created?, edited?` | Nathan on the Kill Switches page (saved to GitHub) + kill-switch checker later |
-| `drivers.json` | Driver layer | `currency, driver, symbol, measure, move1m, corr20, corr60, effect (supports/neutral/conflict), secondOrder` | TradingView pull + rolling correlation |
-| `correlations.json` | Correlation pairs (live) | `asOf, method, missing[], errors[], pairs[{id, a, b, labelA, labelB, typical (positive/inverse), drivers[], driverOf?, why, r20, r60, r60MonthAgo, change1m, shift, status (strong/moderate/weak/flipped), history[{date, r60, r20}]}]` | `scripts/correlations.mjs`, daily in CI (Yahoo + FRED); archive in `data/correlations/` |
-| `levels.json` | Key levels (draft layout) | `note, families{key: label}, types{key: {family, desc}}, statuses{key: desc}, levels[{id, instrument, level, type, who, side, evidence, price, status (untested/defended/broken/reference/historical), lastTouch, source}]`. Families: hand (intervention, options, positioning, flow, cb-floor), cost (avwap, volume-profile), reference (period-open), macro (rate-spread, exporter-pain, yield-cap, fixing-peg) | manual + COT / flow / TradingView later |
-| `indicators.json` | Indicator catalog (Economy Read Chain) | `layers, rates[], performance[], economies{CODE: {cb{name,url}, releases{inflation[],growth[],labour[]}, themes{...}}}` each {name, unit, impact, source}. impact `up` = a rise supports the currency, `down` = a fall does | hand-kept; live jobs fetch exactly this list |
-| `recaps/index.json` | Recap archive | `recaps[{sunday, week, file, headline}]`, newest first | written by the Sunday recap job |
-| `recaps/<sunday>.json` | One weekly recap | `sunday, week, period{start,end}, process{status, steps[{id,label}]}, overview{headline, globalScare, riskMood, bullets[], killSwitchesFired[], nextWeekTop[]}, economies[{code, name, cb, regime{growth,inflation}, scare (inflation/growth/both/neither), verdict, releases{inflation[],growth[],labour[]}, themes{inflation[],growth[],labour[]} each {name, unit, impact (up/down), latest, prior, expected, trend[6], source}, rates{y2{level,chgBp}, y10{level,chgBp}, policy, statement{nextMove, conviction, url}}, performance{rank, of, spread2yPolicyBp}, centralBank{stance, pricedStartBp, pricedEndBp, myPathBp, nextMeeting}, week{currencyPct, takeaways[], biasChange}, nextWeek[], process{stepId: read}}]` | Sunday recap agent, following Nathan's method (to define) |
-| `history.json` | Bias change log | `date, currency, layer (net/structural/status), from, to, kind, killSwitch, reason, grade1w, grade4w` | written on each bias change; grader fills grades |
+All pages are thin shells (`<body data-page="…">`); `assets/desk.js` draws the nav and one renderer per page.
 
-Rules baked into the pages: pair bias = base net − quote net (28 pairs, market-convention order);
-pairs flagged when either side has a driver conflict or is frozen/expired; correlation is "strong" at |r| ≥ 0.5 (60d).
+## Data
+Everything Nathan types is one JSON file per domain in `data/`, committed through the GitHub contents API.
+| File | Holds | Key fields |
+|---|---|---|
+| `scorecard-index.json` | Weeks with a scorecard, newest first | `weeks[{monday, pairs[{pair, dir}], scores{CCY: n}}]` |
+| `scorecard-<monday>.json` | One weekly build, named by the Monday of the trading week | `monday, updated, active[CCY], currencies{CCY: {growth{level,dir}, inflation{level,dir}, labour{level,dir}, sentence, lean, priced12m, weekChange, call (tooLittle/aboutRight/tooMuch), strong, crowded, rank1m}}, pairs[{pair, dir, diff}], events[{id, date, currency, event, ifThen}]` |
+| `daily-notes.json` | The three lines per day | `days{YYYY-MM-DD: {story, ifThen, biasCheck, done[1-7], saved}}` |
+| `killswitches.json` | Kill switches | `kinds{}, effects{}, killSwitches[{id, currency, kind, condition, now, effect, status (armed/near/fired), firedOn, by, created, edited}]` |
+| `levels.json` | Key levels | `note, families{}, types{key: {family, desc}}, statuses{}, levels[{id, instrument, level, type, side, who, evidence, status, lastTouch, created, edited}]` |
+| `ideas.json` | Ideas | `ideas[{id, date, source, text, status (open/kept/dropped)}]` |
+| `correlations.json` | Not used by any page. Still written daily by `scripts/correlations.mjs` until Nathan decides whether to keep that job | |
 
-Regime quadrant (computed from growth / inflation direction; "flat" counts as neither up nor down):
-inflation up + growth not down = Overheating (inflation scare); inflation up + growth down = Stagflation (both);
-inflation not up + growth down = Slowdown (growth scare); otherwise Goldilocks (no scare).
+## Live prices
+`scripts/desk-live.mjs` pulls the seven USD pairs from Yahoo Finance (keyless), derives all 28 crosses and a
+basket move per currency (each currency against the other seven, averaged), and writes one file:
+`asOf, priceTime, week{monday, ref, prevClose, monthRef}, pairs{PAIR: {last, dayPct, wtdPct, m1Pct, typicalPct, x, hi20, lo20}},
+currencies{CCY: {dayPct, wtdPct, m1Pct, rankDay, rankWtd, rankM1}}, history{dates[], usd{CCY: []}}` (three months of daily
+closes, used by Review).
 
-## Economy Read Chain (weekly recap economy tabs)
-Each economy is read in a fixed order: **Releases** (days) → **Themes** (weeks) → **Rates & Yields** (months) →
-**Performance**. The indicator list per currency lives in `data/indicators.json`. Colour on each print = impact on
-the currency, not the economy: green = supportive / hawkish, red = negative / dovish (falling inflation is red,
-falling jobless claims green).
+`.github/workflows/desk-live.yml` runs it every 15 minutes while FX trades and force-pushes the file to the
+`desk-live` branch (a single commit, replaced each run, so main's history stays clean). Pages read it from
+`raw.githubusercontent.com/…/desk-live/live.json` and re-read it every minute; a pill shows its age.
+GitHub can start scheduled runs late and its CDN caches for a few minutes, so "live" here means minutes, not ticks.
+The TradingView mini charts on Today are the only tick-live element.
+Local: `npm run desk:live` writes `data/live.json` (git-ignored), which the local preview also reads.
 
-No calendar page: Nathan uses a separate economic calendar (Events page removed 2026-11-09). The old V5 model board link was removed from the nav at the same time.
+## Saving
+Pages are static, so saves go straight to the repo. Nathan pastes a fine-grained token (this repo only,
+Contents read and write) once per device on any page; it stays in that browser's localStorage and is sent only
+to api.github.com. Each save re-reads the file and applies one change, so a commit made in between is never
+overwritten; a file that does not exist yet is created. Without a token pages are read-only. Pages read the
+repo's current file, not the deployed copy, so a save shows at once.
 
-## Editing kill switches from the desk
-The Kill Switches page commits straight to `data/killswitches.json` through the GitHub contents API.
-Nathan pastes a fine-grained token (this repo only, Contents read/write) once per device; it stays in that
-browser's localStorage and is sent only to api.github.com. Each save re-reads the file and applies just that
-one change, so the daily data commit is never overwritten. Without a token the page is read-only. Pages
-that show kill switches (Hub, Weekly Recap, Kill Switches) read the repo's current file, not the deployed copy.
+The links to his coach's briefs used by the daily checklist are private: they are pasted once per device and
+kept in localStorage, never in the repo.
 
-## Drivers and correlations
-`drivers.json` rows with `corrId` take their 20d / 60d correlation from `correlations.json` (marked live);
-the rest (EUR gas, GBP gilts, NZD dairy) have no free daily feed and stay manual.
+## Local test mode
+Add `?store=local` to any desk address: every save goes to this browser's localStorage instead of GitHub (a
+banner shows it; the flag lasts for the browser session). `?store=github` switches back. Use it for trying
+pages and for testing changes: without it, with a token connected, a save commits to main even from `npm run desk`.
+
+## Scorecard rules
+One card per trading week; a build done on Saturday or Sunday belongs to the coming Monday. Score per currency:
+the call gives the sign (too little priced = +1, about right = 0, too much priced = -1), "strong" doubles it,
+crowded positioning pulls it one notch towards zero. Pairs are every two active currencies with different
+scores, widest gap first; highest against lowest is marked. Nathan confirms two or three.
+
+## Review rules
+A week is measured from the last daily close before its Monday to its Friday close (or the latest price while
+it runs). A call counts as right when price moved more than 0.05% its way. Direction only: it does not grade
+entries or exits.

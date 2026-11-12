@@ -1,0 +1,47 @@
+name: Desk live prices
+
+# Every 15 minutes while FX trades: pull the seven USD pairs, derive crosses and currency baskets,
+# and publish one JSON file to the `desk-live` branch. That branch holds a single commit that is
+# replaced on every run, so main's history stays clean. The Trading Desk reads the file from
+# raw.githubusercontent.com. GitHub may start scheduled runs late; the page shows the data's age.
+on:
+  schedule:
+    - cron: '*/15 * * * 1-5'      # Monday to Friday, all day (UTC)
+    - cron: '*/15 21-23 * * 0'    # Sunday evening: the week's open
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desk-live
+  cancel-in-progress: true
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Pull prices
+        run: node scripts/desk-live.mjs --out "$RUNNER_TEMP/live.json"
+
+      - name: Publish to the desk-live branch (one commit, force-pushed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir "$RUNNER_TEMP/pub" && cd "$RUNNER_TEMP/pub"
+          git init -q -b desk-live
+          cp "$RUNNER_TEMP/live.json" live.json
+          git add live.json
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "live prices $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" desk-live

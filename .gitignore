@@ -21,3 +21,6 @@ backups/
 # Ebooks and course PDFs — copyrighted, kept local only (repo is public)
 library/
 *.pdf
+
+# Local run of scripts/desk-live.mjs (CI publishes the real one to the desk-live branch)
+dashboard/desk/data/live.json

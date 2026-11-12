@@ -1,15 +1,15 @@
 // Trading Desk: shared shell + page renderers.
-// Every page is a thin HTML file with <body data-page="...">; this script draws the
-// nav bar and the page from JSON in ./data/. Mock files carry "mock": true and the
-// shell shows a banner. Live pipelines later overwrite the same files, same shape.
+// Every page is a thin HTML file with <body data-page="...">; this script draws the nav bar and the
+// page. The desk holds Nathan's own layer only: what he types (scorecard, kill switches, levels, notes,
+// ideas) is saved to ./data/ through GitHub; the one thing it reads is a small live price file, used
+// to hold his entries against the market. It shows no data he is already sent elsewhere.
 
 const PAGES = [
-  { id: 'hub', href: 'index.html', label: 'Hub' },
-  { id: 'recap', href: 'weekly-recap.html', label: 'Weekly Recap' },
-  { id: 'bias', href: 'bias.html', label: 'Bias' },
-  { id: 'levels', href: 'levels.html', label: 'Key Levels' },
+  { id: 'hub', href: 'index.html', label: 'Today' },
+  { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard' },
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
-  { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
+  { id: 'levels', href: 'levels.html', label: 'Key Levels' },
+  { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
 const CCYS = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD'];
@@ -19,10 +19,25 @@ const PAIR_ORDER = ['EUR', 'GBP', 'AUD', 'NZD', 'USD', 'CAD', 'CHF', 'JPY'];
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cache = {};
-async function load(name) {
+
+// Local test mode: `?store=local` keeps every save in this browser (the flag lives in sessionStorage, so it
+// survives moving between pages); `?store=github` switches back. Nothing is committed while it is on.
+const STORE_KEY = 'desk.store';
+(() => {
+  const s = new URLSearchParams(location.search).get('store');
+  try { if (s === 'local') sessionStorage.setItem(STORE_KEY, 'local'); else if (s === 'github') sessionStorage.removeItem(STORE_KEY); } catch { /* storage blocked */ }
+})();
+const localMode = () => { try { return sessionStorage.getItem(STORE_KEY) === 'local'; } catch { return false; } };
+const localKey = (name) => `desk.local.${name}`;
+const canSave = () => localMode() || !!ghToken.get();
+
+async function load(name, optional = false) {
   if (!cache[name]) {
     cache[name] = fetch(`data/${name}.json`, { cache: 'no-store' }).then((r) => {
-      if (!r.ok) throw new Error(`data/${name}.json: HTTP ${r.status}`);
+      if (!r.ok) {
+        if (optional && r.status === 404) return null;
+        throw new Error(`data/${name}.json: HTTP ${r.status}`);
+      }
       return r.json();
     });
   }
@@ -45,20 +60,37 @@ const ghHeaders = () => ({ Accept: 'application/vnd.github+json', Authorization:
 const b64decode = (s) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g, '')), (c) => c.charCodeAt(0)));
 const b64encode = (s) => { let bin = ''; new TextEncoder().encode(s).forEach((b) => { bin += String.fromCharCode(b); }); return btoa(bin); };
 async function ghRead(name) {
+  if (localMode()) {
+    const it = localStorage.getItem(localKey(name));
+    if (it) return { data: JSON.parse(it), sha: null };
+    return { data: await load(name, true), sha: null };
+  }
   const r = await fetch(`${ghUrl(name)}?ref=${GH.branch}&t=${Date.now()}`, { headers: ghHeaders(), cache: 'no-store' });
-  if (!r.ok) throw new Error(`GitHub read ${name}: HTTP ${r.status}`);
+  if (!r.ok) {
+    if (r.status === 404) return { data: null, sha: null };
+    throw new Error(`GitHub read ${name}: HTTP ${r.status}`);
+  }
   const j = await r.json();
   return { data: JSON.parse(b64decode(j.content)), sha: j.sha };
 }
 // Re-reads the latest file, applies one change and commits it, so a data snapshot the daily
 // job committed in between is never overwritten. Retries once if the file moved under us.
 async function ghUpdate(name, change, message) {
+  if (localMode()) {
+    const { data } = await ghRead(name);
+    const next = change(data == null ? null : structuredClone(data));
+    localStorage.setItem(localKey(name), JSON.stringify(next));
+    cache[`live:${name}`] = Promise.resolve(next);
+    return { data: next, commit: 'local' };
+  }
   for (let attempt = 0; attempt < 2; attempt++) {
     const { data, sha } = await ghRead(name);
-    const next = change(structuredClone(data));
+    const next = change(data == null ? null : structuredClone(data));
+    const body = { message, content: b64encode(JSON.stringify(next, null, 2) + '\n'), branch: GH.branch };
+    if (sha) body.sha = sha;
     const r = await fetch(ghUrl(name), {
       method: 'PUT', headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, content: b64encode(JSON.stringify(next, null, 2) + '\n'), sha, branch: GH.branch }),
+      body: JSON.stringify(body),
     });
     if (r.ok) { const j = await r.json(); cache[`live:${name}`] = Promise.resolve(next); return { data: next, commit: j.commit?.sha?.slice(0, 7) }; }
     if (r.status !== 409 && r.status !== 422) throw new Error(`GitHub save: HTTP ${r.status}${r.status === 401 || r.status === 403 ? ' (token missing or lacks Contents write on this repo)' : ''}`);
@@ -67,66 +99,113 @@ async function ghUpdate(name, change, message) {
 }
 // Freshest copy: GitHub API with a token, else raw.githubusercontent (up to ~5 min CDN cache),
 // else the copy deployed with the site.
-async function loadLive(name) {
+async function loadLive(name, optional = false) {
+  if (localMode()) {
+    const { data } = await ghRead(name);
+    if (data === null && !optional) throw new Error(`data/${name}.json: not found`);
+    return data;
+  }
   if (!cache[`live:${name}`]) {
     cache[`live:${name}`] = (async () => {
-      try { if (ghToken.get()) return (await ghRead(name)).data; } catch { /* fall through */ }
+      try { if (ghToken.get()) { const { data } = await ghRead(name); if (data !== null) return data; } } catch { /* fall through */ }
       try {
         const r = await fetch(`https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${GH.dir}/${name}.json?t=${Date.now()}`, { cache: 'no-store' });
         if (r.ok) return await r.json();
       } catch { /* fall through */ }
-      return load(name);
+      return load(name, optional);
     })();
   }
   return cache[`live:${name}`];
+}
+
+// ---------- live prices (read-only) ----------
+// scripts/desk-live.mjs runs in CI every 15 minutes and publishes one file to the `desk-live` branch.
+// The desk only uses prices to hold Nathan's own entries against the market: are his pairs moving his
+// way, how far is price from his levels, how did past calls work out. Pages re-read it every minute.
+const PRICES_URL = `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/desk-live/live.json`;
+const IS_LOCALHOST = ['localhost', '127.0.0.1'].includes(location.hostname);
+let prices = null;
+async function loadPrices() {
+  const urls = [`${PRICES_URL}?t=${Date.now()}`, ...(IS_LOCALHOST ? [`data/live.json?t=${Date.now()}`] : [])];
+  const got = await Promise.all(urls.map((u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)));
+  const best = got.filter(Boolean).sort((a, b) => (a.asOf < b.asOf ? 1 : -1))[0];
+  if (best && (!prices || best.asOf >= prices.asOf)) prices = best;
+  return prices;
+}
+const ALL_PAIRS = PAIR_ORDER.flatMap((b, i) => PAIR_ORDER.slice(i + 1).map((q) => b + q));
+const pxFmt = (pair, v) => (v == null ? '—' : Number(v).toFixed(String(pair).endsWith('JPY') ? 3 : 5));
+const pctHtml = (n, d = 2) => (n == null ? '<span class="faint">—</span>' : `<span class="num ${n > 0 ? 'up' : n < 0 ? 'down' : 'muted'}">${n > 0 ? '+' : ''}${Number(n).toFixed(d)}%</span>`);
+function priceAge() {
+  if (!prices) return '<span class="pill warn">price feed not reachable</span>';
+  const min = Math.max(0, Math.round((Date.now() - Date.parse(prices.asOf)) / 60000));
+  if (min > 180) return `<span class="pill flat" title="The feed runs while FX trades">prices as of ${new Date(prices.asOf).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>`;
+  return `<span class="pill ${min > 45 ? 'warn' : 'flat'}" title="Refreshed every 15 minutes; this page re-reads it every minute">prices ${min < 1 ? 'just now' : `${min} min ago`}</span>`;
+}
+// Value of one unit of a currency in USD on history day i (daily closes, last = session in progress).
+const histUsd = (c, i) => (c === 'USD' ? 1 : prices.history.usd[c][i]);
+
+// ---------- small shared pieces ----------
+const pad2 = (n) => String(n).padStart(2, '0');
+const ymd = (d = new Date()) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+// Links Nathan opens daily (his coach's briefs) are private: kept in this browser only, never in the repo.
+const LINKS_KEY = 'desk.links';
+const links = {
+  get() { try { return JSON.parse(localStorage.getItem(LINKS_KEY) || '{}'); } catch { return {}; } },
+  set(v) { try { localStorage.setItem(LINKS_KEY, JSON.stringify(v)); } catch { /* storage blocked */ } },
+};
+const SESSIONS = [['Tokyo', 'Asia/Tokyo', 9, 18], ['London', 'Europe/London', 8, 17], ['New York', 'America/New_York', 8, 17]];
+function sessionState(now = new Date()) {
+  return SESSIONS.map(([name, timeZone, open, close]) => {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone, weekday: 'short', hour: 'numeric', hourCycle: 'h23' }).formatToParts(now).map((x) => [x.type, x.value]));
+    return { name, open: !['Sat', 'Sun'].includes(p.weekday) && Number(p.hour) >= open && Number(p.hour) < close };
+  });
+}
+// One place to connect GitHub, shown on every page that saves. The handler lives on document.
+function connectPanel() {
+  if (localMode()) return '';
+  return ghToken.get()
+    ? `<div class="note">Connected to GitHub on this device: saves are committed to ${esc(GH.repo)}. <button class="link-btn" data-gh="forget">Forget token on this device</button></div>`
+    : `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Connect GitHub to save</h2></div>
+        <p class="small muted" style="margin:0 0 8px">Read-only until connected. Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token ↗</a>: repository access <b>only ${esc(GH.repo)}</b>, permission <b>Contents: Read and write</b>. Paste it here once per device; it stays in this browser and is only sent to api.github.com. To try the desk without saving to GitHub, add <code>?store=local</code> to the address.</p>
+        <div class="form-actions"><input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off" style="flex:1;min-width:200px"><button class="btn primary" data-gh="connect">Connect</button><span class="error small" id="gh-err"></span></div></section>`;
+}
+document.addEventListener('click', async (ev) => {
+  const b = ev.target.closest('[data-gh]'); if (!b) return;
+  ev.preventDefault();
+  if (b.dataset.gh === 'forget') { ghToken.set(''); location.reload(); return; }
+  const v = $('#gh-token')?.value.trim(); if (!v) return;
+  ghToken.set(v);
+  try { await ghRead('killswitches'); location.reload(); }
+  catch (e) { ghToken.set(''); const el = $('#gh-err'); if (el) el.textContent = `Token did not work: ${e.message}`; }
+});
+// TradingView's free embeddable mini chart: the one tick-live element on the desk.
+function tvMini(el, symbol) {
+  el.classList.add('tradingview-widget-container');
+  el.innerHTML = '<div class="tradingview-widget-container__widget"></div>';
+  const s = document.createElement('script');
+  s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js'; s.async = true;
+  s.innerHTML = JSON.stringify({ symbol, width: '100%', height: 170, locale: 'en', dateRange: '5D', colorTheme: 'dark', isTransparent: true, autosize: false });
+  el.appendChild(s);
 }
 
 // ---------- formatting ----------
 const sign = (n) => (n > 0 ? `+${n}` : `${n}`);
 const tone = (n) => (n > 0 ? 'bull' : n < 0 ? 'bear' : 'flat');
 const scoreChip = (n, big = false) => `<span class="score ${tone(n)}${big ? ' big' : ''}">${sign(n)}</span>`;
-const dirWord = (n) => (n > 0 ? 'LONG' : n < 0 ? 'SHORT' : 'FLAT');
-const STATUS_TONE = { ACTIVE: 'bull', FROZEN: 'warn', EXPIRED: 'bear', FLAT: 'flat' };
-const statusPill = (s) => `<span class="pill ${STATUS_TONE[s] || 'flat'}">${esc(s)}</span>`;
-const EFFECT_TONE = { supports: 'bull', conflict: 'bear', neutral: 'flat' };
-const effectPill = (e) => `<span class="pill ${EFFECT_TONE[e] || 'flat'}">${esc(e)}</span>`;
 const TRIG_TONE = { fired: 'bear', near: 'warn', armed: 'flat' };
 const trigPill = (s) => `<span class="pill ${TRIG_TONE[s] || 'flat'}">${esc(s)}</span>`;
 const fmtDate = (iso) => new Date(iso + (iso.length === 10 ? 'T12:00:00Z' : '')).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-const bp = (n) => `${n > 0 ? '+' : ''}${n}bp`;
-const gapOf = (c) => c.cbPath.expectedBp - c.cbPath.pricedBp;
-const gapWord = (g) => (g > 0 ? 'hawkish' : g < 0 ? 'dovish' : 'none');
-
-function allPairs(currencies) {
-  const byCode = Object.fromEntries(currencies.map((c) => [c.code, c]));
-  const out = [];
-  for (let i = 0; i < PAIR_ORDER.length; i++) {
-    for (let j = i + 1; j < PAIR_ORDER.length; j++) {
-      const base = byCode[PAIR_ORDER[i]], quote = byCode[PAIR_ORDER[j]];
-      if (!base || !quote) continue;
-      const diff = base.net - quote.net;
-      const flags = [];
-      for (const c of [base, quote]) {
-        if (c.driver.status === 'conflict') flags.push(`${c.code} driver conflict`);
-        if (c.status === 'FROZEN') flags.push(`${c.code} frozen`);
-        if (c.status === 'EXPIRED') flags.push(`${c.code} expired`);
-      }
-      out.push({ pair: base.code + quote.code, base, quote, diff, flags });
-    }
-  }
-  return out;
-}
 
 // ---------- shell ----------
-function shell(page, asOf, mock) {
+function shell(page) {
   const nav = PAGES.map((p) => `<a href="${p.href}" class="${p.id === page ? 'active' : ''}">${p.label}</a>`).join('');
+  const mockBar = localMode() ? '<div class="mockbar">LOCAL TEST MODE: saves stay in this browser. Nothing is committed to GitHub.</div>' : '';
   document.body.insertAdjacentHTML('afterbegin', `
     <header class="topbar"><div class="topbar-inner">
       <a class="brand" href="index.html">Trading <span>Desk</span></a>
       <nav class="nav">${nav}</nav>
-      <span class="asof">${asOf ? 'as of ' + esc(asOf) : ''}</span>
     </div></header>
-    ${mock ? '<div class="mockbar">MOCK DATA: architecture preview. Nothing here is live or real.</div>' : ''}`);
+    ${mockBar}`);
 }
 function head(title, blurb, right = '') {
   return `<div class="page-head"><div><h1>${esc(title)}</h1>${blurb ? `<p>${blurb}</p>` : ''}</div>${right}</div>`;
@@ -150,140 +229,441 @@ function strengthBars(currencies) {
 // ---------- pages ----------
 const render = {};
 
+// ---------- hub: today ----------
+// Nothing here repeats what Nathan is sent. It shows his pairs and calls against live prices,
+// the daily read as a checklist, his three lines for the day, and his kill switches.
+const DAILY_QUESTIONS = [
+  ['What happened, in one story?', 'Morning debrief: the summary paragraph', 'debrief'],
+  ['Did pricing move towards or away from my gap?', 'Morning debrief: central-bank pricing table, my currencies only', 'debrief'],
+  ['What happened to my pairs, and why?', 'Morning debrief: currencies in depth, my pairs only', 'debrief'],
+  ['What is due today and tomorrow, and what would each outcome do?', 'Morning debrief: scenarios for the week; Market Context: Today', 'debrief'],
+  ['Where are the levels?', 'Morning debrief: levels to watch, my pairs', 'debrief'],
+  ['Anything I missed?', 'Market Context: Today, Shifts; alert emails', 'mc'],
+  ['Are my biases still valid?', 'My kill switches against 1 to 6', 'ks'],
+];
+
 render.hub = async (main) => {
-  const [brief, bias, killswitches, drivers, levels, history, recapIndex] = await Promise.all(
-    ['brief', 'bias', 'killswitches', 'drivers', 'levels', 'history', 'recaps/index'].map((n) => (n === 'killswitches' ? loadLive(n) : load(n))));
-  const latest = recapIndex.recaps[0];
-  const recap = latest ? await load(`recaps/${latest.file.replace(/\.json$/, '')}`) : null;
-  const hotKills = killswitches.killSwitches.filter((t) => t.status !== 'armed');
-  const conflicts = drivers.drivers.filter((d) => d.effect === 'conflict');
-  const regimeTone = { 'RISK-ON': 'bull', 'RISK-OFF': 'bear', CAUTION: 'warn' }[brief.regime] || 'flat';
+  const today = ymd(), target = scMonday();
+  const [index, ks, lv, notes] = await Promise.all([loadLive('scorecard-index', true), loadLive('killswitches', true), loadLive('levels', true), loadLive('daily-notes', true), loadPrices()]);
+  const weeks = index?.weeks || [];
+  const wk = weeks.find((w) => w.monday === target) || weeks.find((w) => w.monday < target) || null;
+  const card = wk ? await loadLive(`scorecard-${wk.monday}`, true) : null;
+  const myPairs = card?.pairs || [], events = card?.events || [];
+  const kills = ks?.killSwitches || [], levels = lv?.levels || [];
+  let days = notes?.days || {};
+  const note = { story: '', ifThen: '', biasCheck: '', done: [], ...(days[today] || {}) };
+  let msg = '';
+  const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  const wayPill = (way) => `<span class="pill ${way > 0 ? 'bull' : way < 0 ? 'bear' : 'flat'}">${way > 0 ? 'with me' : way < 0 ? 'against me' : 'flat'}</span>`;
+  const signOf = (n) => (Math.abs(n) < 0.05 ? 0 : Math.sign(n));
 
-  main.innerHTML = `
-    <div class="grid hub-grid">
-      <section class="panel brief span-2">
-        <div class="panel-head"><h2>Morning brief · ${fmtDate(brief.date)}</h2><span class="pill ${regimeTone}">${esc(brief.regime)}</span></div>
-        <h2 class="headline">${esc(brief.headline)}</h2>
-        <ul class="bullets">${brief.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
-        <div class="panel-head"><h2>Focus</h2></div>
-        <div class="focus">${brief.focus.map((f) => `<div class="item"><b>${esc(f.pair)}</b> <span class="pill ${f.direction === 'LONG' ? 'bull' : 'bear'}">${esc(f.direction)}</span><div class="small muted">${esc(f.why)}</div></div>`).join('')}
-          ${brief.avoid.map((f) => `<div class="item"><b>${esc(f.pair)}</b> <span class="pill warn">avoid</span><div class="small muted">${esc(f.why)}</div></div>`).join('')}</div>
-      </section>
-      ${panel('Currency strength', strengthBars(bias.currencies), { href: 'bias.html', label: 'Bias' })}
-      ${recap ? panel(`Weekly recap · ${fmtDate(recap.sunday)}`, `<p style="margin:0 0 10px">${esc(recap.overview.headline)}</p>
-        <ul class="list">${['inflation', 'growth', 'both', 'neither'].map((s) => [s, recap.economies.filter((e) => e.scare === s)]).filter(([, l]) => l.length)
-          .map(([s, l]) => `<li>${scarePill(s)}<span class="grow ccy small">${l.map((e) => e.code).join(' · ')}</span></li>`).join('')}</ul>`, { href: 'weekly-recap.html', label: 'Read' }) : ''}
-      ${panel('Kill switches fired / near', `<ul class="list">${hotKills.map((t) => `<li><span class="ccy">${t.currency}</span><span class="grow">${esc(t.condition)}<div class="small faint">${esc(t.now)}</div></span>${trigPill(t.status)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
-      ${panel('Driver conflicts', `<ul class="list">${conflicts.map((d) => `<li><span class="ccy">${d.currency}</span><span class="grow">${esc(d.driver)} <span class="num muted">${esc(d.move1m)}</span><div class="small faint">60d corr <span class="num">${d.corr60.toFixed(2)}</span></div></span>${effectPill(d.effect)}</li>`).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'drivers.html', label: 'Drivers' })}
-      ${panel('Key levels', `<ul class="list">${levels.levels.slice(0, 4).map((l) => `<li><span class="ccy">${esc(l.instrument)}</span><span class="grow"><span class="num">${esc(l.level)}</span> · ${esc(l.type)}<div class="small faint">price <span class="num">${esc(l.price)}</span></div></span><span class="pill flat">${esc(l.status)}</span></li>`).join('')}</ul>`, { href: 'levels.html', label: 'Levels' })}
-      ${panel('Recent bias changes', `<ul class="list">${history.changes.slice(0, 4).map((h) => `<li><span class="ccy">${h.currency}</span><span class="grow">${esc(h.reason)}<div class="small faint">${fmtDate(h.date)} · ${esc(h.layer)}</div></span><span class="num small">${esc(String(h.from))} → ${esc(String(h.to))}</span></li>`).join('')}</ul>`, { href: 'review.html', label: 'Review' }, 'span-2')}
-    </div>`;
-};
+  const statusHtml = () => {
+    const next = events.filter((e) => e.date >= today).sort(byDate)[0];
+    return sessionState().map((s) => `<span class="pill ${s.open ? 'bull' : 'flat'}">${s.name} ${s.open ? 'open' : 'closed'}</span>`).join('') +
+      `<span class="grow"></span>` +
+      (next ? `<span class="small">Next of my events: <b>${esc(next.event)}</b> <span class="ccy">${esc(next.currency)}</span> · ${next.date === today ? 'today' : fmtDate(next.date)}</span>` : '') + priceAge();
+  };
 
-render.bias = async (main) => {
-  const bias = await load('bias');
-  const pairs = allPairs(bias.currencies);
-  const picks = pairs.filter((p) => Math.abs(p.diff) >= 2).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
-
-  const card = (c) => {
-    const g = gapOf(c);
-    return `<article class="panel ccard">
-      <div class="ccard-top">${scoreChip(c.net, true)}
-        <div class="title"><span class="ccy">${c.code}</span> <span class="muted">${esc(c.name)}</span><div class="small faint">${esc(c.cb)} · next ${fmtDate(c.nextMeeting)}</div></div>
-        ${statusPill(c.status)}</div>
-      <div class="kv">
-        <div><label>Structural</label><span class="${tone(c.structural)}" style="background:none">${sign(c.structural)}</span></div>
-        <div><label>Driver</label><span style="font-family:inherit">${effectPill(c.driver.status)}</span></div>
-        <div><label>Conviction</label><span>${c.conviction}/5</span></div>
-        <div><label>My path</label><span>${bp(c.cbPath.expectedBp)}</span></div>
-        <div><label>Priced</label><span>${bp(c.cbPath.pricedBp)}</span></div>
-        <div><label>Gap</label><span class="${tone(g)}" style="background:none">${bp(g)} ${gapWord(g)}</span></div>
+  const pairLive = (p) => {
+    const s = prices?.pairs?.[p.pair];
+    if (!s) return '<div class="empty">No price for this pair yet.</div>';
+    const near = levels.filter((l) => l.instrument === p.pair && l.status !== 'historical' && Number.isFinite(Number(l.level)))
+      .map((l) => ({ l, pct: (Number(l.level) / s.last - 1) * 100 })).sort((a, b) => Math.abs(a.pct) - Math.abs(b.pct)).slice(0, 2);
+    return `<div class="kpis">
+        <div><label>Last</label><span class="num big">${pxFmt(p.pair, s.last)}</span></div>
+        <div><label>Today</label>${pctHtml(s.dayPct)}<div class="small ${s.x >= 1.75 ? 'warn-t' : 'faint'}">${s.x}× a typical day</div></div>
+        <div><label>This week</label>${pctHtml(s.wtdPct)}</div>
+        <div><label>1 month</label>${pctHtml(s.m1Pct)}</div>
+        <div><label>Week vs my call</label>${wayPill(signOf(s.wtdPct) * (p.dir === 'LONG' ? 1 : -1))}</div>
       </div>
-      <p class="thesis">${esc(c.thesis)}</p>
-      <details><summary>Full read</summary><dl>
-        <dt>Growth</dt><dd>${esc(c.growth.dir)} · ${esc(c.growth.note)}</dd>
-        <dt>Inflation</dt><dd>${esc(c.inflation.dir)}, ${esc(c.inflation.vsTarget)} target · ${esc(c.inflation.note)}</dd>
-        <dt>Driver</dt><dd>${esc(c.driver.name)} (<a href="drivers.html">drivers</a>)</dd>
-        <dt>Positioning</dt><dd>${esc(c.positioning)}</dd>
-        <dt>Invalidation</dt><dd>${esc(c.invalidation)}</dd>
-        <dt>Kill switches</dt><dd>${c.killSwitches.length ? `<a href="kill-switches.html?ccy=${c.code}">${c.killSwitches.length} linked</a>` : '<span class="faint">none</span>'}</dd>
-        <dt>Reviewed</dt><dd>${fmtDate(c.reviewed)} · expires ${fmtDate(c.expires)}</dd>
-      </dl></details>
-    </article>`;
+      ${near.length ? `<div class="small muted" style="margin-bottom:8px">My levels: ${near.map(({ l, pct }) => `<span class="num">${esc(l.level)}</span> ${esc(l.type)} <span class="faint">(${pct > 0 ? '+' : ''}${pct.toFixed(2)}% away)</span>`).join(' · ')}</div>` : ''}`;
+  };
+  const pairMine = (p) => {
+    const b = p.pair.slice(0, 3), q = p.pair.slice(3);
+    const k = kills.filter((x) => x.currency === b || x.currency === q), hot = k.filter((x) => x.status !== 'armed');
+    const ev = events.filter((e) => (e.currency === b || e.currency === q) && e.date >= today).sort(byDate).slice(0, 3);
+    return `<ul class="list">
+      ${ev.map((e) => `<li><span class="small nowrap">${e.date === today ? '<b>today</b>' : fmtDate(e.date)}</span><span class="grow"><b>${esc(e.event)}</b> <span class="ccy">${esc(e.currency)}</span><div class="small muted">${esc(e.ifThen)}</div></span></li>`).join('') || '<li class="small faint">No event written for this pair.</li>'}
+      ${hot.map((x) => `<li>${trigPill(x.status)}<span class="grow small">${esc(x.condition)}</span><span class="ccy">${esc(x.currency)}</span></li>`).join('')}
+      <li class="small muted"><a href="kill-switches.html">${k.length ? `${k.length} kill switch${k.length > 1 ? 'es' : ''} on ${b} / ${q}` : `No kill switch on ${b} or ${q} yet: write one`}</a></li></ul>`;
+  };
+  const pairsHtml = () => (myPairs.length
+    ? `<div class="grid sc-grid">${myPairs.map((p) => `<section class="panel pcard" data-pair="${esc(p.pair)}">
+        <div class="panel-head"><h2><span class="ccy">${esc(p.pair)}</span> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span></h2><span class="small muted">gap ${esc(p.diff)}</span></div>
+        <div data-live>${pairLive(p)}</div><div class="tv" data-symbol="FX:${esc(p.pair)}"></div>${pairMine(p)}</section>`).join('')}</div>`
+    : `<section class="panel"><div class="empty">${card ? 'No pairs confirmed on this week\'s scorecard.' : 'No scorecard yet.'} <a href="scorecard.html?week=${target}">Do the weekly build →</a></div></section>`);
+
+  const callsHtml = () => {
+    const order = prices ? [...CCYS].sort((a, b) => prices.currencies[a].rankWtd - prices.currencies[b].rankWtd) : CCYS;
+    return `<div class="table-wrap"><table><thead><tr><th>Ccy</th><th>My score</th><th>Today</th><th>This week</th><th>1M rank</th><th>Week vs my call</th></tr></thead><tbody>${order.map((c) => {
+      const sc = card && card.active?.includes(c) ? scScore(card.currencies[c]) : null, s = prices?.currencies?.[c];
+      return `<tr><td><span class="ccy">${c}</span></td><td>${sc == null ? '<span class="faint">no call</span>' : scoreChip(sc)}</td><td>${pctHtml(s?.dayPct)}</td><td>${pctHtml(s?.wtdPct)}</td>
+        <td class="num small">${s ? `${s.rankM1} of 8` : '—'}</td><td>${sc && s ? wayPill(Math.sign(sc) * signOf(s.wtdPct)) : '<span class="faint">—</span>'}</td></tr>`;
+    }).join('')}</tbody></table></div>
+    <p class="small faint" style="margin:8px 0 0">Each currency against the other seven, averaged. Strongest this week first.</p>`;
   };
 
-  const byCode = Object.fromEntries(bias.currencies.map((c) => [c.code, c]));
-  const order = [...bias.currencies].sort((a, b) => b.net - a.net).map((c) => c.code);
-  const cell = (r, c) => {
-    if (r === c) return '<td class="self"></td>';
-    const d = byCode[r].net - byCode[c].net;
-    const a = Math.min(Math.abs(d) / 4, 1) * 0.55 + (d ? 0.08 : 0);
-    const bg = d > 0 ? `rgba(52,195,122,${a})` : d < 0 ? `rgba(240,96,106,${a})` : 'var(--panel-2)';
-    return `<td style="background:${bg}" title="${r} vs ${c}">${d ? sign(d) : '0'}</td>`;
-  };
-  const matrix = `<div class="table-wrap"><table class="matrix"><thead><tr><th></th>${order.map((c) => `<th>${c}</th>`).join('')}</tr></thead>
-    <tbody>${order.map((r) => `<tr><th>${r}</th>${order.map((c) => cell(r, c)).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="small faint">Row currency vs column currency: row net minus column net.</p>`;
-
-  const pickList = `<ul class="list">${picks.map((p) => `<li><span class="ccy" style="min-width:64px">${p.pair}</span>
-    <span class="pill ${p.diff > 0 ? 'bull' : 'bear'}">${dirWord(p.diff)}</span>
-    <span class="grow small ${p.flags.length ? '' : 'muted'}">${p.flags.length ? `<span class="warn" style="background:none">⚠ ${esc(p.flags.join(', '))}</span>` : 'clean: no conflicts'}</span>
-    ${scoreChip(p.diff)}</li>`).join('')}</ul>`;
-
-  const gold = bias.gold;
-  const goldCard = `<article class="panel ccard">
-    <div class="ccard-top">${scoreChip(gold.net, true)}<div class="title"><span class="ccy">XAU</span> <span class="muted">Gold</span></div>${statusPill(gold.status)}</div>
-    <p class="thesis">${esc(gold.thesis)}</p>
-    <ul class="list">${gold.drivers.map((d) => `<li><span class="grow">${esc(d.name)}</span>${effectPill(d.status)}</li>`).join('')}</ul>
-    <div class="small muted">Invalidation: ${esc(gold.invalidation)}</div></article>`;
-
-  main.innerHTML = head('Bias', 'One bias per currency, set by the central-bank gap (my path minus priced), adjusted by the driver layer. Pair bias = strongest vs weakest.') +
-    `<div class="note">${esc(bias.scale)}</div>
-    <div class="grid hub-grid" style="margin-bottom:14px">
-      ${panel('Strength ranking', strengthBars(bias.currencies))}
-      <section class="panel span-2"><div class="panel-head"><h2>Top pairs (score gap 2+)</h2></div>${pickList}</section>
+  const linkFor = (kind) => ({ debrief: links.get().debrief, mc: links.get().mc || 'https://marketcontext.com/market-flow', ks: 'kill-switches.html' }[kind]);
+  const prev = Object.keys(days).filter((d) => d < today).sort().at(-1);
+  const readHtml = () => `<ul class="checks">${DAILY_QUESTIONS.map(([q, where, kind], i) => `<li>
+      <input type="checkbox" data-q="${i + 1}" ${note.done.includes(i + 1) ? 'checked' : ''}>
+      <span class="grow"><b>${i + 1}. ${esc(q)}</b><div class="small muted">${linkFor(kind) ? `<a href="${esc(linkFor(kind))}" ${kind === 'ks' ? '' : 'target="_blank" rel="noopener"'}>${esc(where)} ↗</a>` : esc(where)}</div></span></li>`).join('')}</ul>
+    <div class="form-grid">
+      <label class="full">The day in one sentence<textarea rows="2" id="dn-story" placeholder="What happened, as one story">${esc(note.story)}</textarea></label>
+      <label class="full">Today's event and my if / then<textarea rows="2" id="dn-ifthen" placeholder="If __ prints above __, pricing moves __, my pair should __">${esc(note.ifThen)}</textarea></label>
+      <label class="full">Bias check<textarea rows="2" id="dn-bias" placeholder="Holds / a kill switch fired / the gap is closing">${esc(note.biasCheck)}</textarea></label>
     </div>
-    <div class="grid cards">${bias.currencies.map(card).join('')}${goldCard}</div>
-    <div style="margin-top:14px">${panel('Pair matrix', matrix)}</div>`;
+    <div class="form-actions"><button class="btn primary" data-act="save-note">${localMode() ? 'Save today (local test)' : ghToken.get() ? 'Save today to GitHub' : 'Save today (connect GitHub first)'}</button>
+      ${days[today]?.saved ? `<span class="small faint">saved ${new Date(days[today].saved).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>` : ''}</div>
+    ${prev ? `<div class="note" style="margin:12px 0 0"><b>${fmtDate(prev)}:</b> ${esc(days[prev].story || '—')}<br><span class="small">Bias check: ${esc(days[prev].biasCheck || '—')}</span></div>` : ''}
+    <details class="small" style="margin-top:12px"><summary class="muted">Links for the checklist (kept in this browser only)</summary>
+      <div class="form-grid" style="margin-top:8px">
+        <label class="wide">Morning debrief link<input id="ln-debrief" value="${esc(links.get().debrief || '')}" placeholder="https://…"></label>
+        <label class="wide">Weekly review link<input id="ln-weekly" value="${esc(links.get().weekly || '')}" placeholder="https://…"></label>
+      </div><div class="form-actions"><button class="btn" data-act="save-links">Save links on this device</button></div></details>`;
+
+  const hot = kills.filter((x) => x.status !== 'armed');
+  const draw = () => {
+    main.innerHTML = head(`Today · ${fmtDate(today)}`, 'My pairs and calls against live prices, the daily read, my three lines. What I am sent stays where I read it.',
+        `<a class="btn" href="scorecard.html?week=${target}">Weekly build →</a>`) +
+      `<div id="hub-msg">${msg ? `<div class="note">${msg}</div>` : ''}</div>` + (canSave() ? '' : connectPanel()) +
+      `<div class="statusbar" id="hub-status">${statusHtml()}</div>
+      <div class="panel-head"><h2>My pairs${wk ? ` · week of ${fmtDate(wk.monday)}` : ''}</h2>${wk && wk.monday !== target ? `<a href="scorecard.html?week=${target}">No build yet for the week of ${fmtDate(target)} →</a>` : ''}</div>
+      <div id="hub-pairs">${pairsHtml()}</div>
+      <div class="grid sc-grid" style="margin-top:14px">
+        ${panel('The daily read', readHtml())}
+        <div>${panel('My calls against price', `<div id="hub-calls">${callsHtml()}</div>`, { href: 'review.html', label: 'Review' })}
+          <div style="height:14px"></div>
+          ${panel('Kill switches fired or near', `<ul class="list">${hot.map((x) => `<li><span class="ccy">${esc(x.currency)}</span><span class="grow">${esc(x.condition)}<div class="small faint">${esc(x.now || '')}</div></span>${trigPill(x.status)}</li>`).join('') || `<div class="empty">None. ${kills.length} armed.</div>`}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}</div>
+      </div>`;
+    main.querySelectorAll('.tv[data-symbol]').forEach((el) => tvMini(el, el.dataset.symbol));
+  };
+  // Live parts only: the forms and the charts are left alone.
+  const paint = () => {
+    $('#hub-status').innerHTML = statusHtml();
+    main.querySelectorAll('.pcard').forEach((el) => { const p = myPairs.find((x) => x.pair === el.dataset.pair); if (p) $('[data-live]', el).innerHTML = pairLive(p); });
+    $('#hub-calls').innerHTML = callsHtml();
+  };
+  const say = (html) => { msg = html; $('#hub-msg').innerHTML = html ? `<div class="note">${html}</div>` : ''; };
+
+  main.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]'); if (!b) return;
+    ev.preventDefault();
+    if (b.dataset.act === 'save-links') {
+      links.set({ ...links.get(), debrief: $('#ln-debrief').value.trim(), weekly: $('#ln-weekly').value.trim() });
+      Object.assign(note, { story: $('#dn-story').value, ifThen: $('#dn-ifthen').value, biasCheck: $('#dn-bias').value, done: [...main.querySelectorAll('[data-q]:checked')].map((x) => Number(x.dataset.q)) });
+      msg = 'Links saved on this device.'; draw();
+    } else if (b.dataset.act === 'save-note') {
+      if (!canSave()) { say('<span class="error">Connect GitHub first, or use local test mode.</span>'); return; }
+      const entry = { story: $('#dn-story').value.trim(), ifThen: $('#dn-ifthen').value.trim(), biasCheck: $('#dn-bias').value.trim(), done: [...main.querySelectorAll('[data-q]:checked')].map((x) => Number(x.dataset.q)), saved: new Date().toISOString() };
+      say('Saving…');
+      try {
+        const res = await ghUpdate('daily-notes', (d) => { const x = d || { days: {} }; x.days = { ...(x.days || {}), [today]: entry }; return x; }, `Daily note ${today} (desk)`);
+        days = res.data.days; Object.assign(note, entry);
+        msg = res.commit === 'local' ? 'Saved in this browser (local test mode). Nothing was committed.' : `Saved to GitHub (commit ${esc(res.commit || '')}).`;
+      } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
+      draw();
+    }
+  });
+  draw();
+  setInterval(async () => { await loadPrices(); paint(); }, 60000);
 };
 
-render.levels = async (main) => {
-  const data = await load('levels');
-  const fams = data.families || {};
-  const typeOf = (k) => data.types[k] || {};
-  const stTone = { defended: 'bull', broken: 'bear', untested: 'flat', reference: 'flat', historical: 'flat' };
-  main.innerHTML = head('Key Levels', 'Where big players act: where they showed their hand, their cost basis, the reference points they hedge against, and macro levels that force a central bank\'s hand. <span class="pill warn">draft layout</span>') +
-    `<div class="note">${esc(data.note)}</div>
-    <div class="filters tabs" id="lv-fams">${[['all', 'All'], ...Object.entries(fams)].map(([k, v]) => `<a class="chip" data-fam="${k}" href="#${k === 'all' ? '' : k}">${esc(v)}</a>`).join('')}</div>
-    <section class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Instrument</th><th>Level</th><th>Price now</th><th>Type</th><th>Who</th><th>Side</th><th>Evidence</th><th>Status</th><th>Last touch</th><th>Source</th></tr></thead>
-      <tbody id="lv-rows"></tbody></table></div></section>
-    <div class="grid hub-grid" style="margin-top:14px">
-      ${Object.entries(fams).map(([f, label]) => panel(label, `<ul class="list">${Object.entries(data.types).filter(([, t]) => t.family === f).map(([k, t]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(t.desc)}</span></li>`).join('')}</ul>`)).join('')}
-      ${data.statuses ? panel('Status', `<ul class="list">${Object.entries(data.statuses).map(([k, v]) => `<li><span class="pill ${stTone[k] || 'flat'}">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`) : ''}
-    </div>`;
-  const draw = () => {
-    const f = location.hash.slice(1);
-    const want = fams[f] ? f : 'all';
-    main.querySelectorAll('[data-fam]').forEach((a) => a.classList.toggle('on', a.dataset.fam === want));
-    const rows = data.levels.filter((l) => want === 'all' || typeOf(l.type).family === want);
-    $('#lv-rows').innerHTML = rows.map((l) => `<tr>
-        <td><span class="ccy">${esc(l.instrument)}</span></td>
-        <td class="num">${esc(l.level)}</td><td class="num muted">${esc(l.price)}</td>
-        <td><span class="pill flat" title="${esc(typeOf(l.type).desc || '')}">${esc(l.type)}</span></td>
-        <td class="small">${esc(l.who)}</td><td class="small">${esc(l.side)}</td>
-        <td class="small muted">${esc(l.evidence)}</td>
-        <td><span class="pill ${stTone[l.status] || 'flat'}">${esc(l.status)}</span></td>
-        <td class="small nowrap">${l.lastTouch === '—' ? '—' : fmtDate(l.lastTouch)}</td>
-        <td class="small">${l.source ? `<a href="${esc(l.source.url)}" target="_blank" rel="noopener">${esc(l.source.name)} ↗</a>` : '<span class="faint">—</span>'}</td>
-      </tr>`).join('') || '<tr><td colspan="10" class="empty">No levels of this kind yet.</td></tr>';
+// ---------- scorecard (weekly build) ----------
+// One card per trading week, named by its Monday. Nathan types every field; nothing here is pulled.
+// Files: data/scorecard-<monday>.json (the card) and data/scorecard-index.json (weeks, newest first).
+const SC_LEVELS = ['low', 'normal', 'high'], SC_DIRS = ['rising', 'steady', 'falling'], SC_LEANS = ['hawkish', 'neutral', 'dovish'];
+const SC_CALLS = { tooLittle: 'too little priced', aboutRight: 'about right', tooMuch: 'too much priced' };
+const scBlankRow = () => ({ growth: { level: '', dir: '' }, inflation: { level: '', dir: '' }, labour: { level: '', dir: '' }, sentence: '', lean: '', priced12m: null, weekChange: null, call: '', strong: false, crowded: false, rank1m: null });
+const scBlankCard = (monday) => ({ monday, updated: null, active: ['USD', 'EUR', 'JPY', 'GBP'], currencies: Object.fromEntries(CCYS.map((c) => [c, scBlankRow()])), pairs: [], events: [] });
+// Score: the call gives the sign (+ = the market prices too little tightening, so the currency is underpriced);
+// "strong" doubles it; crowded positioning pulls it one notch towards zero. No call = no score.
+function scScore(row) {
+  const base = { tooLittle: 1, aboutRight: 0, tooMuch: -1 }[row.call];
+  if (base == null) return null;
+  const mag = Math.max(0, Math.abs(base) * (row.strong ? 2 : 1) - (row.crowded ? 1 : 0));
+  return mag === 0 ? 0 : Math.sign(base) * mag;
+}
+// Monday (YYYY-MM-DD, local time) of the trading week a build belongs to: on Saturday and Sunday, the coming Monday.
+function scMonday(d = new Date()) {
+  const day = d.getDay();
+  const shift = day === 0 ? 1 : day === 6 ? 2 : 1 - day;
+  const m = new Date(d.getFullYear(), d.getMonth(), d.getDate() + shift);
+  return `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}-${String(m.getDate()).padStart(2, '0')}`;
+}
+// Every pair of scored, active currencies whose scores differ, widest gap first. `top` marks highest-vs-lowest.
+function scPairs(card) {
+  const scored = card.active.map((code) => ({ code, score: scScore(card.currencies[code]) })).filter((c) => c.score != null);
+  if (scored.length < 2) return [];
+  const max = Math.max(...scored.map((c) => c.score)), min = Math.min(...scored.map((c) => c.score));
+  const out = [];
+  for (let i = 0; i < PAIR_ORDER.length; i++) for (let j = i + 1; j < PAIR_ORDER.length; j++) {
+    const b = scored.find((c) => c.code === PAIR_ORDER[i]), q = scored.find((c) => c.code === PAIR_ORDER[j]);
+    if (!b || !q || b.score === q.score) continue;
+    const diff = b.score - q.score;
+    out.push({ pair: b.code + q.code, dir: diff > 0 ? 'LONG' : 'SHORT', diff: Math.abs(diff), top: Math.max(b.score, q.score) === max && Math.min(b.score, q.score) === min });
+  }
+  return out.sort((x, y) => y.diff - x.diff || (y.top - x.top));
+}
+
+render.scorecard = async (main) => {
+  const asked = new URLSearchParams(location.search).get('week') || '';
+  const monday = /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : scMonday();
+  let index = (await loadLive('scorecard-index', true)) || { weeks: [] };
+  await loadPrices();
+  // Only weeks listed in the index have a file; a new week starts blank without asking for one.
+  const card = (index.weeks.some((w) => w.monday === monday) && (await loadLive(`scorecard-${monday}`, true))) || scBlankCard(monday);
+  card.currencies = card.currencies || {};
+  for (const c of CCYS) card.currencies[c] = { ...scBlankRow(), ...(card.currencies[c] || {}) };
+  card.active = CCYS.filter((c) => (card.active || ['USD', 'EUR', 'JPY', 'GBP']).includes(c));
+  card.pairs = card.pairs || [];
+  card.events = card.events || [];
+  let dirty = false, msg = '';
+
+  const opts = (list, sel) => '<option value="">—</option>' + list.map(([v, l]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  const same = (list) => list.map((v) => [v, v]);
+  const pick = (label, f, list, cur, cls = '') => `<label class="${cls}">${label}<select data-f="${f}">${opts(list, cur)}</select></label>`;
+  const num = (label, f, cur, attrs = 'step="any"') => `<label>${label}<input type="number" ${attrs} data-f="${f}" value="${cur == null ? '' : esc(cur)}"></label>`;
+  const scoreHtml = (code) => { const s = scScore(card.currencies[code]); return s == null ? '<span class="pill flat">no call</span>' : scoreChip(s); };
+
+  // Confirmed pairs follow the scores: a pair whose two sides no longer differ drops out.
+  const prune = () => {
+    const live = new Map(scPairs(card).map((p) => [p.pair, p]));
+    card.pairs = card.pairs.filter((p) => live.has(p.pair)).map((p) => { const l = live.get(p.pair); return { pair: l.pair, dir: l.dir, diff: l.diff }; });
   };
-  window.addEventListener('hashchange', draw);
+
+  const rowPanel = (code) => {
+    const r = card.currencies[code];
+    return `<section class="panel sc-row" data-ccy="${code}">
+      <div class="panel-head"><h2><span class="ccy">${code}</span></h2><span data-score>${scoreHtml(code)}</span></div>
+      <div class="form-grid">
+        ${pick('Growth level', 'growth.level', same(SC_LEVELS), r.growth.level)}${pick('Growth direction', 'growth.dir', same(SC_DIRS), r.growth.dir)}
+        ${pick('Inflation level', 'inflation.level', same(SC_LEVELS), r.inflation.level)}${pick('Inflation direction', 'inflation.dir', same(SC_DIRS), r.inflation.dir)}
+        ${pick('Labour level', 'labour.level', same(SC_LEVELS), r.labour.level)}${pick('Labour direction', 'labour.dir', same(SC_DIRS), r.labour.dir)}
+        ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num('1M rank (1-8)', 'rank1m', r.rank1m, `min="1" max="8" step="1" placeholder="${prices ? `live: ${prices.currencies[code].rankM1}` : ''}"`)}
+        <label class="full">My sentence<textarea rows="2" data-f="sentence" placeholder="Growth is __, inflation is __, labour is __, so the bank leans __.">${esc(r.sentence)}</textarea></label>
+        ${num('Priced 12m (bp)', 'priced12m', r.priced12m)}${num("Week's change (bp)", 'weekChange', r.weekChange)}
+        ${pick('My call', 'call', Object.entries(SC_CALLS), r.call, 'wide')}
+        <label class="check"><input type="checkbox" data-f="strong" ${r.strong ? 'checked' : ''}> Strong</label>
+        <label class="check"><input type="checkbox" data-f="crowded" ${r.crowded ? 'checked' : ''}> COT crowded my way</label>
+      </div></section>`;
+  };
+
+  const rankBody = () => {
+    const scored = card.active.map((code) => ({ code, net: scScore(card.currencies[code]) })).filter((c) => c.net != null);
+    const pairs = scPairs(card), chosen = new Set(card.pairs.map((p) => p.pair));
+    return `<div class="grid sc-grid">
+      <div>${scored.length >= 2 ? strengthBars(scored) : '<div class="empty">Make a call on at least two currencies.</div>'}</div>
+      <div>${pairs.length ? `<ul class="list">${pairs.map((p) => `<li><label class="check"><input type="checkbox" data-act="pair" data-pair="${p.pair}" ${chosen.has(p.pair) ? 'checked' : ''}></label>
+          <span class="grow"><b>${p.pair}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${p.dir}</span> <span class="small muted">gap ${p.diff}</span></span>
+          ${p.top ? '<span class="pill warn">top vs bottom</span>' : ''}</li>`).join('')}</ul>` : '<div class="empty">No pairs yet: two currencies need different scores.</div>'}
+        ${card.pairs.length > 3 ? '<div class="note" style="margin:10px 0 0">More than three pairs. The routine says two or three.</div>' : ''}</div>
+    </div>`;
+  };
+
+  const eventsPanel = () => `<section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Week ahead: events and if / then</h2></div>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Ccy</th><th>Event</th><th>If / then</th><th></th></tr></thead>
+    <tbody>${[...card.events].sort((a, b) => (a.date < b.date ? -1 : 1)).map((e) => `<tr>
+      <td class="small nowrap">${fmtDate(e.date)}</td><td><span class="ccy">${esc(e.currency)}</span></td><td>${esc(e.event)}</td><td class="small">${esc(e.ifThen)}</td>
+      <td><button class="link-btn" data-act="del-event" data-id="${esc(e.id)}">Delete</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">No events yet.</td></tr>'}</tbody></table></div>
+    <div class="form-grid" style="margin-top:12px">
+      <label>Date<input type="date" id="ev-date"></label>
+      <label>Currency<select id="ev-ccy">${card.active.map((c) => `<option>${c}</option>`).join('')}</select></label>
+      <label class="wide">Event<input id="ev-event" placeholder="e.g. US CPI"></label>
+      <label class="wide">If / then<textarea id="ev-ifthen" rows="2" placeholder="If the print is above __, pricing moves __, the pair should __"></textarea></label>
+    </div>
+    <div class="form-actions"><button class="btn" data-act="add-event">+ Add event</button></div></section>`;
+
+  const saveBar = () => `<div class="form-actions" style="margin-top:14px">
+    <button class="btn primary" data-act="save">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+    ${dirty ? '<span class="pill warn">unsaved changes</span>' : ''}${card.updated ? `<span class="small faint">last saved ${fmtDate(card.updated)}</span>` : ''}</div>`;
+  const say = (html) => { msg = html; $('#sc-msg').innerHTML = html ? `<div class="note">${html}</div>` : ''; };
+
+  const draw = () => {
+    prune();
+    const weeks = [...new Set([monday, ...index.weeks.map((w) => w.monday)])].sort().reverse();
+    const saved = new Set(index.weeks.map((w) => w.monday));
+    const picker = `<select id="sc-week">${weeks.map((m) => `<option value="${m}" ${m === monday ? 'selected' : ''}>Week of ${fmtDate(m)}${saved.has(m) ? '' : ' (new)'}</option>`).join('')}</select>`;
+    main.innerHTML = head(`Scorecard · week of ${fmtDate(monday)}`, 'Weekly build. First my own read of each economy, then what is priced, then rank and pair. Only the gap pays.', picker) +
+      `<div id="sc-msg">${msg ? `<div class="note">${msg}</div>` : ''}</div>` +
+      (canSave() ? '' : connectPanel()) +
+      `<div class="filters"><span class="small muted">Currencies in this build</span>${CCYS.map((c) => `<button class="chip ${card.active.includes(c) ? 'on' : ''}" data-act="toggle" data-ccy="${c}">${c}</button>`).join('')}</div>
+      <div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
+      <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Rank and pairs</h2></div><div id="sc-rank">${rankBody()}</div></section>` +
+      eventsPanel() + `<div id="sc-save">${saveBar()}</div>`;
+  };
+  // After a field changes: scores, ranking and the save bar update in place, so typing focus is never lost.
+  const refresh = () => {
+    prune();
+    main.querySelectorAll('.sc-row').forEach((el) => { $('[data-score]', el).innerHTML = scoreHtml(el.dataset.ccy); });
+    $('#sc-rank').innerHTML = rankBody();
+    $('#sc-save').innerHTML = saveBar();
+  };
+
+  main.addEventListener('input', (ev) => {
+    const el = ev.target.closest('.sc-row [data-f]'); if (!el) return;
+    const row = card.currencies[el.closest('.sc-row').dataset.ccy], path = el.dataset.f.split('.');
+    const v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
+    if (path.length === 2) row[path[0]][path[1]] = v; else row[path[0]] = v;
+    dirty = true; refresh();
+  });
+  main.addEventListener('change', (ev) => {
+    const t = ev.target;
+    if (t.id === 'sc-week') {
+      if (dirty && !confirm('Leave this week without saving?')) { t.value = monday; return; }
+      dirty = false; location.search = `?week=${t.value}`;
+    } else if (t.dataset.act === 'pair') {
+      const p = scPairs(card).find((x) => x.pair === t.dataset.pair);
+      card.pairs = card.pairs.filter((x) => x.pair !== t.dataset.pair);
+      if (t.checked && p) card.pairs.push({ pair: p.pair, dir: p.dir, diff: p.diff });
+      dirty = true; refresh();
+    }
+  });
+  main.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]'); if (!b) return;
+    ev.preventDefault();
+    const act = b.dataset.act;
+    if (act === 'toggle') {
+      const c = b.dataset.ccy, on = card.active.includes(c);
+      card.active = CCYS.filter((x) => (x === c ? !on : card.active.includes(x)));
+      dirty = true; draw();
+    } else if (act === 'add-event') {
+      const date = $('#ev-date').value, event = $('#ev-event').value.trim();
+      if (!date || !event) { say('<span class="error">An event needs a date and a name.</span>'); return; }
+      card.events.push({ id: `e-${Date.now().toString(36)}`, date, currency: $('#ev-ccy').value, event, ifThen: $('#ev-ifthen').value.trim() });
+      dirty = true; msg = ''; draw();
+    } else if (act === 'del-event') {
+      card.events = card.events.filter((e) => e.id !== b.dataset.id);
+      dirty = true; draw();
+    } else if (act === 'save') {
+      if (!canSave()) { say('<span class="error">Connect GitHub first (Kill Switches page), or use local test mode.</span>'); return; }
+      say('Saving…');
+      try {
+        prune();
+        card.updated = new Date().toISOString().slice(0, 10);
+        const res = await ghUpdate(`scorecard-${monday}`, () => card, `Scorecard: week of ${monday} (desk)`);
+        const entry = { monday, pairs: card.pairs.map(({ pair, dir }) => ({ pair, dir })), scores: Object.fromEntries(card.active.map((c) => [c, scScore(card.currencies[c])]).filter(([, s]) => s != null)) };
+        const idx = await ghUpdate('scorecard-index', (d) => { const i = d || { weeks: [] }; i.weeks = [entry, ...i.weeks.filter((w) => w.monday !== monday)].sort((a, b) => (a.monday < b.monday ? 1 : -1)); return i; }, `Scorecard index: week of ${monday} (desk)`);
+        index = idx.data; dirty = false;
+        msg = res.commit === 'local' ? 'Saved in this browser (local test mode). Nothing was committed.' : `Saved to GitHub (commit ${esc(res.commit || '')}).`;
+      } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
+      draw();
+    }
+  });
+  window.addEventListener('beforeunload', (ev) => { if (dirty) { ev.preventDefault(); ev.returnValue = ''; } });
   draw();
 };
 
+// ---------- key levels (Nathan's own list, held against live price) ----------
+render.levels = async (main) => {
+  let data = (await loadLive('levels', true)) || { note: '', families: {}, types: {}, statuses: {}, levels: [] };
+  await loadPrices();
+  const fams = data.families || {}, typeOf = (k) => data.types[k] || {};
+  const stTone = { defended: 'bull', broken: 'bear', untested: 'flat', reference: 'flat', historical: 'flat' };
+  const today = () => new Date().toISOString().slice(0, 10);
+  let editing = null, msg = '';
+
+  const dist = (l) => {
+    const s = prices?.pairs?.[l.instrument], lv = Number(l.level);
+    if (!s || !Number.isFinite(lv)) return null;
+    const pct = (lv / s.last - 1) * 100;
+    return { last: s.last, pct, days: s.typicalPct ? Math.abs(pct) / s.typicalPct : null };
+  };
+  const opts = (list, sel) => list.map(([v, l]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  const form = (k) => `<section class="panel ks-form" id="lv-form"><div class="panel-head"><h2>${k.id ? 'Edit level' : 'New level'}</h2></div>
+    <div class="form-grid">
+      <label>Pair<select name="instrument">${opts(ALL_PAIRS.map((p) => [p, p]), k.instrument || 'USDJPY')}</select></label>
+      <label>Level<input type="number" step="any" name="level" value="${esc(k.level ?? '')}"></label>
+      <label>Type<select name="type">${opts(Object.entries(data.types).map(([v, t]) => [v, `${v} · ${fams[t.family] || t.family}`]), k.type || Object.keys(data.types)[0])}</select></label>
+      <label>Side<select name="side">${opts([['cap', 'cap (above price)'], ['floor', 'floor (below price)'], ['pivot', 'pivot']], k.side || 'cap')}</select></label>
+      <label class="wide">Who acts here<input name="who" value="${esc(k.who || '')}" placeholder="e.g. Japan MoF / BoJ"></label>
+      <label>Status<select name="status">${opts(Object.entries(data.statuses || {}).map(([v]) => [v, v]), k.status || 'untested')}</select></label>
+      <label>Last touch<input type="date" name="lastTouch" value="${esc(/^\d{4}-/.test(k.lastTouch || '') ? k.lastTouch : '')}"></label>
+      <label class="full">Evidence (why this level matters)<textarea name="evidence" rows="2" placeholder="What happened here, and what I read into it">${esc(k.evidence || '')}</textarea></label>
+    </div>
+    <div class="form-actions">
+      <button class="btn primary" data-act="save">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+      <button class="btn" data-act="cancel">Cancel</button>${k.id ? '<button class="btn danger" data-act="delete">Delete</button>' : ''}
+    </div></section>`;
+
+  const rows = () => {
+    const f = location.hash.slice(1), want = fams[f] ? f : 'all';
+    main.querySelectorAll('[data-fam]').forEach((a) => a.classList.toggle('on', a.dataset.fam === want));
+    const list = data.levels.filter((l) => want === 'all' || typeOf(l.type).family === want).map((l) => ({ l, d: dist(l) }))
+      .sort((a, b) => (a.d ? Math.abs(a.d.pct) : 1e9) - (b.d ? Math.abs(b.d.pct) : 1e9));
+    $('#lv-rows').innerHTML = list.map(({ l, d }) => `<tr>
+        <td><span class="ccy">${esc(l.instrument)}</span></td><td class="num">${esc(l.level)}</td>
+        <td class="num muted">${d ? pxFmt(l.instrument, d.last) : '—'}</td>
+        <td class="nowrap">${d ? `${pctHtml(d.pct)} <span class="small ${d.days != null && d.days < 1 ? 'warn-t' : 'faint'}">${d.days == null ? '' : `${d.days.toFixed(1)} typical days`}</span>` : '<span class="faint">—</span>'}</td>
+        <td><span class="pill flat" title="${esc(typeOf(l.type).desc || '')}">${esc(l.type)}</span></td>
+        <td class="small">${esc(l.side || '')}</td>
+        <td class="small">${esc(l.who || '')}<div class="muted">${esc(l.evidence || '')}</div></td>
+        <td><span class="pill ${stTone[l.status] || 'flat'}">${esc(l.status)}</span></td>
+        <td class="small nowrap">${/^\d{4}-/.test(l.lastTouch || '') ? fmtDate(l.lastTouch) : '—'}</td>
+        <td><button class="link-btn" data-act="edit" data-id="${esc(l.id)}">Edit</button></td>
+      </tr>`).join('') || `<tr><td colspan="10" class="empty">No levels yet. Add the ones you watch: intervention zones, forced-hand levels, cost-basis levels.</td></tr>`;
+    $('#lv-age').innerHTML = priceAge();
+  };
+
+  const draw = () => {
+    const cur = editing === 'new' ? {} : data.levels.find((l) => l.id === editing);
+    main.innerHTML = head('Key Levels', 'My own levels: where big players showed their hand, their cost basis, their reference points, and levels that force a central bank\'s hand. Nearest to price first.',
+        '<button class="btn primary" data-act="new">+ New level</button>') +
+      (msg ? `<div class="note">${msg}</div>` : '') + (canSave() ? '' : connectPanel()) + (cur ? form(cur) : '') +
+      `<div class="filters tabs" id="lv-fams">${[['all', 'All'], ...Object.entries(fams)].map(([k, v]) => `<a class="chip" data-fam="${k}" href="#${k === 'all' ? '' : k}">${esc(v)}</a>`).join('')}<span class="grow"></span><span id="lv-age"></span></div>
+      <section class="panel"><div class="table-wrap"><table>
+        <thead><tr><th>Pair</th><th>Level</th><th>Price now</th><th>Distance</th><th>Type</th><th>Side</th><th>Who / evidence</th><th>Status</th><th>Last touch</th><th></th></tr></thead>
+        <tbody id="lv-rows"></tbody></table></div></section>
+      <div class="grid hub-grid" style="margin-top:14px">
+        ${Object.entries(fams).map(([f, label]) => panel(label, `<ul class="list">${Object.entries(data.types).filter(([, t]) => t.family === f).map(([k, t]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(t.desc)}</span></li>`).join('')}</ul>`)).join('')}
+        ${data.statuses ? panel('Status', `<ul class="list">${Object.entries(data.statuses).map(([k, v]) => `<li><span class="pill ${stTone[k] || 'flat'}">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`) : ''}
+      </div>`;
+    rows();
+    if (cur) $('#lv-form').scrollIntoView({ block: 'nearest' });
+  };
+
+  const save = async (change, label) => {
+    if (!canSave()) { msg = '<span class="error">Connect GitHub first, or use local test mode.</span>'; draw(); return; }
+    msg = 'Saving…'; draw();
+    try {
+      const res = await ghUpdate('levels', change, `Key level: ${label} (desk)`);
+      data = res.data; editing = null;
+      msg = res.commit === 'local' ? 'Saved in this browser (local test mode). Nothing was committed.' : `Saved to GitHub (commit ${esc(res.commit || '')}).`;
+    } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
+    draw();
+  };
+
+  main.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]'); if (!b) return;
+    ev.preventDefault();
+    const act = b.dataset.act;
+    if (act === 'new') { editing = 'new'; msg = ''; draw(); }
+    else if (act === 'edit') { editing = b.dataset.id; msg = ''; draw(); }
+    else if (act === 'cancel') { editing = null; draw(); }
+    else if (act === 'delete') {
+      const id = editing;
+      if (!confirm('Delete this level?')) return;
+      await save((d) => ({ ...d, levels: d.levels.filter((l) => l.id !== id) }), `delete ${id}`);
+    } else if (act === 'save') {
+      const f = $('#lv-form'), val = (n) => f.querySelector(`[name="${n}"]`).value.trim();
+      if (val('level') === '' || !Number.isFinite(Number(val('level')))) { msg = '<span class="error">Give the level as a number.</span>'; draw(); return; }
+      const fields = { instrument: val('instrument'), level: Number(val('level')), type: val('type'), side: val('side'), who: val('who'), status: val('status'), lastTouch: val('lastTouch') || null, evidence: val('evidence') };
+      if (editing === 'new') {
+        const id = `l-${fields.instrument.toLowerCase()}-${Date.now().toString(36)}`;
+        await save((d) => ({ ...d, levels: [...(d.levels || []), { id, ...fields, created: today() }] }), `add ${fields.instrument} ${fields.level}`);
+      } else {
+        const id = editing;
+        await save((d) => ({ ...d, levels: d.levels.map((l) => (l.id === id ? { ...l, ...fields, edited: today() } : l)) }), `edit ${id}`);
+      }
+    }
+  });
+  window.addEventListener('hashchange', rows);
+  draw();
+  setInterval(async () => { await loadPrices(); if ($('#lv-rows')) rows(); }, 60000);
+};
+
 render.killswitches = async (main) => {
-  let data = await loadLive('killswitches');
+  let data = (await loadLive('killswitches', true)) || { kinds: {}, effects: {}, killSwitches: [] };
   const want = new URLSearchParams(location.search).get('ccy');
   const order = { fired: 0, near: 1, armed: 2 };
   const today = () => new Date().toISOString().slice(0, 10);
@@ -302,16 +682,19 @@ render.killswitches = async (main) => {
       <label>Fired on<input type="date" name="firedOn" value="${esc(k.firedOn || '')}"></label>
     </div>
     <div class="form-actions">
-      <button class="btn primary" data-act="save">${ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+      <button class="btn primary" data-act="save">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
       <button class="btn" data-act="cancel">Cancel</button>
       ${k.id ? '<button class="btn danger" data-act="delete">Delete</button>' : ''}
     </div></section>`;
 
-  const connect = () => (ghToken.get()
-    ? `<div class="note">Connected to GitHub: changes are committed to <code>${GH.dir}/killswitches.json</code> in ${esc(GH.repo)}. <button class="link-btn" data-act="forget">Forget token on this device</button></div>`
-    : `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Connect GitHub to edit</h2></div>
+  const connect = () => {
+    if (localMode()) return '<div class="note">Local test mode: saves stay in this browser.</div>';
+    return ghToken.get()
+      ? `<div class="note">Connected to GitHub: changes are committed to <code>${GH.dir}/killswitches.json</code> in ${esc(GH.repo)}. <button class="link-btn" data-act="forget">Forget token on this device</button></div>`
+      : `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Connect GitHub to edit</h2></div>
         <p class="small muted" style="margin:0 0 8px">Read-only until connected. Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">fine-grained token ↗</a>: repository access <b>only ${esc(GH.repo)}</b>, permission <b>Contents: Read and write</b>, short expiry. Paste it here once per device; it stays in this browser and is only sent to api.github.com.</p>
-        <div class="form-actions"><input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off" style="flex:1;min-width:200px"><button class="btn primary" data-act="token">Connect</button></div></section>`);
+        <div class="form-actions"><input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off" style="flex:1;min-width:200px"><button class="btn primary" data-act="token">Connect</button></div></section>`;
+  };
 
   const draw = () => {
     const list = data.killSwitches.filter((t) => !want || t.currency === want).sort((a, b) => order[a.status] - order[b.status]);
@@ -338,12 +721,16 @@ render.killswitches = async (main) => {
   };
 
   const save = async (change, label) => {
-    if (!ghToken.get()) { msg = '<span class="error">Connect GitHub first.</span>'; draw(); return; }
+    if (!canSave()) { msg = '<span class="error">Connect GitHub first.</span>'; draw(); return; }
     msg = 'Saving…'; draw();
     try {
       const res = await ghUpdate('killswitches', change, `Kill switch: ${label} (desk)`);
       data = res.data; editing = null;
-      msg = `Saved to GitHub (commit ${esc(res.commit || '')}). Shows here right away; the Pages copy catches up on the next deploy.`;
+      if (res.commit === 'local') {
+        msg = 'Saved in this browser (local test mode). Nothing was committed.';
+      } else {
+        msg = `Saved to GitHub (commit ${esc(res.commit || '')}). Shows here right away; the Pages copy catches up on the next deploy.`;
+      }
     } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
     draw();
   };
@@ -386,277 +773,119 @@ render.killswitches = async (main) => {
   draw();
 };
 
-// Correlation (-1..1) as a small chart: zero line, ±0.5 guides, 60d line (accent) + 20d (faint).
-function corrSpark(history, w = 140, h = 34) {
-  const y = (v) => h / 2 - v * (h / 2 - 3);
-  const pts = (key) => { const arr = history.filter((p) => p[key] != null); return arr.map((p, i) => [(i / Math.max(arr.length - 1, 1)) * (w - 4) + 2, y(p[key])]); };
-  const line = (p) => p.map((q) => q.map((n) => n.toFixed(1)).join(',')).join(' ');
-  const p60 = pts('r60'), p20 = pts('r20');
-  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
-    <line x1="0" x2="${w}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}" stroke="var(--line)"/>
-    <line x1="0" x2="${w}" y1="${y(0.5).toFixed(1)}" y2="${y(0.5).toFixed(1)}" stroke="var(--line)" stroke-dasharray="2 3"/>
-    <line x1="0" x2="${w}" y1="${y(-0.5).toFixed(1)}" y2="${y(-0.5).toFixed(1)}" stroke="var(--line)" stroke-dasharray="2 3"/>
-    ${p20.length > 1 ? `<polyline points="${line(p20)}" fill="none" stroke="var(--faint)" stroke-width="1"/>` : ''}
-    ${p60.length > 1 ? `<polyline points="${line(p60)}" fill="none" stroke="var(--accent)" stroke-width="1.6"/><circle cx="${p60.at(-1)[0].toFixed(1)}" cy="${p60.at(-1)[1].toFixed(1)}" r="2.5" fill="var(--accent)"/>` : ''}
-  </svg>`;
-}
-const CORR_TONE = { strong: 'bull', moderate: 'flat', weak: 'warn', flipped: 'bear', 'no data': 'flat' };
-const rNum = (r) => (r == null ? '<span class="faint">—</span>' : `<span class="num ${Math.abs(r) >= 0.5 ? '' : 'muted'}">${r > 0 ? '+' : ''}${r.toFixed(2)}</span>`);
+// ---------- ideas (inbox for what Nathan picks up from podcasts, videos, calls) ----------
+render.ideas = async (main) => {
+  let data = (await loadLive('ideas', true)) || { ideas: [] };
+  const TONE = { open: 'warn', kept: 'bull', dropped: 'flat' };
+  const today = () => new Date().toISOString().slice(0, 10);
+  let editing = null, msg = '', filter = 'all';
 
-render.drivers = async (main) => {
-  const [data, cor] = await Promise.all([load('drivers'), load('correlations').catch(() => null)]);
-  const pairs = cor?.pairs || [];
-  const byId = Object.fromEntries(pairs.map((p) => [p.id, p]));
-  const pairName = (p) => `${p.labelA} / ${p.labelB}`;
-  const related = (ccy) => pairs.filter((p) => p.drivers.includes(ccy));
-  const driverRows = data.drivers.map((d) => {
-    const live = d.corrId && byId[d.corrId]?.r60 != null ? byId[d.corrId] : null;
-    return `<tr id="drv-${d.currency}">
-      <td><span class="ccy">${d.currency}</span></td><td>${esc(d.driver)}<div class="small faint">${esc(d.symbol)}</div></td>
-      <td class="small muted">${esc(live ? pairName(live) : d.measure)}</td><td class="num">${esc(d.move1m)}</td>
-      <td>${live ? rNum(live.r20) : rNum(d.corr20)}</td><td>${live ? rNum(live.r60) : rNum(d.corr60)}</td>
-      <td class="small nowrap">${live ? `<span class="pill bull">live</span> <span class="faint">${live.change1m == null ? '' : `1m ${live.change1m > 0 ? '+' : ''}${live.change1m.toFixed(2)}`}</span>` : '<span class="pill flat">manual</span>'}</td>
-      <td>${effectPill(d.effect)}</td>
-      <td class="small">${related(d.currency).map((p) => `<a class="chip-link" href="#corr-${p.id}" title="${esc(pairName(p))}">${esc(p.a)}·${esc(p.b)}</a>`).join(' ') || '<span class="faint">—</span>'}</td>
-      <td class="small muted">${esc(d.secondOrder)}</td></tr>`;
-  }).join('');
-
-  const corrSection = () => {
-    if (!cor) return '<section class="panel"><div class="empty">Correlation data not built yet (npm run correlations).</div></section>';
-    const filters = ['All', ...CCYS, 'XAU'].filter((c) => c === 'All' || related(c).length);
-    return `<div class="page-head" style="margin-top:22px"><div><h1 style="font-size:20px">Correlation pairs</h1><p>Pairs that normally move together or against each other, how strongly right now, and how that changed over 6 months. Watch for weakening or flipped links before trusting a driver.</p></div>
-        <span class="small faint">as of ${fmtDate(cor.asOf)}</span></div>
-      <div class="note">${esc(cor.method)}${cor.missing?.length ? ` No free daily feed yet: ${esc(cor.missing.join(', '))}.` : ''}</div>
-      <div class="filters" id="corr-filter">${filters.map((c) => `<button class="chip" data-ccy="${c}">${c}</button>`).join('')}</div>
-      <section class="panel"><div class="table-wrap"><table>
-        <thead><tr><th>Pair</th><th>Usually</th><th>r 20d</th><th>r 60d</th><th>60d a month ago</th><th>6-month history</th><th>Strength</th><th>Shift</th><th>Drivers</th></tr></thead>
-        <tbody id="corr-rows"></tbody></table></div>
-        <p class="small faint" style="margin:8px 0 0">Chart: blue = 60-day, grey = 20-day; middle line = 0, dashed = ±0.5.</p></section>`;
-  };
-  const drawCorr = (ccy) => {
-    const rows = pairs.filter((p) => ccy === 'All' || p.drivers.includes(ccy));
-    $('#corr-rows').innerHTML = rows.map((p) => `<tr id="corr-${p.id}">
-      <td><b>${esc(pairName(p))}</b><div class="small faint">${esc(p.why)}</div></td>
-      <td class="small nowrap">${p.typical === 'inverse' ? '↕ opposite' : '⇈ together'}</td>
-      <td>${rNum(p.r20)}</td><td>${rNum(p.r60)}</td>
-      <td class="nowrap">${rNum(p.r60MonthAgo)} ${p.change1m == null ? '' : `<span class="small ${Math.abs(p.change1m) >= 0.2 ? '' : 'faint'}">(${p.change1m > 0 ? '+' : ''}${p.change1m.toFixed(2)})</span>`}</td>
-      <td>${p.history?.length ? corrSpark(p.history) : '—'}</td>
-      <td><span class="pill ${CORR_TONE[p.status] || 'flat'}">${esc(p.status)}</span></td>
-      <td class="small">${esc(p.shift || '—')}</td>
-      <td class="small">${p.drivers.map((c) => (data.drivers.some((d) => d.currency === c) ? `<a class="chip-link" href="#drv-${c}">${c}</a>` : `<span class="ccy">${c}</span>`)).join(' ')}${p.driverOf ? ' <span class="faint">(driver)</span>' : ''}</td>
-    </tr>`).join('');
-    main.querySelectorAll('#corr-filter .chip').forEach((b) => b.classList.toggle('on', b.dataset.ccy === ccy));
-  };
-
-  main.innerHTML = head('Drivers', 'Each currency\'s main outside driver, how tightly price follows it right now, and whether it backs or fights my bias.') +
-    `<div class="note">${esc(data.rule)} Rows marked <b>live</b> use the daily correlation feed; <b>manual</b> rows have no free daily data yet.</div>
-    <section class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Ccy</th><th>Driver</th><th>Measured as</th><th>1m move</th><th>Corr 20d</th><th>Corr 60d</th><th>Feed</th><th>vs my bias</th><th>Related pairs</th><th>Second-order effect</th></tr></thead>
-      <tbody>${driverRows}</tbody></table></div></section>
-    <p class="small faint">Commodities: ${esc(data.commodities.note)}</p>` + corrSection();
-  if (cor) {
-    drawCorr('All');
-    $('#corr-filter').addEventListener('click', (ev) => { const b = ev.target.closest('[data-ccy]'); if (b) drawCorr(b.dataset.ccy); });
-    main.addEventListener('click', (ev) => { // a related-pair link whose row is filtered out: show all first
-      const a = ev.target.closest('a[href^="#corr-"]'); if (a && !document.getElementById(a.getAttribute('href').slice(1))) drawCorr('All');
-    });
-  }
-};
-
-render.review = async (main) => {
-  const data = await load('history');
-  const stats = {};
-  for (const h of data.changes) {
-    const s = (stats[h.currency] ||= { n: 0, hit1: 0, g1: 0, hit4: 0, g4: 0 });
-    s.n++;
-    if (h.grade1w) { s.g1++; if (h.grade1w === 'hit') s.hit1++; }
-    if (h.grade4w) { s.g4++; if (h.grade4w === 'hit') s.hit4++; }
-  }
-  const rate = (hit, n) => (n ? `${Math.round((hit / n) * 100)}% <span class="faint">(${n})</span>` : '<span class="faint">—</span>');
-  const grade = (g) => (g ? `<span class="pill ${g === 'hit' ? 'bull' : 'bear'}">${g}</span>` : '<span class="faint">pending</span>');
-  main.innerHTML = head('Review', 'Every bias change, why it changed, and whether it was right afterwards.') +
-    `<div class="note">${esc(data.method)}</div>
-    <div class="grid hub-grid">
-      <section class="panel span-2"><div class="panel-head"><h2>Bias change log</h2></div><div class="table-wrap"><table>
-        <thead><tr><th>Date</th><th>Ccy</th><th>Layer</th><th>Change</th><th>Kind</th><th>Reason</th><th>1w</th><th>4w</th></tr></thead>
-        <tbody>${data.changes.map((h) => `<tr>
-          <td class="nowrap small">${fmtDate(h.date)}</td><td><span class="ccy">${h.currency}</span></td>
-          <td class="small">${esc(h.layer)}</td><td class="num nowrap">${esc(String(h.from))} → ${esc(String(h.to))}</td>
-          <td class="small">${esc(h.kind)}</td><td class="small">${esc(h.reason)}</td>
-          <td>${grade(h.grade1w)}</td><td>${grade(h.grade4w)}</td></tr>`).join('')}</tbody></table></div></section>
-      <section class="panel"><div class="panel-head"><h2>Hit rate by currency</h2></div><table>
-        <thead><tr><th>Ccy</th><th>Changes</th><th>1w</th><th>4w</th></tr></thead>
-        <tbody>${CCYS.filter((c) => stats[c]).map((c) => `<tr><td><span class="ccy">${c}</span></td><td class="num">${stats[c].n}</td><td class="num">${rate(stats[c].hit1, stats[c].g1)}</td><td class="num">${rate(stats[c].hit4, stats[c].g4)}</td></tr>`).join('')}</tbody></table></section>
-    </div>`;
-};
-
-// ---------- weekly recap ----------
-const SCARE_TONE = { inflation: 'bear', growth: 'warn', both: 'bear', neither: 'bull', mixed: 'flat' };
-const scarePill = (s) => `<span class="pill ${SCARE_TONE[s] || 'flat'}">${esc(s === 'neither' ? 'no scare' : s === 'both' ? 'both scares' : s === 'mixed' ? 'mixed' : s + ' scare')}</span>`;
-// Regime quadrant from direction of growth and inflation ("flat" counts as not up / not down).
-const QUADS = {
-  overheating: { label: 'Overheating', scare: 'inflation', row: 0, col: 1 },
-  stagflation: { label: 'Stagflation', scare: 'both', row: 0, col: 0 },
-  slowdown: { label: 'Slowdown', scare: 'growth', row: 1, col: 0 },
-  goldilocks: { label: 'Goldilocks', scare: 'neither', row: 1, col: 1 },
-};
-function quadrantOf(regime) {
-  const infUp = regime.inflation === 'up' || regime.inflation === 'sticky';
-  const growthDown = regime.growth === 'down';
-  return infUp ? (growthDown ? 'stagflation' : 'overheating') : (growthDown ? 'slowdown' : 'goldilocks');
-}
-function regimeMap(economies, highlight) {
-  const cells = Object.entries(QUADS).sort((a, b) => a[1].row - b[1].row || a[1].col - b[1].col).map(([id, q]) => {
-    const here = economies.filter((e) => quadrantOf(e.regime) === id);
-    return `<div class="quad ${SCARE_TONE[q.scare]}-q">
-      <div class="quad-label">${q.label}<span>${q.scare === 'neither' ? 'no scare' : q.scare === 'both' ? 'both scares' : q.scare + ' scare'}</span></div>
-      <div class="quad-ccys">${here.map((e) => `<a href="#${e.code}" class="ccy ${highlight && highlight !== e.code ? 'dim' : ''}">${e.code}</a>`).join('')}</div></div>`;
-  }).join('');
-  return `<div class="regime"><div class="axis-y">Inflation ↑</div><div class="quads">${cells}</div><div class="axis-x">Growth weak ← → Growth firm</div></div>`;
-}
-function sparkline(values, w = 92, h = 26) {
-  const min = Math.min(...values), max = Math.max(...values), span = max - min || 1;
-  const pts = values.map((v, i) => [(i / (values.length - 1)) * (w - 4) + 2, h - 3 - ((v - min) / span) * (h - 6)]);
-  const [lx, ly] = pts.at(-1);
-  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
-    <polyline points="${pts.map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
-    <circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.5" fill="var(--accent)"/></svg>`;
-}
-function trendWord(values) {
-  const n = values.length, recent = values.slice(-3).reduce((a, b) => a + b, 0) / 3, earlier = values.slice(0, 3).reduce((a, b) => a + b, 0) / 3;
-  const d = recent - earlier, scale = Math.max(Math.abs(earlier), 1) * 0.02;
-  return n < 4 ? '—' : d > scale ? '↑ rising' : d < -scale ? '↓ falling' : '→ flat';
-}
-// Economy Read Chain: Releases (days) -> Themes (weeks) -> Rates & Yields (months) -> Performance.
-// Colour = impact on the currency, not the economy: impact "up" means a rise supports the currency,
-// "down" means a fall does (unemployment, claims). Green = supportive / hawkish, red = negative / dovish.
-const BUCKETS = [['inflation', 'Inflation'], ['growth', 'Growth'], ['labour', 'Labour']];
-function impactOf(r) {
-  const d = r.latest - r.prior;
-  if (r.prior == null || d === 0) return { cls: 'flat', arrow: '–' };
-  const good = r.impact === 'down' ? d < 0 : d > 0;
-  return { cls: good ? 'bull' : 'bear', arrow: d > 0 ? '▲' : '▼' };
-}
-function chainTable(title, horizon, layer) {
-  const fmt = (v, u) => (v == null ? '—' : `${v}${u || ''}`);
-  const groups = BUCKETS.filter(([k]) => layer?.[k]?.length);
-  if (!groups.length) return '';
-  const body = groups.map(([k, label]) => `<tr class="group"><th colspan="7">${label}</th></tr>` + layer[k].map((r) => {
-    const d = r.expected == null ? null : +(r.latest - r.expected).toFixed(2);
-    const im = impactOf(r);
-    return `<tr><td>${esc(r.name)}</td><td class="num"><span class="pill ${im.cls}">${esc(fmt(r.latest, r.unit))} ${im.arrow}</span></td>
-      <td class="num muted">${esc(fmt(r.prior, r.unit))}</td><td class="num muted">${esc(fmt(r.expected, r.unit))}</td>
-      <td class="num">${d == null ? '—' : d === 0 ? '<span class="faint">inline</span>' : `${d > 0 ? '+' : ''}${d}`}</td>
-      <td class="nowrap">${sparkline(r.trend)} <span class="small muted">${trendWord(r.trend)}</span></td>
-      <td class="small">${r.source ? `<a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.name)} ↗</a>` : '—'}</td></tr>`;
-  }).join('')).join('');
-  return `<section class="panel span-3"><div class="panel-head"><h2>${esc(title)} <span class="faint small">· ${esc(horizon)}</span></h2></div><div class="table-wrap"><table class="chain">
-    <thead><tr><th>Indicator</th><th>Latest</th><th>Prior</th><th>Expected</th><th>vs exp.</th><th>6-period trend</th><th>Source</th></tr></thead>
-    <tbody>${body}</tbody></table></div></section>`;
-}
-function ratesPanel(e) {
-  const r = e.rates; if (!r) return '';
-  const mv = r.statement.nextMove, mvCls = mv === 'Hike' ? 'bull' : mv === 'Cut' ? 'bear' : 'flat';
-  const chg = (n) => `<span class="small ${tone(n)}" style="background:none">${bp(n)}</span>`;
-  return `<section class="panel"><div class="panel-head"><h2>Rates &amp; Yields <span class="faint small">· months</span></h2></div>
-    <div class="kv" style="grid-template-columns:repeat(3,1fr)">
-      <div><label>2Y yield</label><span>${r.y2.level.toFixed(2)}% ${chg(r.y2.chgBp)}</span></div>
-      <div><label>10Y yield</label><span>${r.y10.level.toFixed(2)}% ${chg(r.y10.chgBp)}</span></div>
-      <div><label>Policy rate</label><span>${r.policy.toFixed(2)}%</span></div>
+  const opts = (list, sel) => list.map((v) => `<option ${v === sel ? 'selected' : ''}>${esc(v)}</option>`).join('');
+  const form = (k) => `<section class="panel ks-form" id="id-form"><div class="panel-head"><h2>${k.id ? 'Edit idea' : 'New idea'}</h2></div>
+    <div class="form-grid">
+      <label>Date<input type="date" name="date" value="${esc(k.date || today())}"></label>
+      <label class="wide">Source<input name="source" list="id-sources" value="${esc(k.source || '')}" placeholder="podcast, video, call, own">
+        <datalist id="id-sources">${['Podcast', 'YouTube', 'Coaching call', 'Morning debrief', 'Weekly review', 'Own idea'].map((s) => `<option value="${s}">`).join('')}</datalist></label>
+      <label>Status<select name="status">${opts(['open', 'kept', 'dropped'], k.status || 'open')}</select></label>
+      <label class="full">The idea<textarea name="text" rows="3" placeholder="One idea, in my own words. What would I check to see if it holds?">${esc(k.text || '')}</textarea></label>
     </div>
-    <p class="small" style="margin:10px 0 0">Policy statement: est. next move <span class="pill ${mvCls}">${esc(mv)}</span> · ${esc(r.statement.conviction)} conviction
-      ${r.statement.url ? ` · <a href="${esc(r.statement.url)}" target="_blank" rel="noopener">${esc(e.cb)} ↗</a>` : ''}</p></section>`;
-}
-function performancePanel(e) {
-  const p = e.performance; if (!p) return '';
-  const s = p.spread2yPolicyBp;
-  return `<section class="panel"><div class="panel-head"><h2>Performance</h2></div>
-    <div class="kv" style="grid-template-columns:repeat(3,1fr)">
-      <div><label>Strength rank</label><span>${p.rank} of ${p.of}</span></div>
-      <div><label>Currency (week)</label><span class="${tone(e.week.currencyPct)}" style="background:none">${e.week.currencyPct > 0 ? '+' : ''}${e.week.currencyPct.toFixed(1)}%</span></div>
-      <div><label>2Y vs policy</label><span class="${tone(s)}" style="background:none">${bp(s)}</span></div>
-    </div>
-    <p class="small muted" style="margin:10px 0 0">2Y above policy = market prices higher rates than today; below = cuts priced. Has price caught up with the read?</p></section>`;
-}
-
-render.recap = async (main) => {
-  const index = await load('recaps/index');
-  if (!index.recaps.length) { main.innerHTML = head('Weekly Recap', '') + '<p class="empty">No recaps yet.</p>'; return; }
-  const params = new URLSearchParams(location.search);
-  const chosen = index.recaps.find((r) => r.sunday === params.get('week')) || index.recaps[0];
-  const [recap, ks] = await Promise.all([load(`recaps/${chosen.file.replace(/\.json$/, '')}`), loadLive('killswitches')]);
-  const kills = Object.fromEntries(ks.killSwitches.map((k) => [k.id, k]));
-  const weekPicker = `<select id="week">${index.recaps.map((r) => `<option value="${r.sunday}" ${r === chosen ? 'selected' : ''}>${esc(r.week)} · Sun ${fmtDate(r.sunday)}</option>`).join('')}</select>`;
-
-  const overview = () => {
-    const o = recap.overview;
-    const perf = [...recap.economies].sort((a, b) => b.week.currencyPct - a.week.currencyPct);
-    const maxAbs = Math.max(...perf.map((e) => Math.abs(e.week.currencyPct)), 0.1);
-    const perfBars = `<div class="bars">${perf.map((e) => {
-      const v = e.week.currencyPct, pct = (Math.abs(v) / maxAbs) * 50;
-      return `<div class="bar-row"><a class="ccy" href="#${e.code}">${e.code}</a><div class="bar-track"><div class="bar-fill" style="left:${v >= 0 ? 50 : 50 - pct}%;width:${Math.max(pct, 1)}%;background:${v >= 0 ? 'var(--bull)' : 'var(--bear)'}"></div></div><span class="num small">${v > 0 ? '+' : ''}${v.toFixed(1)}%</span></div>`;
-    }).join('')}</div><p class="small faint">Currency vs basket of the other majors, Mon open to Fri close.</p>`;
-    const steps = `<div class="note">${esc(recap.process.note)}</div><ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}</li>`).join('')}</ol>`;
-    return `<div class="grid hub-grid">
-      <section class="panel brief span-2"><div class="panel-head"><h2>The week · ${fmtDate(recap.period.start)} – ${fmtDate(recap.period.end)}</h2>${scarePill(o.globalScare)}</div>
-        <h2 class="headline">${esc(o.headline)}</h2><ul class="bullets">${o.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul></section>
-      ${panel('Currency performance', perfBars)}
-      <section class="panel span-2"><div class="panel-head"><h2>Regime map · where each economy sits</h2></div>${regimeMap(recap.economies)}</section>
-      ${panel('Economies', `<ul class="list">${recap.economies.map((e) => `<li><a class="ccy" href="#${e.code}">${e.code}</a><span class="grow small muted">${QUADS[quadrantOf(e.regime)].label}</span>${scarePill(e.scare)}</li>`).join('')}</ul>`)}
-      ${panel('Kill switches fired', `<ul class="list">${o.killSwitchesFired.map((id) => { const k = kills[id]; return k ? `<li><span class="ccy">${k.currency}</span><span class="grow small">${esc(k.condition)}</span><span class="pill flat">${esc(k.effect)}</span></li>` : `<li class="small">${esc(id)}</li>`; }).join('') || '<div class="empty">None</div>'}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}
-      ${panel('Next week · watch', `<ul class="list">${o.nextWeekTop.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`)}
-      ${panel(`Method · ${recap.process.status}`, steps)}
-    </div>`;
-  };
-
-  const economy = (e) => {
-    const cbp = e.centralBank, moved = cbp.pricedEndBp - cbp.pricedStartBp, gap = cbp.myPathBp - cbp.pricedEndBp;
-    const q = QUADS[quadrantOf(e.regime)];
-    const bc = e.week.biasChange;
-    return `<div class="grid hub-grid">
-      <section class="panel brief span-2"><div class="panel-head"><h2>${esc(e.name)} · ${esc(e.cb)}</h2>${scarePill(e.scare)}</div>
-        <h2 class="headline">${esc(e.verdict)}</h2>
-        <div class="kv">
-          <div><label>Growth</label><span>${esc(e.regime.growth)}</span></div>
-          <div><label>Inflation</label><span>${esc(e.regime.inflation)}</span></div>
-          <div><label>Regime</label><span>${q.label}</span></div>
-          <div><label>Currency (week)</label><span class="${e.week.currencyPct >= 0 ? 'bull' : 'bear'}" style="background:none">${e.week.currencyPct > 0 ? '+' : ''}${e.week.currencyPct.toFixed(1)}%</span></div>
-          <div><label>Bias change</label><span>${bc ? `${sign(bc.from)} → ${sign(bc.to)}` : 'none'}</span></div>
-          <div><label>Next ${esc(e.cb)}</label><span>${fmtDate(cbp.nextMeeting)}</span></div>
-        </div>
-        ${bc ? `<p class="small muted" style="margin:10px 0 0">Bias: ${esc(bc.why)}</p>` : ''}</section>
-      <section class="panel"><div class="panel-head"><h2>Regime</h2></div>${regimeMap(recap.economies, e.code)}</section>
-      <div class="span-3 chain-flow small faint">Read in order: Releases (days) → Themes (weeks) → Rates &amp; Yields (months) → Performance. Green / red = impact on the currency.</div>
-      ${chainTable('Releases', 'days', e.releases)}
-      ${chainTable('Themes', 'weeks', e.themes)}
-      ${ratesPanel(e)}
-      ${performancePanel(e)}
-      <section class="panel"><div class="panel-head"><h2>Central bank · my path vs priced</h2><span class="pill ${e.centralBank.stance === 'hawkish' ? 'bull' : e.centralBank.stance === 'dovish' ? 'bear' : 'flat'}">${esc(cbp.stance)}</span></div>
-        <div class="kv" style="grid-template-columns:repeat(2,1fr)">
-          <div><label>Priced Mon</label><span>${bp(cbp.pricedStartBp)}</span></div>
-          <div><label>Priced Fri</label><span>${bp(cbp.pricedEndBp)}</span></div>
-          <div><label>Repricing</label><span class="${tone(moved)}" style="background:none">${bp(moved)} ${gapWord(moved)}</span></div>
-          <div><label>My path</label><span>${bp(cbp.myPathBp)}</span></div>
-        </div><p class="small muted" style="margin:10px 0 0">Gap after the week: <span class="num ${tone(gap)}" style="background:none">${bp(gap)} ${gapWord(gap)}</span></p></section>
-      ${panel('This week', `<ul class="bullets" style="margin:0;padding-left:18px">${e.week.takeaways.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`)}
-      ${panel('Next week', `<ul class="list">${e.nextWeek.map((x) => `<li class="small">${esc(x)}</li>`).join('')}</ul>`)}
-      <section class="panel span-3"><div class="panel-head"><h2>Method · ${esc(recap.process.status)}</h2></div>
-        <ol class="steps">${recap.process.steps.map((s) => `<li>${esc(s.label)}<div class="small faint">${esc(e.process?.[s.id] || 'Read goes here once the method is set.')}</div></li>`).join('')}</ol></section>
-    </div>`;
-  };
-
-  const tabs = () => `<div class="filters tabs">${['Overview', ...recap.economies.map((e) => e.code)].map((t) => `<a class="chip" data-tab="${t}" href="#${t === 'Overview' ? '' : t}">${t}</a>`).join('')}</div><div id="recap-body"></div>`;
-  main.innerHTML = head(`Weekly Recap · ${recap.week}`, `Sunday read: ${fmtDate(recap.period.start)} – ${fmtDate(recap.period.end)}. Overview first, then one tab per economy.`, weekPicker) + tabs();
+    <div class="form-actions">
+      <button class="btn primary" data-act="save">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+      <button class="btn" data-act="cancel">Cancel</button>${k.id ? '<button class="btn danger" data-act="delete">Delete</button>' : ''}
+    </div></section>`;
 
   const draw = () => {
-    const code = location.hash.slice(1);
-    const e = recap.economies.find((x) => x.code === code);
-    main.querySelectorAll('[data-tab]').forEach((a) => a.classList.toggle('on', a.dataset.tab === (e ? e.code : 'Overview')));
-    $('#recap-body').innerHTML = e ? economy(e) : overview();
+    const cur = editing === 'new' ? {} : data.ideas.find((i) => i.id === editing);
+    const list = data.ideas.filter((i) => filter === 'all' || i.status === filter).sort((a, b) => (a.date < b.date ? 1 : -1));
+    const count = (s) => data.ideas.filter((i) => s === 'all' || i.status === s).length;
+    main.innerHTML = head('Ideas', 'Things I pick up from podcasts, videos and calls, in my own words. Open until I have checked them; then kept or dropped.',
+        '<button class="btn primary" data-act="new">+ New idea</button>') +
+      (msg ? `<div class="note">${msg}</div>` : '') + (canSave() ? '' : connectPanel()) + (cur ? form(cur) : '') +
+      `<div class="filters">${['all', 'open', 'kept', 'dropped'].map((s) => `<button class="chip ${filter === s ? 'on' : ''}" data-act="filter" data-s="${s}">${s} ${count(s)}</button>`).join('')}</div>
+      <section class="panel"><ul class="list">${list.map((i) => `<li><span class="small nowrap muted">${fmtDate(i.date)}</span>
+        <span class="grow">${esc(i.text)}<div class="small faint">${esc(i.source || '')}</div></span>
+        <span class="pill ${TONE[i.status] || 'flat'}">${esc(i.status)}</span><button class="link-btn" data-act="edit" data-id="${esc(i.id)}">Edit</button></li>`).join('') || '<div class="empty">Nothing here yet.</div>'}</ul></section>`;
+    if (cur) $('#id-form').scrollIntoView({ block: 'nearest' });
   };
-  window.addEventListener('hashchange', () => { draw(); window.scrollTo(0, 0); });
-  $('#week').addEventListener('change', (ev) => { location.search = `?week=${ev.target.value}`; });
+
+  const save = async (change, label) => {
+    if (!canSave()) { msg = '<span class="error">Connect GitHub first, or use local test mode.</span>'; draw(); return; }
+    msg = 'Saving…'; draw();
+    try {
+      const res = await ghUpdate('ideas', (d) => change(d || { ideas: [] }), `Idea: ${label} (desk)`);
+      data = res.data; editing = null;
+      msg = res.commit === 'local' ? 'Saved in this browser (local test mode). Nothing was committed.' : `Saved to GitHub (commit ${esc(res.commit || '')}).`;
+    } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
+    draw();
+  };
+
+  main.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-act]'); if (!b) return;
+    ev.preventDefault();
+    const act = b.dataset.act;
+    if (act === 'new') { editing = 'new'; msg = ''; draw(); }
+    else if (act === 'edit') { editing = b.dataset.id; msg = ''; draw(); }
+    else if (act === 'cancel') { editing = null; draw(); }
+    else if (act === 'filter') { filter = b.dataset.s; draw(); }
+    else if (act === 'delete') {
+      const id = editing;
+      if (!confirm('Delete this idea?')) return;
+      await save((d) => ({ ...d, ideas: d.ideas.filter((i) => i.id !== id) }), `delete ${id}`);
+    } else if (act === 'save') {
+      const f = $('#id-form'), val = (n) => f.querySelector(`[name="${n}"]`).value.trim();
+      if (!val('text')) { msg = '<span class="error">Write the idea first.</span>'; draw(); return; }
+      const fields = { date: val('date') || today(), source: val('source'), status: val('status'), text: val('text') };
+      if (editing === 'new') {
+        const id = `i-${Date.now().toString(36)}`;
+        await save((d) => ({ ...d, ideas: [...d.ideas, { id, ...fields }] }), 'add');
+      } else {
+        const id = editing;
+        await save((d) => ({ ...d, ideas: d.ideas.map((i) => (i.id === id ? { ...i, ...fields } : i)) }), `edit ${id}`);
+      }
+    }
+  });
   draw();
+};
+
+// ---------- review (were my calls right? graded from prices, not from memory) ----------
+render.review = async (main) => {
+  const [index] = await Promise.all([loadLive('scorecard-index', true), loadPrices()]);
+  const weeks = index?.weeks || [];
+  const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const hitPill = (r) => (r == null ? '<span class="pill flat">no data</span>' : `<span class="pill ${r > 0.05 ? 'bull' : r < -0.05 ? 'bear' : 'flat'}">${r > 0.05 ? 'right' : r < -0.05 ? 'wrong' : 'flat'}</span>`);
+
+  // A week runs from the last close before its Monday to its Friday close (or the latest price while it is running).
+  const grade = (w) => {
+    const dates = prices?.history?.dates || [];
+    const friday = addDays(w.monday, 4);
+    let ref = -1, end = -1;
+    dates.forEach((d, i) => { if (d < w.monday) ref = i; if (d >= w.monday && d <= friday) end = i; });
+    if (ref < 0 || end < 0) return { state: ref < 0 ? 'too old for the price history' : 'not started', pairs: [], calls: [] };
+    const px = (b, q, i) => histUsd(b, i) / histUsd(q, i);
+    const basket = (c) => { const o = CCYS.filter((x) => x !== c); return o.reduce((s, x) => s + (px(c, x, end) / px(c, x, ref) - 1) * 100, 0) / o.length; };
+    return {
+      state: Date.now() > Date.parse(friday + 'T22:00:00Z') ? 'closed' : 'running', from: dates[ref], to: dates[end],
+      pairs: (w.pairs || []).map((p) => { const b = p.pair.slice(0, 3), q = p.pair.slice(3); const move = (px(b, q, end) / px(b, q, ref) - 1) * 100; return { ...p, move, mine: move * (p.dir === 'LONG' ? 1 : -1) }; }),
+      calls: Object.entries(w.scores || {}).filter(([, s]) => s !== 0).map(([c, s]) => { const move = basket(c); return { c, s, move, mine: move * Math.sign(s) }; }),
+    };
+  };
+  const graded = weeks.map((w) => ({ w, g: grade(w) }));
+  const closed = graded.filter((x) => x.g.state === 'closed');
+  const tally = (key) => { const all = closed.flatMap((x) => x.g[key]); const right = all.filter((r) => r.mine > 0.05).length, wrong = all.filter((r) => r.mine < -0.05).length; return { n: all.length, right, wrong }; };
+  const tp = tally('pairs'), tc = tally('calls');
+  const stat = (label, t) => `<div><label>${label}</label><span class="num big">${t.n ? `${t.right} of ${t.n}` : '—'}</span><div class="small faint">${t.n ? `${t.wrong} wrong, ${t.n - t.right - t.wrong} flat` : 'no closed week yet'}</div></div>`;
+
+  main.innerHTML = head('Review', 'Were my calls right? Each saved week is graded from prices: pairs by their move in my direction, currency calls by the currency against the other seven.', `<span>${priceAge()}</span>`) +
+    `<section class="panel" style="margin-bottom:14px"><div class="kpis">${stat('Pairs right, closed weeks', tp)}${stat('Currency calls right, closed weeks', tc)}
+      <div><label>Weeks saved</label><span class="num big">${weeks.length}</span></div></div></section>` +
+    (graded.map(({ w, g }) => `<section class="panel" style="margin-bottom:14px">
+      <div class="panel-head"><h2>Week of ${fmtDate(w.monday)}</h2><span><span class="pill ${g.state === 'running' ? 'warn' : 'flat'}">${esc(g.state)}</span> <a href="scorecard.html?week=${w.monday}">Scorecard →</a></span></div>
+      ${g.from ? `<p class="small faint" style="margin:0 0 8px">Measured from the close of ${fmtDate(g.from)} to ${g.state === 'running' ? 'now' : `the close of ${fmtDate(g.to)}`}.</p>` : ''}
+      <div class="grid sc-grid">
+        <div><div class="small muted" style="margin-bottom:4px">Pairs</div><ul class="list">${g.pairs.map((p) => `<li><b>${esc(p.pair)}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span><span class="grow small muted">pair moved ${pctHtml(p.move)}</span>${hitPill(p.mine)}</li>`).join('') || `<li class="small faint">${(w.pairs || []).length ? 'Not measurable yet.' : 'No pairs confirmed that week.'}</li>`}</ul></div>
+        <div><div class="small muted" style="margin-bottom:4px">Currency calls</div><ul class="list">${g.calls.map((c) => `<li><span class="ccy">${esc(c.c)}</span> ${scoreChip(c.s)}<span class="grow small muted">vs the other seven ${pctHtml(c.move)}</span>${hitPill(c.mine)}</li>`).join('') || `<li class="small faint">${Object.keys(w.scores || {}).length ? 'Not measurable yet, or all calls were "about right".' : 'No calls that week.'}</li>`}</ul></div>
+      </div></section>`).join('') || '<section class="panel"><div class="empty">No scorecard saved yet. This page fills itself once a week has been saved. <a href="scorecard.html">Do the weekly build →</a></div></section>') +
+    `<p class="small faint">A call counts as right when price moved more than 0.05% its way over the week. This grades direction only, not entries or exits. My own verdict per call and the monthly review come next.</p>`;
 };
 
 // ---------- boot ----------
@@ -664,13 +893,9 @@ render.recap = async (main) => {
   const page = document.body.dataset.page;
   const main = document.createElement('main');
   document.body.appendChild(main);
-  let mock = true, asOf = '';
+  shell(page);
   try {
-    const b = await load('brief');
-    mock = !!b.mock; asOf = b.date;
-  } catch { /* shell still renders */ }
-  shell(page, asOf, mock);
-  try {
+    if (typeof render[page] !== 'function') throw new Error('Unknown page');
     await render[page](main);
   } catch (err) {
     const hint = location.protocol === 'file:' ? ' Open through a web server (e.g. npm run desk), not as a file.' : '';

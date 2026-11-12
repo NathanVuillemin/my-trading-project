@@ -24,7 +24,8 @@
     "bias:fred": "node scripts/fred-macro.mjs",
     "bias:dash": "node scripts/build-bias-dashboard.mjs",
     "desk": "node scripts/serve-desk.mjs",
-    "correlations": "node scripts/correlations.mjs"
+    "correlations": "node scripts/correlations.mjs",
+    "desk:live": "node scripts/desk-live.mjs"
   },
   "devDependencies": {
     "pinets": "^0.9.29"
