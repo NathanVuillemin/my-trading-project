@@ -496,15 +496,37 @@ render.scorecard = async (main) => {
     card.pairs = card.pairs.filter((p) => live.has(p.pair)).map((p) => { const l = live.get(p.pair); return { pair: l.pair, dir: l.dir, diff: l.diff }; });
   };
 
+  // Fields filled for Nathan (scripts/desk-fill.mjs) keep their evidence in `row.auto`: the figure behind each
+  // label, where it was read and when. A dropdown that no longer matches what was filled is marked as his change.
+  const AUTO_ROWS = [['inflation', 'Inflation'], ['growth', 'Growth'], ['labour', 'Unemployment']];
+  const evidence = (code) => {
+    const r = card.currencies[code], a = r.auto;
+    if (!a) return '';
+    const line = ([key, label]) => {
+      const e = a[key]; if (!e) return '';
+      const mine = r[key].level !== e.level || r[key].dir !== e.dir;
+      return `<li><span class="grow"><b>${label}</b> <span class="muted">${esc(e.name || '')}</span> <span class="num">${esc(e.value ?? '')}</span>${e.projection != null && e.projection !== '' ? ` <span class="faint">projected ${esc(e.projection)}</span>` : ''}</span>
+        <span class="small ${mine ? 'warn-t' : 'muted'}">${esc(e.level)} · ${esc(e.dir)}${mine ? ' (I changed it)' : ''}</span></li>`;
+    };
+    const b = a.rates, leanMine = b && r.lean !== b.stance;
+    const bank = b ? `<li><span class="grow"><b>Bank</b> <span class="muted">policy</span> <span class="num">${esc(b.policy ?? '')}</span> <span class="muted">2Y</span> <span class="num">${esc(b.y2 ?? '')}</span>${b.spreadBp != null ? ` <span class="faint">${b.spreadBp > 0 ? '+' : ''}${esc(b.spreadBp)}bp${b.priced ? `, ${esc(String(b.priced).toLowerCase())}` : ''}</span>` : ''}</span>
+        <span class="small ${leanMine ? 'warn-t' : 'muted'}">${esc(b.stance || '')}${leanMine ? ' (I changed it)' : ''}</span></li>` : '';
+    return `<ul class="list sc-evidence">${AUTO_ROWS.map(line).join('')}${bank}</ul>
+      <p class="small faint" style="margin:4px 0 10px">${esc(a.source)}, read ${new Date(a.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Unemployment "low" means a tight jobs market.</p>`;
+  };
+  // The 1-month rank comes from the desk's own live prices unless Nathan types another; it is stored on save.
+  const liveRank = (code) => prices?.currencies?.[code]?.rankM1 ?? null;
+
   const rowPanel = (code) => {
     const r = card.currencies[code];
     return `<section class="panel sc-row" data-ccy="${code}">
       <div class="panel-head"><h2><span class="ccy">${code}</span></h2><span data-score>${scoreHtml(code)}</span></div>
+      <div data-evidence>${evidence(code)}</div>
       <div class="form-grid">
         ${pick('Growth level', 'growth.level', same(SC_LEVELS), r.growth.level)}${pick('Growth direction', 'growth.dir', same(SC_DIRS), r.growth.dir)}
         ${pick('Inflation level', 'inflation.level', same(SC_LEVELS), r.inflation.level)}${pick('Inflation direction', 'inflation.dir', same(SC_DIRS), r.inflation.dir)}
-        ${pick('Labour level', 'labour.level', same(SC_LEVELS), r.labour.level)}${pick('Labour direction', 'labour.dir', same(SC_DIRS), r.labour.dir)}
-        ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num('1M rank (1-8)', 'rank1m', r.rank1m, `min="1" max="8" step="1" placeholder="${prices ? `live: ${prices.currencies[code].rankM1}` : ''}"`)}
+        ${pick('Unemployment level', 'labour.level', same(SC_LEVELS), r.labour.level)}${pick('Unemployment direction', 'labour.dir', same(SC_DIRS), r.labour.dir)}
+        ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num(r.rank1m == null && liveRank(code) != null ? '1M rank (live)' : '1M rank (1-8)', 'rank1m', r.rank1m ?? liveRank(code), 'min="1" max="8" step="1" title="From the desk\'s own live prices unless you type another; stored when you save"')}
         <label class="full">My sentence<textarea rows="2" data-f="sentence" placeholder="Growth is __, inflation is __, labour is __, so the bank leans __.">${esc(r.sentence)}</textarea></label>
         ${num('Priced 12m (bp)', 'priced12m', r.priced12m)}${num("Week's change (bp)", 'weekChange', r.weekChange)}
         ${pick('My call', 'call', Object.entries(SC_CALLS), r.call, 'wide')}
@@ -551,6 +573,8 @@ render.scorecard = async (main) => {
     main.innerHTML = head(`Scorecard · week of ${fmtDate(monday)}`, 'Weekly build. First my own read of each economy, then what is priced, then rank and pair. Only the gap pays.', picker) +
       `<div id="sc-msg">${msg ? `<div class="note">${msg}</div>` : ''}</div>` +
       (canSave() ? '' : connectPanel()) +
+      (card.autoFill ? `<div class="note"><b>Data fields filled from ${esc(card.autoFill.source)}</b>, read ${new Date(card.autoFill.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, for ${esc((card.autoFill.currencies || []).join(', '))}.
+        Level and direction for inflation, growth and unemployment, and the bank's lean, are ${esc(card.autoFill.source)}'s own labels, copied as they stood. Check them, then write the sentence and make the call yourself.${(card.autoFill.missing || []).length ? ` <span class="warn-t">Not filled: ${esc(card.autoFill.missing.join('; '))}.</span>` : ''}</div>` : '') +
       `<div class="filters"><span class="small muted">Currencies in this build</span>${CCYS.map((c) => `<button class="chip ${card.active.includes(c) ? 'on' : ''}" data-act="toggle" data-ccy="${c}">${c}</button>`).join('')}</div>
       <div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Rank and pairs</h2></div><div id="sc-rank">${rankBody()}</div></section>` +
@@ -559,7 +583,7 @@ render.scorecard = async (main) => {
   // After a field changes: scores, ranking and the save bar update in place, so typing focus is never lost.
   const refresh = () => {
     prune();
-    main.querySelectorAll('.sc-row').forEach((el) => { $('[data-score]', el).innerHTML = scoreHtml(el.dataset.ccy); });
+    main.querySelectorAll('.sc-row').forEach((el) => { $('[data-score]', el).innerHTML = scoreHtml(el.dataset.ccy); $('[data-evidence]', el).innerHTML = evidence(el.dataset.ccy); });
     $('#sc-rank').innerHTML = rankBody();
     $('#sc-save').innerHTML = saveBar();
   };
@@ -604,6 +628,7 @@ render.scorecard = async (main) => {
       say('Saving…');
       try {
         prune();
+        for (const c of card.active) if (card.currencies[c].rank1m == null && liveRank(c) != null) card.currencies[c].rank1m = liveRank(c);
         card.updated = new Date().toISOString().slice(0, 10);
         const res = await ghUpdate(`scorecard-${monday}`, () => card, `Scorecard: week of ${monday} (desk)`);
         const entry = { monday, pairs: card.pairs.map(({ pair, dir }) => ({ pair, dir })), scores: Object.fromEntries(card.active.map((c) => [c, scScore(card.currencies[c])]).filter(([, s]) => s != null)) };
@@ -914,7 +939,8 @@ render.ideas = async (main) => {
 // ---------- review (were my calls right? graded from prices, not from memory) ----------
 render.review = async (main) => {
   const [index] = await Promise.all([loadLive('scorecard-index', true), loadPrices()]);
-  const weeks = index?.weeks || [];
+  // A week with data fields filled but no call made yet has nothing to grade.
+  const weeks = (index?.weeks || []).filter((w) => (w.pairs || []).length || Object.keys(w.scores || {}).length);
   const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const hitPill = (r) => (r == null ? '<span class="pill flat">no data</span>' : `<span class="pill ${r > 0.05 ? 'bull' : r < -0.05 ? 'bear' : 'flat'}">${r > 0.05 ? 'right' : r < -0.05 ? 'wrong' : 'flat'}</span>`);
 

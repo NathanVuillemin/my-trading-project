@@ -1,0 +1,461 @@
+{
+  "monday": "2026-11-09",
+  "updated": null,
+  "active": [
+    "USD",
+    "EUR",
+    "JPY",
+    "GBP"
+  ],
+  "currencies": {
+    "USD": {
+      "growth": {
+        "level": "normal",
+        "dir": "falling"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "falling"
+      },
+      "labour": {
+        "level": "low",
+        "dir": "falling"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "PCE Price Index YoY",
+          "value": "3.6%",
+          "projection": "2.7",
+          "level": "high",
+          "dir": "falling"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ Final",
+          "value": "2.2%",
+          "projection": "2.2",
+          "level": "normal",
+          "dir": "falling"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "4.1%",
+          "projection": "4.3",
+          "level": "low",
+          "dir": "falling"
+        },
+        "rates": {
+          "policy": "4.00%",
+          "y2": "4.87%",
+          "spreadBp": 87,
+          "priced": "Hikes priced",
+          "stance": "hawkish"
+        }
+      }
+    },
+    "EUR": {
+      "growth": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "labour": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "sentence": "",
+      "lean": "neutral",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY Flash",
+          "value": "4%",
+          "projection": "3.3",
+          "level": "high",
+          "dir": "rising"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ Flash",
+          "value": "0.4%",
+          "projection": "0.3",
+          "level": "high",
+          "dir": "rising"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "6.5%",
+          "projection": "6.4",
+          "level": "high",
+          "dir": "rising"
+        },
+        "rates": {
+          "policy": "2.65%",
+          "y2": "3.28%",
+          "spreadBp": 63,
+          "priced": "Hikes priced",
+          "stance": "neutral"
+        }
+      }
+    },
+    "GBP": {
+      "growth": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "labour": {
+        "level": "normal",
+        "dir": "falling"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "3.5%",
+          "projection": "4",
+          "level": "high",
+          "dir": "rising"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ Prel",
+          "value": "0.7%",
+          "projection": "0.2",
+          "level": "high",
+          "dir": "rising"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "4.7%",
+          "projection": "5.4",
+          "level": "normal",
+          "dir": "falling"
+        },
+        "rates": {
+          "policy": "4.00%",
+          "y2": "4.98%",
+          "spreadBp": 98,
+          "priced": "Hikes priced",
+          "stance": "hawkish"
+        }
+      }
+    },
+    "JPY": {
+      "growth": {
+        "level": "normal",
+        "dir": "rising"
+      },
+      "inflation": {
+        "level": "normal",
+        "dir": "rising"
+      },
+      "labour": {
+        "level": "low",
+        "dir": "falling"
+      },
+      "sentence": "",
+      "lean": "neutral",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "2.1%",
+          "projection": "1.8",
+          "level": "normal",
+          "dir": "rising"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ Final",
+          "value": "0.4%",
+          "projection": "0.5",
+          "level": "normal",
+          "dir": "rising"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "2.4%",
+          "projection": "2.6",
+          "level": "low",
+          "dir": "falling"
+        },
+        "rates": {
+          "policy": "1.25%",
+          "y2": "1.88%",
+          "spreadBp": 63,
+          "priced": "Hikes priced",
+          "stance": "neutral"
+        }
+      }
+    },
+    "CHF": {
+      "growth": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "labour": {
+        "level": "high",
+        "dir": "steady"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "1.5%",
+          "projection": "1.1",
+          "level": "high",
+          "dir": "rising"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ Flash",
+          "value": "1.5%",
+          "projection": "0.3",
+          "level": "high",
+          "dir": "rising"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "3%",
+          "projection": "3",
+          "level": "high",
+          "dir": "steady"
+        },
+        "rates": {
+          "policy": "0.00%",
+          "y2": "0.28%",
+          "spreadBp": 28,
+          "priced": "Hikes priced",
+          "stance": "hawkish"
+        }
+      }
+    },
+    "CAD": {
+      "growth": {
+        "level": "high",
+        "dir": "steady"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "steady"
+      },
+      "labour": {
+        "level": "normal",
+        "dir": "steady"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "3.1%",
+          "projection": "3.1",
+          "level": "high",
+          "dir": "steady"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ",
+          "value": "0.8%",
+          "projection": "0.6",
+          "level": "high",
+          "dir": "steady"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "6.7%",
+          "projection": "6.7",
+          "level": "normal",
+          "dir": "steady"
+        },
+        "rates": {
+          "policy": "2.50%",
+          "y2": "3.35%",
+          "spreadBp": 85,
+          "priced": "Hikes priced",
+          "stance": "hawkish"
+        }
+      }
+    },
+    "AUD": {
+      "growth": {
+        "level": "normal",
+        "dir": "rising"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "steady"
+      },
+      "labour": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "4.3%",
+          "projection": "3",
+          "level": "high",
+          "dir": "steady"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ",
+          "value": "0.4%",
+          "projection": "0.4",
+          "level": "normal",
+          "dir": "rising"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "4.7%",
+          "projection": "4.7",
+          "level": "high",
+          "dir": "rising"
+        },
+        "rates": {
+          "policy": "4.85%",
+          "y2": "4.92%",
+          "spreadBp": 7,
+          "priced": "Nothing priced",
+          "stance": "hawkish"
+        }
+      }
+    },
+    "NZD": {
+      "growth": {
+        "level": "normal",
+        "dir": "steady"
+      },
+      "inflation": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "labour": {
+        "level": "high",
+        "dir": "rising"
+      },
+      "sentence": "",
+      "lean": "hawkish",
+      "priced12m": null,
+      "weekChange": null,
+      "call": "",
+      "strong": false,
+      "crowded": false,
+      "rank1m": null,
+      "auto": {
+        "source": "Market Context",
+        "readAt": "2026-11-13T17:22:28.490Z",
+        "inflation": {
+          "name": "Inflation Rate YoY",
+          "value": "3.7%",
+          "projection": "3.2",
+          "level": "high",
+          "dir": "rising"
+        },
+        "growth": {
+          "name": "GDP Growth Rate QoQ",
+          "value": "0.2%",
+          "projection": "1.1",
+          "level": "normal",
+          "dir": "steady"
+        },
+        "labour": {
+          "name": "Unemployment Rate",
+          "value": "5.7%",
+          "projection": "5.4",
+          "level": "high",
+          "dir": "rising"
+        },
+        "rates": {
+          "policy": "2.75%",
+          "y2": "3.93%",
+          "spreadBp": 118,
+          "priced": "Hikes priced",
+          "stance": "hawkish"
+        }
+      }
+    }
+  },
+  "pairs": [],
+  "events": [],
+  "autoFill": {
+    "source": "Market Context",
+    "readAt": "2026-11-13T17:22:28.490Z",
+    "currencies": [
+      "USD",
+      "EUR",
+      "GBP",
+      "JPY",
+      "CHF",
+      "CAD",
+      "AUD",
+      "NZD"
+    ],
+    "missing": []
+  }
+}
