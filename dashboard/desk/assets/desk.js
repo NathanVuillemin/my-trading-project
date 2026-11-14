@@ -560,9 +560,10 @@ render.scorecard = async (main) => {
     </div>
     <div class="form-actions"><button class="btn" data-act="add-event">+ Add event</button></div></section>`;
 
-  const saveBar = () => `<div class="form-actions" style="margin-top:14px">
-    <button class="btn primary" data-act="save">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
-    ${dirty ? '<span class="pill warn">unsaved changes</span>' : ''}${card.updated ? `<span class="small faint">last saved ${fmtDate(card.updated)}</span>` : ''}</div>`;
+  // Shown twice: in the page head (always in reach on a long page) and after the events. Ctrl+S saves too.
+  const saveBar = (top = false) => `<div class="form-actions" style="${top ? 'margin:0' : 'margin-top:14px'}">
+    <button class="btn primary" data-act="save" title="Ctrl+S">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+    ${dirty ? '<span class="pill warn">unsaved changes</span>' : ''}${card.updated && !top ? `<span class="small faint">last saved ${fmtDate(card.updated)}</span>` : ''}</div>`;
   const say = (html) => { msg = html; $('#sc-msg').innerHTML = html ? `<div class="note">${html}</div>` : ''; };
 
   const draw = () => {
@@ -570,7 +571,8 @@ render.scorecard = async (main) => {
     const weeks = [...new Set([monday, ...index.weeks.map((w) => w.monday)])].sort().reverse();
     const saved = new Set(index.weeks.map((w) => w.monday));
     const picker = `<select id="sc-week">${weeks.map((m) => `<option value="${m}" ${m === monday ? 'selected' : ''}>Week of ${fmtDate(m)}${saved.has(m) ? '' : ' (new)'}</option>`).join('')}</select>`;
-    main.innerHTML = head(`Scorecard · week of ${fmtDate(monday)}`, 'Weekly build. First my own read of each economy, then what is priced, then rank and pair. Only the gap pays.', picker) +
+    main.innerHTML = head(`Scorecard · week of ${fmtDate(monday)}`, 'Weekly build. First my own read of each economy, then what is priced, then rank and pair. Only the gap pays.',
+      `<div class="form-actions" style="margin:0;align-items:center">${picker}<span id="sc-save-top">${saveBar(true)}</span></div>`) +
       `<div id="sc-msg">${msg ? `<div class="note">${msg}</div>` : ''}</div>` +
       (canSave() ? '' : connectPanel()) +
       (card.autoFill ? `<div class="note"><b>Data fields filled from ${esc(card.autoFill.source)}</b>, read ${new Date(card.autoFill.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, for ${esc((card.autoFill.currencies || []).join(', '))}.
@@ -586,6 +588,7 @@ render.scorecard = async (main) => {
     main.querySelectorAll('.sc-row').forEach((el) => { $('[data-score]', el).innerHTML = scoreHtml(el.dataset.ccy); $('[data-evidence]', el).innerHTML = evidence(el.dataset.ccy); });
     $('#sc-rank').innerHTML = rankBody();
     $('#sc-save').innerHTML = saveBar();
+    $('#sc-save-top').innerHTML = saveBar(true);
   };
 
   main.addEventListener('input', (ev) => {
@@ -624,6 +627,11 @@ render.scorecard = async (main) => {
       card.events = card.events.filter((e) => e.id !== b.dataset.id);
       dirty = true; draw();
     } else if (act === 'save') {
+      await save();
+    }
+  });
+  const save = async () => {
+    {
       if (!canSave()) { say('<span class="error">Connect GitHub first (Kill Switches page), or use local test mode.</span>'); return; }
       say('Saving…');
       try {
@@ -638,6 +646,9 @@ render.scorecard = async (main) => {
       } catch (e) { msg = `<span class="error">${esc(e.message)}</span>`; }
       draw();
     }
+  };
+  document.addEventListener('keydown', (ev) => {
+    if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's') { ev.preventDefault(); if (dirty) save(); }
   });
   window.addEventListener('beforeunload', (ev) => { if (dirty) { ev.preventDefault(); ev.returnValue = ''; } });
   draw();
