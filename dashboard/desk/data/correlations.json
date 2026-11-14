@@ -1,7 +1,7 @@
 {
   "mock": false,
-  "asOf": "2026-11-13",
-  "generatedAt": "2026-11-13T22:30:55.687Z",
+  "asOf": "2026-11-14",
+  "generatedAt": "2026-11-14T02:03:16.511Z",
   "method": "Pearson correlation of daily moves (log returns; daily change for yields) on dates both series traded. r20 = last 20 days, r60 = last 60. Strength is read against the pair's typical direction: strong |r| ≥ 0.5, moderate ≥ 0.3, weak below, flipped = 0.3+ the wrong way. Shifting = r60 moved 0.2+ in a month.",
   "sources": "Yahoo Finance daily closes; FRED (DGS2, DGS10, DFII10).",
   "missing": [
@@ -341,10 +341,10 @@
       "labelB": "USDCHF",
       "asOf": "2026-11-12",
       "obs": 259,
-      "r20": -0.7,
-      "r60": -0.6,
+      "r20": -0.71,
+      "r60": -0.61,
       "r60MonthAgo": -0.72,
-      "change1m": 0.12,
+      "change1m": 0.11,
       "shift": "stable",
       "status": "strong",
       "history": [
@@ -480,8 +480,8 @@
         },
         {
           "date": "2026-11-12",
-          "r60": -0.6,
-          "r20": -0.7
+          "r60": -0.61,
+          "r20": -0.71
         }
       ]
     },
@@ -499,7 +499,7 @@
       "labelB": "USDCHF",
       "asOf": "2026-11-12",
       "obs": 259,
-      "r20": 0.69,
+      "r20": 0.68,
       "r60": 0.47,
       "r60MonthAgo": 0.48,
       "change1m": -0.01,
@@ -639,7 +639,7 @@
         {
           "date": "2026-11-12",
           "r60": 0.47,
-          "r20": 0.69
+          "r20": 0.68
         }
       ]
     },
@@ -815,8 +815,8 @@
       "labelB": "USDCAD",
       "asOf": "2026-11-12",
       "obs": 259,
-      "r20": -0.74,
-      "r60": -0.57,
+      "r20": -0.75,
+      "r60": -0.58,
       "r60MonthAgo": -0.46,
       "change1m": -0.12,
       "shift": "stable",
@@ -954,8 +954,8 @@
         },
         {
           "date": "2026-11-12",
-          "r60": -0.57,
-          "r20": -0.74
+          "r60": -0.58,
+          "r20": -0.75
         }
       ]
     },
@@ -1447,10 +1447,10 @@
       "labelB": "WTI oil",
       "asOf": "2026-11-12",
       "obs": 248,
-      "r20": -0.03,
-      "r60": -0.13,
+      "r20": -0.02,
+      "r60": -0.12,
       "r60MonthAgo": -0.29,
-      "change1m": 0.16,
+      "change1m": 0.17,
       "shift": "stable",
       "status": "weak",
       "history": [
@@ -1586,8 +1586,8 @@
         },
         {
           "date": "2026-11-12",
-          "r60": -0.13,
-          "r20": -0.03
+          "r60": -0.12,
+          "r20": -0.02
         }
       ]
     },
@@ -1605,7 +1605,7 @@
       "labelB": "Iron ore",
       "asOf": "2026-11-12",
       "obs": 248,
-      "r20": 0.08,
+      "r20": 0.09,
       "r60": 0.06,
       "r60MonthAgo": 0.12,
       "change1m": -0.06,
@@ -1745,7 +1745,7 @@
         {
           "date": "2026-11-12",
           "r60": 0.06,
-          "r20": 0.08
+          "r20": 0.09
         }
       ]
     },
@@ -1920,8 +1920,8 @@
       "labelB": "VIX",
       "asOf": "2026-11-12",
       "obs": 250,
-      "r20": -0.28,
-      "r60": -0.09,
+      "r20": -0.26,
+      "r60": -0.08,
       "r60MonthAgo": 0.26,
       "change1m": -0.34,
       "shift": "strengthening",
@@ -2059,8 +2059,8 @@
         },
         {
           "date": "2026-11-12",
-          "r60": -0.09,
-          "r20": -0.28
+          "r60": -0.08,
+          "r20": -0.26
         }
       ]
     },
