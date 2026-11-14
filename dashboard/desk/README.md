@@ -39,6 +39,9 @@ Everything Nathan types is one JSON file per domain in `data/`, committed throug
 1. Nathan writes the idea raw on the Ideas page (date, source, a few lines).
 2. The words behind it go in `inbox/` (git-ignored, publishers' material): `python scripts/ingest-transcript.py <url-or-file> --title "..." --date YYYY-MM-DD`.
    Handles a transcript PDF (MacroVoices links one per episode), a YouTube URL (needs `pip install youtube-transcript-api`) or a text file.
+   Or give the link to the `podcast-digest` agent (`.claude/agents/podcast-digest.md`): it ingests, reads the whole thing and writes
+   `inbox/digest-<date>-<slug>.md` with attributed claims, data points, what to watch and candidate ideas. Nathan picks which candidates
+   become ideas, in his own words.
 3. The `idea-researcher` agent (`.claude/agents/idea-researcher.md`) reads the idea, the inbox and the web and writes `inbox/research-<id>.json`.
 4. `node scripts/idea-research.mjs --apply inbox/research-<id>.json` merges it under the idea as `research`; `npm run ideas` lists ideas and which have research. Commit `ideas.json` to publish.
 5. The page shows the research under the idea, folded. Nathan reads it and sets kept or dropped himself.
