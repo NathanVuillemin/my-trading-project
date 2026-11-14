@@ -894,6 +894,22 @@ render.ideas = async (main) => {
       <button class="btn" data-act="cancel">Cancel</button>${k.id ? '<button class="btn danger" data-act="delete">Delete</button>' : ''}
     </div></section>`;
 
+  // Research written by the idea-researcher agent (scripts/idea-research.mjs). Evidence and a suggestion; the
+  // decision stays Nathan's, so it is read-only here and survives his edits of the idea.
+  const VTONE = { holds: 'bull', breaks: 'bear', unclear: 'flat' }, STONE = { keep: 'bull', drop: 'bear', watch: 'warn' };
+  const ul = (xs) => (xs || []).length ? `<ul>${xs.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<span class="faint">none</span>';
+  const research = (r) => !r ? '' : `<details class="research"><summary>Research ${esc(fmtDate(r.researchedAt))} · suggests <span class="pill ${STONE[r.suggest] || 'flat'}">${esc(r.suggest)}</span></summary>
+    <p class="thesis"><b>Thesis.</b> ${esc(r.thesis)}</p>
+    <p class="small muted">${(r.instruments || []).map((t) => `<code>${esc(t)}</code>`).join(' ')}${r.horizon ? ` · horizon ${esc(r.horizon)}` : ''}</p>
+    <dl><dt>Claims</dt><dd><ul>${(r.claims || []).map((c) => `<li><span class="pill ${VTONE[c.verdict] || 'flat'}">${esc(c.verdict)}</span> ${esc(c.claim)}<div class="small muted">${esc(c.evidence)}${c.source ? ` <span class="faint">(${esc(c.source)})</span>` : ''}</div></li>`).join('')}</ul></dd>
+    <dt>Priced</dt><dd>${esc(r.priced)}</dd>
+    <dt>Confirms</dt><dd>${ul(r.confirm)}</dd>
+    <dt>Kills</dt><dd>${ul(r.kill)}</dd>
+    <dt>My routine</dt><dd>${esc(r.routineFit)}</dd>
+    <dt>Watch</dt><dd>${(r.watch || []).length ? `<ul>${r.watch.map((w) => `<li>${esc(w.what)} <span class="faint">${esc(w.when)}</span></li>`).join('')}</ul>` : '<span class="faint">none</span>'}</dd>
+    <dt>Why</dt><dd>${esc(r.why)}</dd>
+    <dt>Sources</dt><dd class="small">${(r.sources || []).map((s) => s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title || s.url)}</a>` : esc(s.title)).join(' · ')}</dd></dl></details>`;
+
   const draw = () => {
     const cur = editing === 'new' ? {} : data.ideas.find((i) => i.id === editing);
     const list = data.ideas.filter((i) => filter === 'all' || i.status === filter).sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -903,7 +919,7 @@ render.ideas = async (main) => {
       (msg ? `<div class="note">${msg}</div>` : '') + (canSave() ? '' : connectPanel()) + (cur ? form(cur) : '') +
       `<div class="filters">${['all', 'open', 'kept', 'dropped'].map((s) => `<button class="chip ${filter === s ? 'on' : ''}" data-act="filter" data-s="${s}">${s} ${count(s)}</button>`).join('')}</div>
       <section class="panel"><ul class="list">${list.map((i) => `<li><span class="small nowrap muted">${fmtDate(i.date)}</span>
-        <span class="grow">${esc(i.text)}<div class="small faint">${esc(i.source || '')}</div></span>
+        <span class="grow">${esc(i.text)}<div class="small faint">${esc(i.source || '')}</div>${research(i.research)}</span>
         <span class="pill ${TONE[i.status] || 'flat'}">${esc(i.status)}</span><button class="link-btn" data-act="edit" data-id="${esc(i.id)}">Edit</button></li>`).join('') || '<div class="empty">Nothing here yet.</div>'}</ul></section>`;
     if (cur) $('#id-form').scrollIntoView({ block: 'nearest' });
   };

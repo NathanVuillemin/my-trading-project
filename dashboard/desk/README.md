@@ -32,8 +32,16 @@ Everything Nathan types is one JSON file per domain in `data/`, committed throug
 | `daily-notes.json` | The three lines per day | `days{YYYY-MM-DD: {story, ifThen, biasCheck, done[1-7], saved}}` |
 | `killswitches.json` | Kill switches | `kinds{}, effects{}, killSwitches[{id, currency, kind, condition, now, effect, status (armed/near/fired), firedOn, by, created, edited}]` |
 | `levels.json` | Key levels | `note, families{}, types{key: {family, desc}}, statuses{}, levels[{id, instrument, level, type, side, who, evidence, status, lastTouch, created, edited}]` |
-| `ideas.json` | Ideas | `ideas[{id, date, source, text, status (open/kept/dropped)}]` |
+| `ideas.json` | Ideas | `ideas[{id, date, source, text, status (open/kept/dropped), research?}]`. `research` is written by the `idea-researcher` agent through `scripts/idea-research.mjs --apply`: thesis, instruments, claims with verdicts and sources, what is priced, what confirms and kills it, fit with the routine, a keep/drop/watch suggestion. Read-only on the page; the decision is Nathan's |
 | `correlations.json` | Not used by any page. Still written daily by `scripts/correlations.mjs` until Nathan decides whether to keep that job | |
+
+## Ideas: from a podcast to a checked idea
+1. Nathan writes the idea raw on the Ideas page (date, source, a few lines).
+2. The words behind it go in `inbox/` (git-ignored, publishers' material): `python scripts/ingest-transcript.py <url-or-file> --title "..." --date YYYY-MM-DD`.
+   Handles a transcript PDF (MacroVoices links one per episode), a YouTube URL (needs `pip install youtube-transcript-api`) or a text file.
+3. The `idea-researcher` agent (`.claude/agents/idea-researcher.md`) reads the idea, the inbox and the web and writes `inbox/research-<id>.json`.
+4. `node scripts/idea-research.mjs --apply inbox/research-<id>.json` merges it under the idea as `research`; `npm run ideas` lists ideas and which have research. Commit `ideas.json` to publish.
+5. The page shows the research under the idea, folded. Nathan reads it and sets kept or dropped himself.
 
 ## Live prices
 Two inputs, combined in the browser (`derivePrices` in `assets/desk.js`):

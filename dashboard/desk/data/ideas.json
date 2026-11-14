@@ -5,14 +5,300 @@
       "date": "2026-11-14",
       "source": "Podcast",
       "status": "open",
-      "text": "Uranium stocks and metal prices are not moving in correlation as the stocks are moving inlign with the AI trade. This thesis looks at potentially jumping into uranium stocks whilst they are still correlated with tech stocks, as tech stocks are starting to show signs of cracking. Look at Nvidia's earnings and see how the market reacts."
+      "text": "Uranium stocks and metal prices are not moving in correlation as the stocks are moving inlign with the AI trade. This thesis looks at potentially jumping into uranium stocks whilst they are still correlated with tech stocks, as tech stocks are starting to show signs of cracking. Look at Nvidia's earnings and see how the market reacts.",
+      "research": {
+        "researchedAt": "2026-11-14",
+        "thesis": "Uranium miners re-rate back toward the metal once the AI-basket liquidation that dragged them down ends; the metal (spot ~$90, term record $99) does not need to move. As written the idea contradicts itself: buying miners while they still trade as an AI proxy and tech is cracking means buying the next leg down, not the gap.",
+        "instruments": [
+          "URA (Global X Uranium ETF)",
+          "URNM (Sprott Uranium Miners)",
+          "CCJ (Cameco)",
+          "U.UN / SRUUF (Sprott Physical Uranium, ~16% below NAV)",
+          "NVDA (timing trigger only)"
+        ],
+        "horizon": "weeks",
+        "claims": [
+          {
+            "claim": "Uranium metal and uranium stocks have decoupled: metal firm, stocks down hard.",
+            "verdict": "holds",
+            "evidence": "Spot $90.25/lb on 13 Nov, +17% y/y, near 9-month high; term price record $99/lb (31 Oct). URNM -52% from 29 Jan peak to 23 Oct; URA ~-42% from Jan high, $32.36 on 12 Nov near 52-week low $30.40.",
+            "source": "Trading Economics; Sprott via Kitco 30 Oct; FXEmpire 13 Nov"
+          },
+          {
+            "claim": "Miners fall because the street baskets nuclear with the AI/data-center trade.",
+            "verdict": "unclear",
+            "evidence": "Guest opinion (Mike Alkin, Sachem Cove): 'it becomes facts be damned, it becomes flows'. Sprott's own read is different: since late Aug URNM tracked small caps and a liquidity-stress proxy (MOVE+VVIX), rolling corr of URNM/SPX turned strongly negative. No published number for miners vs Nasdaq. Both stories agree on direction, not on cause.",
+            "source": "MacroVoices 558 transcript; Sprott/Kitco 30 Oct"
+          },
+          {
+            "claim": "Tech/AI is cracking and Nvidia earnings is the next catalyst.",
+            "verdict": "holds",
+            "evidence": "Nasdaq -16% peak to trough vs S&P -7%, SMH -30% (MacroVoices desk, 12 Nov). NVDA -4% on 9 Nov and -5.5% on 10 Nov after board probe into Huang. Earnings Tue 17 Nov after close; guide $108bn rev, 74% GM; options price ~±10% move.",
+            "source": "MarketPulse 11 Nov; Motley Fool 9-10 Nov; MacroVoices 558"
+          },
+          {
+            "claim": "Democrat sweep ('blue tsunami') will turn AI/data centers into a political target.",
+            "verdict": "unclear",
+            "evidence": "Democrats took both chambers on 3 Nov (Senate 54-44, House largest majority since 2008). Data-center backlash was a campaign theme (63% back a 1-year build pause, Data for Progress) but no specific Schumer/Jeffries bill yet; Trump keeps veto. Narrative real, policy not.",
+            "source": "Cox Media 4 Nov; The Week; MLex"
+          },
+          {
+            "claim": "Uranium fundamentals (deficit, contracting) are independent of AI demand.",
+            "verdict": "holds",
+            "evidence": "Cameco Q3 (30 Oct): contract floors mid-high $70s, ceilings ~$160, fixed-price components in triple digits; stock still -12% on the print (costs, guidance). Utilities contracting ~half of needs per Alkin's NEI deck (his data, not verified here).",
+            "source": "Zacks call summary 30 Oct; MacroVoices 558"
+          },
+          {
+            "claim": "Buying miners while they are still correlated to tech is the right entry.",
+            "verdict": "breaks",
+            "evidence": "If the correlation still holds and tech breaks lower, miners go with it. The gap only pays after the correlation weakens or tech bottoms. Own transcript: Alkin says physical metal is the way to avoid the basket; Erik warns of 'potentially a wipeout' before the up.",
+            "source": "MacroVoices 558; logic of the idea itself"
+          }
+        ],
+        "priced": "Miners already price the AI bust: URA/URNM 40-50% off January highs, SPUT 16% below NAV (near -2 sd), CCJ at ~8-9x EBITDA on Alkin's math. The metal side is not cheap: spot/term near highs, consensus bullish, no bears at NEI. Gap is in the equity-vs-metal spread, and it is crowded with value buyers (Sprott, TD, Goldman all defending). Nvidia miss on 17 Nov could widen it further before it closes.",
+        "confirm": [
+          "URA holds $30 support through Nvidia print and closes back above $37 (October breakdown level)",
+          "20-day correlation of URA vs QQQ drops below 0.3 while URA rises: decoupling is on",
+          "SPUT discount narrows from ~16% toward 5-10%",
+          "New term contracts announced with floors above $80 or ceilings above $160"
+        ],
+        "kill": [
+          "URA daily close below $30 (long-term support, 52-week low $30.40)",
+          "Spot uranium below $85 (metal joins the selloff, thesis of firm metal gone)",
+          "Nasdaq makes new low after 17 Nov and miners fall more than QQQ on the day",
+          "MOVE/VIX spike continues: Sprott's liquidity proxy says forced selling not over"
+        ],
+        "routineFit": "Side trade, outside the FX routine. Only link: Nasdaq 100 is his AUDJPY risk barometer, so an Nvidia-driven Nasdaq break is the same event that moves AUDJPY and USDCHF/VIX; CAD gets a faint touch via Cameco/Canadian miners. Use the 17 Nov print as a risk-tone date for the majors regardless of uranium.",
+        "watch": [
+          {
+            "what": "Nvidia Q3 FY27 earnings, reaction in QQQ, SMH and URA next day",
+            "when": "2026-11-17 after US close"
+          },
+          {
+            "what": "Huang probe: congressional briefing / federal investigation headlines",
+            "when": "2026-11-18 onward"
+          },
+          {
+            "what": "Cameco and TradeTech month-end spot/term indicators",
+            "when": "2026-11-30"
+          },
+          {
+            "what": "SPUT premium/discount on sprott.com",
+            "when": "ongoing"
+          },
+          {
+            "what": "URA vs QQQ 20-day correlation on desk Drivers page (add pair)",
+            "when": "ongoing"
+          }
+        ],
+        "suggest": "watch",
+        "why": "The decoupling is real and the equity-vs-metal gap exists, but the entry logic as written is backwards: buying while miners still trade as an AI proxy into a cracking Nasdaq is catching the knife. Dated trigger is 17 Nov: if URA holds $30 through the Nvidia reaction and the correlation to QQQ fades, the idea graduates to keep; physical (SPUT) is the lower-risk expression per the guest himself.",
+        "sources": [
+          {
+            "title": "MacroVoices #558 Mike Alkin, Uranium at a Crossroads (12 Nov 2026)",
+            "url": "https://www.macrovoices.com/1561-macrovoices-558-mike-alkin-uranium-at-a-crossroads-3"
+          },
+          {
+            "title": "Trading Economics: Uranium",
+            "url": "https://tradingeconomics.com/commodity/uranium"
+          },
+          {
+            "title": "Sprott via Kitco: Uranium miners, a liquidity shock not a broken thesis (30 Oct 2026)",
+            "url": "http://www.kitco.com/opinion/2026-10-30/uranium-miners-liquidity-shock-not-broken-thesis"
+          },
+          {
+            "title": "FXEmpire: Copper, Uranium and Lithium forecast (13 Nov 2026)",
+            "url": "https://fxempire.com/forecasts/article/copper-uranium-and-lithium-price-forecast-nvidia-ceo-exit-hits-copper-1644434"
+          },
+          {
+            "title": "Oilprice/ZeroHedge: Uranium hits record high while nuclear stocks slide (1 Oct 2026)",
+            "url": "https://oilprice.com/Alternative-Energy/Nuclear-Power/Uranium-Hits-Record-High-While-Nuclear-Stocks-Slide.html"
+          },
+          {
+            "title": "Zacks: Cameco Q3 call highlights pricing discipline",
+            "url": "https://zacks.com/stock/news/3023346/cameco-q3-earnings-call-highlights-uranium-pricing-discipline"
+          },
+          {
+            "title": "Sprott Physical Uranium Trust (NAV/discount)",
+            "url": "https://www.sprott.com/investment-strategies/physical-commodity-funds/uranium/"
+          },
+          {
+            "title": "MarketPulse: Nvidia Q3 earnings preview (11 Nov 2026)",
+            "url": "https://www.marketpulse.com/markets/nvidia-nvda-q3-earnings-preview-ai-spending-risks-and-governance-concerns-threaten-major-uptrend/"
+          },
+          {
+            "title": "Motley Fool: Why Nvidia stock was down today (9 Nov 2026)",
+            "url": "https://fool.com/investing/2026/11/09/why-nvidia-stock-was-down-today"
+          },
+          {
+            "title": "Election 2026: Democrats capture both chambers of Congress",
+            "url": "https://www.wsbtv.com/news/trending/election-2026-democrats-capture-both-houses-congress/5ILOWTVABVDPZFYP7VBBCX4EWE/"
+          },
+          {
+            "title": "The Week: Will data center backlash decide the midterms?",
+            "url": "https://theweek.com/politics/data-center-backlash-decide-midterms"
+          }
+        ]
+      }
     },
     {
       "id": "i-mwgq820t",
       "date": "2026-11-14",
       "source": "YouTube",
       "status": "open",
-      "text": "China's control of precious metals and Oil.\n\nChina holds serious power when it comes to the flow of precoius metals as they are huge producers. They are also \"secretly\" stockpiling gold alongside other BRICS nations (related to the gold backed BRICS currency) to lower the dependency on the dollar. This is also related to oil, and this is where it gets interesting. China was relying on its oil stockpile (biggest in the world by a large margin) since june, and this is essentially what saved the supply shock in may/april when they announced it. China could have rebought the oil they chose not to in June at a lower price in july but didn't indicating that the reason for relying on stockpiles wasn't necessarily financial and potentially related to the power battle between the US and China. Recently China started buyng again and I believe this is the reason we saw oil prices rebound on the 10th of november.\n\nhttps://oilprice.com/Latest-Energy-News/World-News/China-Is-Buying-Oil-Again-After-Months-of-Living-Off-Its-Stockpiles.html\nhttps://youtu.be/BkA0bkb6ZO0?si=64N5ZAIvBFDLTmtL\nhttps://youtu.be/ekgjaTbiEKc?si=k07QdqYFQPEQ7RRi"
+      "text": "China's control of precious metals and Oil.\n\nChina holds serious power when it comes to the flow of precoius metals as they are huge producers. They are also \"secretly\" stockpiling gold alongside other BRICS nations (related to the gold backed BRICS currency) to lower the dependency on the dollar. This is also related to oil, and this is where it gets interesting. China was relying on its oil stockpile (biggest in the world by a large margin) since june, and this is essentially what saved the supply shock in may/april when they announced it. China could have rebought the oil they chose not to in June at a lower price in july but didn't indicating that the reason for relying on stockpiles wasn't necessarily financial and potentially related to the power battle between the US and China. Recently China started buyng again and I believe this is the reason we saw oil prices rebound on the 10th of november.\n\nhttps://oilprice.com/Latest-Energy-News/World-News/China-Is-Buying-Oil-Again-After-Months-of-Living-Off-Its-Stockpiles.html\nhttps://youtu.be/BkA0bkb6ZO0?si=64N5ZAIvBFDLTmtL\nhttps://youtu.be/ekgjaTbiEKc?si=k07QdqYFQPEQ7RRi",
+      "research": {
+        "researchedAt": "2026-11-14",
+        "thesis": "China restocking crude after drawing stockpiles since spring puts a floor under oil and lifts it once Iran-war risk premium fades; gold/BRICS is a second idea, researched as a side claim.",
+        "instruments": [
+          "Brent (BZ)",
+          "WTI (CL)",
+          "USDCAD",
+          "AUDUSD",
+          "XAUUSD"
+        ],
+        "horizon": "weeks",
+        "claims": [
+          {
+            "claim": "China lived off stockpiles since June instead of importing",
+            "verdict": "holds",
+            "evidence": "Imports 7.12m bpd in June (decade low, -41% y/y); stock draw ~500k bpd May, ~940k bpd June; IEA: 41m bbl June draw. Kpler: buying ~6m bpd since March vs >10m pre-war. Jan-Oct imports -15.1% y/y.",
+            "source": "Reuters/Clyde Russell via BOE Report 17 Aug 2026; Kpler blog 28 Jul 2026; customs via Baird Maritime"
+          },
+          {
+            "claim": "China could have rebought cheaper in July but chose not to - pause was strategic, not financial",
+            "verdict": "unclear",
+            "evidence": "Partly wrong on data: July imports rose to 8.41m bpd and China built ~210k bpd of stock in July. But volumes stayed ~3m bpd below pre-war and Kpler itself frames the pause as strategic (security buffer, Unipec near-zero Saudi nominations). Motive is inference, not fact.",
+            "source": "Russell column Aug 2026; Kpler 'Strategic timing of China's crude purchases' Jul 2026"
+          },
+          {
+            "claim": "China recently started buying again",
+            "verdict": "holds",
+            "evidence": "Oct imports 9.88m bpd (41.94mt), highest since March, +9.4% m/m, Kpler seaborne +12% m/m; Saudi intake 1.62m bpd. Still -13.3% y/y.",
+            "source": "China customs via Oilprice 10 Nov 2026, Baird Maritime, Bloomberg"
+          },
+          {
+            "claim": "China buying is why oil rebounded on 10 November",
+            "verdict": "breaks",
+            "evidence": "10 Nov Brent SETTLED DOWN 1.2% at $91.49 (low $89.16, first sub-$90 since Aug) on Iran-truce / Qatar-Hormuz-deal headlines. Rebound came 11 Nov (Brent $92.81) and was attributed to mines and tanker attacks in Hormuz. China buying cited only as a secondary floor, by a commentary site. Oilprice: prices move on geopolitics, not Chinese buying 'for now'.",
+            "source": "TradingNews 11 Nov 2026; Oilprice 10 Nov 2026; EnergyConnects 6 Nov 2026"
+          },
+          {
+            "claim": "China's oil stockpile is the world's largest by a large margin",
+            "verdict": "holds",
+            "evidence": "~1.3bn bbl commercial+strategic cited; US SPR is roughly a third of that. Kpler: refiner storage >300m bbl in May, 60-75 days of import shortfall cover.",
+            "source": "Oilprice 10 Nov 2026; Oilprice 14 Jul 2026 (Kpler)"
+          },
+          {
+            "claim": "PBoC is 'secretly' stockpiling gold",
+            "verdict": "holds",
+            "evidence": "True but not secret - published monthly: Aug +20.2t, Sep +21t, Oct +25.8t (largest since Sep 2023), ~129t YTD. Public via SAFE; streak length disputed across sources (8 vs 24 months).",
+            "source": "Kitco 8 Sep and 7 Oct 2026; China Daily HK 8 Nov 2026; GKToday"
+          },
+          {
+            "claim": "A gold-backed BRICS currency exists / is coming",
+            "verdict": "breaks",
+            "evidence": "No BRICS currency adopted; 2026 New Delhi declaration proposes none, India presidency focused on payment interoperability. Only a Russian think-tank 'Unit' token pilot (40% gold, 100 units issued). Not a BRICS institution.",
+            "source": "BullionTrading fact-check; PaymentsJournal; Daily Maverick Dec 2025"
+          }
+        ],
+        "priced": "Oil: Brent -21% from start of Nov on peace hopes, ~$89-93 vs >$100 in Oct; market prices war end, not China demand. China restock is known (Kpler, IEA, EIA all flag it) so it is a floor argument, not a catalyst - gap only if restocking runs bigger/faster than ~9-10m bpd consensus while Hormuz reopens. Gold: PBoC buying is public and gold fell ~7% in Oct anyway; no gap in the BRICS story.",
+        "confirm": [
+          "Nov customs (early Dec) crude imports >10m bpd and Kpler seaborne arrivals rising",
+          "Unipec back nominating Saudi term barrels; Aramco OSP to Asia raised",
+          "Brent holds $89 on peace-deal headlines (floor behaviour) and Dubai/Oman spreads tighten",
+          "USDCAD falls with oil again (20d correlation turns negative and holds)"
+        ],
+        "kill": [
+          "Brent closes below $85 with Chinese imports still rising - buying not enough vs peace repricing",
+          "Nov/Dec imports fall back under 9m bpd, refinery runs stay ~12.5m bpd",
+          "Iran deal signed and Hormuz traffic normal: supply returns faster than China restocks",
+          "China re-tightens fuel export curbs (conserving, not restocking)"
+        ],
+        "routineFit": "Touches CAD (WTI terms of trade; FXStreet 10 Nov: CAD lags oil upside, follows it down, so an oil floor = less CAD downside, not a CAD driver up), AUD/NZD (China demand, risk tone) and JPY (importer, oil up = JPY weaker). USD: oil floor keeps headline CPI sticky, fewer Fed cuts. Use as a driver input on the Bias Board, not as a trade: oil itself is a side trade. Gold/BRICS leg: side trade, outside the routine.",
+        "watch": [
+          {
+            "what": "China Nov crude import data (customs)",
+            "when": "~2026-12-07"
+          },
+          {
+            "what": "Kpler/Vortexa weekly China seaborne arrivals",
+            "when": "ongoing"
+          },
+          {
+            "what": "US-Iran talks / Hormuz shipping attacks",
+            "when": "ongoing"
+          },
+          {
+            "what": "Aramco Dec/Jan OSPs to Asia",
+            "when": "early Dec"
+          },
+          {
+            "what": "PBoC gold reserves (SAFE release)",
+            "when": "~2026-12-07"
+          },
+          {
+            "what": "BoC decision and CAD-oil 20d correlation",
+            "when": "2026-12-10"
+          }
+        ],
+        "suggest": "watch",
+        "why": "Restocking is real but already in every desk note; the 10 Nov causal link is wrong (oil fell that day, bounced 11 Nov on Hormuz attacks). Keep as an oil-floor input for the CAD/AUD/USD driver layer, with Nov import data as the dated trigger. Drop the BRICS-currency leg.",
+        "sources": [
+          {
+            "title": "Oilprice: China Is Buying Oil Again After Months of Living Off Its Stockpiles (10 Nov 2026)",
+            "url": "https://oilprice.com/Latest-Energy-News/World-News/China-Is-Buying-Oil-Again-After-Months-of-Living-Off-Its-Stockpiles.html"
+          },
+          {
+            "title": "Baird Maritime: China crude imports hit seven-month high in October",
+            "url": "https://www.bairdmaritime.com/shipping/tankers/china-crude-oil-imports-hit-seven-month-high-in-october"
+          },
+          {
+            "title": "Kpler: The strategic timing of China's crude purchases (28 Jul 2026)",
+            "url": "https://cn.kpler.com/blog/the-strategic-timing-of-chinas-crude-purchases-2"
+          },
+          {
+            "title": "Russell/BOE Report: China returns to stockpiling in July (17 Aug 2026)",
+            "url": "https://boereport.com/2026/08/17/china-surprises-oil-markets-again-with-a-return-to-stockpiling-in-july-russell/"
+          },
+          {
+            "title": "Oilprice: The Next Oil Rally May Depend On China (14 Jul 2026)",
+            "url": "https://oilprice.com/Energy/Crude-Oil/The-Next-Oil-Rally-May-Depend-On-China-Not-The-Middle-East.html"
+          },
+          {
+            "title": "TradingNews: Brent bounces from $89 as mines and 10 Nov tanker attacks offset truce hopes",
+            "url": "https://www.tradingnews.com/news/brent-bounces-from-89-usd-as-mines-and-november-tanker-attacks-offset-iran-truce-hopes"
+          },
+          {
+            "title": "EnergyConnects: Oil extends rebound on uncertainty over Iran war peace progress (6 Nov 2026)",
+            "url": "https://www.energyconnects.com/news/oil/2026/november/oil-extends-rebound-on-uncertainty-over-iran-war-peace-progress/"
+          },
+          {
+            "title": "China Daily HK: PBoC gold purchases October 2026",
+            "url": "https://www.chinadailyhk.com/article/642391"
+          },
+          {
+            "title": "Kitco: PBoC buys 21t gold in September 2026",
+            "url": "https://www.kitco.com/news/article/2026-10-07/chinas-central-bank-buys-21-tonnes-gold-september-largest-monthly-purchase"
+          },
+          {
+            "title": "BRICS gold-backed currency: fact check across four summits",
+            "url": "https://bulliontradingllc.com/blog/brics-gold-backed-currency-fact-check/"
+          },
+          {
+            "title": "FXStreet: The Canadian dollar's crude problem (10 Nov 2026)",
+            "url": "https://www.fxstreet.com/analysis/the-canadian-dollars-crude-problem-202611101842"
+          },
+          {
+            "title": "YouTube: China quietly saved the world last month",
+            "url": "https://youtu.be/BkA0bkb6ZO0"
+          },
+          {
+            "title": "YouTube: They Just Triggered A Global Monetary Reset Using Gold",
+            "url": "https://youtu.be/ekgjaTbiEKc"
+          }
+        ]
+      }
     }
   ]
 }

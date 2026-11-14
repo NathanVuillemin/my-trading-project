@@ -251,3 +251,15 @@ a.btn { text-decoration: none; display: inline-block; }
 /* scorecard: evidence behind filled fields */
 .sc-evidence { margin: 0 0 2px; }
 .sc-evidence li { padding: 4px 0; font-size: 12.5px; }
+
+/* ---------- ideas: research block from the idea-researcher agent ---------- */
+.research { margin-top: 6px; font-size: 13px; }
+.research summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+.research .thesis { margin: 8px 0 2px; white-space: pre-wrap; }
+.research dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 8px 0 0; }
+.research dt { color: var(--faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; }
+.research dd { margin: 0; min-width: 0; }
+.research ul { margin: 0; padding-left: 18px; }
+.research li { display: block; margin: 2px 0; padding: 0; border: 0; }
+.research code { font-family: var(--mono); background: var(--panel-2); border-radius: 4px; padding: 1px 5px; }
+body[data-page="ideas"] .list .grow { white-space: pre-wrap; }
