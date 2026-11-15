@@ -475,7 +475,8 @@ render.scorecard = async (main) => {
   const asked = new URLSearchParams(location.search).get('week') || '';
   const monday = /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : scMonday();
   let index = (await loadLive('scorecard-index', true)) || { weeks: [] };
-  await loadPrices();
+  const [pos] = await Promise.all([loadLive('positioning', true).catch(() => null), loadPrices()]);
+  const PC = pos?.currencies || {};
   // Only weeks listed in the index have a file; a new week starts blank without asking for one.
   const card = (index.weeks.some((w) => w.monday === monday) && (await loadLive(`scorecard-${monday}`, true))) || scBlankCard(monday);
   card.currencies = card.currencies || {};
@@ -518,11 +519,40 @@ render.scorecard = async (main) => {
   // The 1-month rank comes from the desk's own live prices unless Nathan types another; it is stored on save.
   const liveRank = (code) => prices?.currencies?.[code]?.rankM1 ?? null;
 
+  // COT positioning (data/positioning.json). "COT crowded my way" fills itself once a call is made: yes when asset
+  // managers or leveraged funds already sit at an extreme in the call's direction. Once Nathan ticks or unticks the
+  // box himself (crowdedBy: 'me'), his choice stands and the hint shows where COT disagrees.
+  const callSign = (r) => ({ tooLittle: 1, tooMuch: -1 }[r.call] || 0);
+  const cotFor = (code) => posCrowdedMyWay(PC[code], callSign(card.currencies[code]));
+  const applyCot = () => {
+    let changed = false;
+    for (const c of card.active) {
+      const r = card.currencies[c], v = cotFor(c);
+      if (!v || r.crowdedBy === 'me') continue;
+      if (r.crowded !== v.yes || r.crowdedBy !== 'cot') { changed = changed || r.crowded !== v.yes; r.crowded = v.yes; r.crowdedBy = 'cot'; }
+    }
+    return changed;
+  };
+  const cotHint = (code) => {
+    if (!PC[code]) return '';
+    const r = card.currencies[code], v = cotFor(code);
+    if (!v) return '<span class="cot-hint faint">fills from COT once I make a call</span>';
+    const said = v.yes ? `yes: ${esc(v.why)}` : 'no extreme my way';
+    if (r.crowdedBy === 'me' && r.crowded !== v.yes) return `<span class="cot-hint warn-t">my override; COT says ${said}</span>`;
+    return `<span class="cot-hint ${v.yes ? 'warn-t' : 'muted'}">${r.crowdedBy === 'me' ? 'my choice' : 'from COT'}: ${said}</span>`;
+  };
+  const cotBlock = (code) => (PC[code] ? `<div class="sc-cot">${posGauge(PC[code], { compact: true })}<div class="pos-legend">${posLegend(PC[code])}</div>${posSqueeze(PC[code])}</div>` : '');
+  const posMap = () => (!pos ? '' : `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Positioning · COT of ${fmtDate(pos.cotDate)}</h2><a href="positioning.html">Positioning →</a></div>
+    <div class="pos-map">${CCYS.filter((c) => PC[c]).sort((a, b) => (posGrp(PC[b], 'slow')?.index ?? 0) - (posGrp(PC[a], 'slow')?.index ?? 0)).map((c) => `<div class="pos-map-row ${card.active.includes(c) ? '' : 'dim'}"><span class="ccy">${c}</span>${posGauge(PC[c], { compact: true })}</div>`).join('')}</div>
+    <p class="small faint" style="margin:6px 0 0">● asset managers (slow) · ◆ leveraged funds (fast) · hollow = 4 weeks ago · shaded ends = crowded. "COT crowded my way" in each currency fills itself from this once I make a call; ticking it myself overrides.</p></section>`);
+  dirty = applyCot() || dirty;
+
   const rowPanel = (code) => {
     const r = card.currencies[code];
     return `<section class="panel sc-row" data-ccy="${code}">
       <div class="panel-head"><h2><span class="ccy">${code}</span></h2><span data-score>${scoreHtml(code)}</span></div>
       <div data-evidence>${evidence(code)}</div>
+      ${cotBlock(code)}
       <div class="form-grid">
         ${pick('Growth level', 'growth.level', same(SC_LEVELS), r.growth.level)}${pick('Growth direction', 'growth.dir', same(SC_DIRS), r.growth.dir)}
         ${pick('Inflation level', 'inflation.level', same(SC_LEVELS), r.inflation.level)}${pick('Inflation direction', 'inflation.dir', same(SC_DIRS), r.inflation.dir)}
@@ -533,6 +563,7 @@ render.scorecard = async (main) => {
         ${pick('My call', 'call', Object.entries(SC_CALLS), r.call, 'wide')}
         <label class="check"><input type="checkbox" data-f="strong" ${r.strong ? 'checked' : ''}> Strong</label>
         <label class="check"><input type="checkbox" data-f="crowded" ${r.crowded ? 'checked' : ''}> COT crowded my way</label>
+        <div class="full" data-cothint>${cotHint(code)}</div>
       </div></section>`;
   };
 
@@ -542,7 +573,8 @@ render.scorecard = async (main) => {
     return `<div class="grid sc-grid">
       <div>${scored.length >= 2 ? strengthBars(scored) : '<div class="empty">Make a call on at least two currencies.</div>'}</div>
       <div>${pairs.length ? `<ul class="list">${pairs.map((p) => `<li><label class="check"><input type="checkbox" data-act="pair" data-pair="${p.pair}" ${chosen.has(p.pair) ? 'checked' : ''}></label>
-          <span class="grow"><b>${p.pair}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${p.dir}</span> <span class="small muted">gap ${p.diff}</span></span>
+          <span class="grow"><b>${p.pair}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${p.dir}</span> <span class="small muted">gap ${p.diff}</span>
+            ${pos ? `<div class="pos-pairline">${posPairBar(PC, p.pair)} ${posPairVerdict(PC, p.pair, p.dir)}</div>` : ''}</span>
           ${p.top ? '<span class="pill warn">top vs bottom</span>' : ''}</li>`).join('')}</ul>` : '<div class="empty">No pairs yet: two currencies need different scores.</div>'}
         ${card.pairs.length > 3 ? '<div class="note" style="margin:10px 0 0">More than three pairs. The routine says two or three.</div>' : ''}</div>
     </div>`;
@@ -579,14 +611,20 @@ render.scorecard = async (main) => {
       (card.autoFill ? `<div class="note"><b>Data fields filled from ${esc(card.autoFill.source)}</b>, read ${new Date(card.autoFill.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, for ${esc((card.autoFill.currencies || []).join(', '))}.
         Level and direction for inflation, growth and unemployment, and the bank's lean, are ${esc(card.autoFill.source)}'s own labels, copied as they stood. Check them, then write the sentence and make the call yourself.${(card.autoFill.missing || []).length ? ` <span class="warn-t">Not filled: ${esc(card.autoFill.missing.join('; '))}.</span>` : ''}</div>` : '') +
       `<div class="filters"><span class="small muted">Currencies in this build</span>${CCYS.map((c) => `<button class="chip ${card.active.includes(c) ? 'on' : ''}" data-act="toggle" data-ccy="${c}">${c}</button>`).join('')}</div>
-      <div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
+      ${posMap()}<div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Rank and pairs</h2></div><div id="sc-rank">${rankBody()}</div></section>` +
       eventsPanel() + `<div id="sc-save">${saveBar()}</div>`;
   };
   // After a field changes: scores, ranking and the save bar update in place, so typing focus is never lost.
   const refresh = () => {
+    applyCot();
     prune();
-    main.querySelectorAll('.sc-row').forEach((el) => { $('[data-score]', el).innerHTML = scoreHtml(el.dataset.ccy); $('[data-evidence]', el).innerHTML = evidence(el.dataset.ccy); });
+    main.querySelectorAll('.sc-row').forEach((el) => {
+      const code = el.dataset.ccy;
+      $('[data-score]', el).innerHTML = scoreHtml(code); $('[data-evidence]', el).innerHTML = evidence(code);
+      $('[data-f="crowded"]', el).checked = !!card.currencies[code].crowded;
+      const hint = $('[data-cothint]', el); if (hint) hint.innerHTML = cotHint(code);
+    });
     $('#sc-rank').innerHTML = rankBody();
     $('#sc-save').innerHTML = saveBar();
     $('#sc-save-top').innerHTML = saveBar(true);
@@ -597,6 +635,7 @@ render.scorecard = async (main) => {
     const row = card.currencies[el.closest('.sc-row').dataset.ccy], path = el.dataset.f.split('.');
     const v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
     if (path.length === 2) row[path[0]][path[1]] = v; else row[path[0]] = v;
+    if (el.dataset.f === 'crowded') row.crowdedBy = 'me';
     dirty = true; refresh();
   });
   main.addEventListener('change', (ev) => {
@@ -876,8 +915,12 @@ render.killswitches = async (main) => {
 
 // ---------- ideas (inbox for what Nathan picks up from podcasts, videos, calls) ----------
 render.ideas = async (main) => {
-  let data = (await loadLive('ideas', true)) || { ideas: [] };
+  const [ideasData, pos] = await Promise.all([loadLive('ideas', true), loadLive('positioning', true).catch(() => null)]);
+  let data = ideasData || { ideas: [] };
   const TONE = { open: 'warn', kept: 'bull', dropped: 'flat' };
+  // Once an idea is researched, how capital is positioned in its markets shows under it, open, as cards.
+  const positioning = (i) => (!i.research || !pos ? '' : `<details class="idea-pos" open><summary>Positioning · COT of ${esc(fmtDate(pos.cotDate))} <a class="small" href="positioning.html">all →</a></summary>${posIdeaCards(pos, i)}
+    <p class="small faint" style="margin:4px 0 0">● asset managers (slow) · ◆ leveraged funds / managed money (fast) · hollow = 4 weeks ago · shaded ends = crowded.</p></details>`);
   const today = () => new Date().toISOString().slice(0, 10);
   let editing = null, msg = '', filter = 'all';
 
@@ -920,7 +963,7 @@ render.ideas = async (main) => {
       (msg ? `<div class="note">${msg}</div>` : '') + (canSave() ? '' : connectPanel()) + (cur ? form(cur) : '') +
       `<div class="filters">${['all', 'open', 'kept', 'dropped'].map((s) => `<button class="chip ${filter === s ? 'on' : ''}" data-act="filter" data-s="${s}">${s} ${count(s)}</button>`).join('')}</div>
       <section class="panel"><ul class="list">${list.map((i) => `<li><span class="small nowrap muted">${fmtDate(i.date)}</span>
-        <span class="grow">${esc(i.text)}<div class="small faint">${esc(i.source || '')}</div>${research(i.research)}</span>
+        <span class="grow">${esc(i.text)}<div class="small faint">${esc(i.source || '')}</div>${positioning(i)}${research(i.research)}</span>
         <span class="pill ${TONE[i.status] || 'flat'}">${esc(i.status)}</span><button class="link-btn" data-act="edit" data-id="${esc(i.id)}">Edit</button></li>`).join('') || '<div class="empty">Nothing here yet.</div>'}</ul></section>`;
     if (cur) $('#id-form').scrollIntoView({ block: 'nearest' });
   };
@@ -996,103 +1039,178 @@ function posLinks(idea) {
   return { markets: [...markets], ccys: [...ccys], pairs: [...pairs], none };
 }
 
+// ---- shared positioning visuals (Positioning, Scorecard, Ideas) ----
+const posGrp = (x, role) => x?.groups?.find((g) => g.role === role) || null;
+const posTagPill = (t) => (t && POS_TAG[t] ? `<span class="pill ${POS_TAG[t][1]}">${POS_TAG[t][0]}</span>` : '');
+const POS_ROLE = { slow: { shape: 'circle', color: 'var(--pos-slow)' }, fast: { shape: 'diamond', color: 'var(--pos-fast)' } };
+// Who is slow and who is fast differs by report: TFF has asset managers, commodities only managed money (fast).
+const posPair = (x) => [posGrp(x, 'slow'), posGrp(x, 'fast')].filter(Boolean);
+const posMarker = (role, x, y, r, attrs = '') => (POS_ROLE[role].shape === 'circle'
+  ? `<circle cx="${x}" cy="${y}" r="${r}" ${attrs}/>`
+  : `<rect x="${x - r * 0.8}" y="${y - r * 0.8}" width="${r * 1.6}" height="${r * 1.6}" transform="rotate(45 ${x} ${y})" ${attrs}/>`);
+
+// Gauge: where each group sits in its 3-year range today (solid marker) and 4 weeks ago (hollow), with the move between.
+// The two ends are the crowded zones.
+function posGauge(x, { compact = false } = {}) {
+  const groups = posPair(x);
+  if (!groups.length) return '<span class="faint small">no positioning data</span>';
+  const W = 300, L = 12, R = 288, X = (v) => L + ((R - L) * v) / 100, ty = compact ? 20 : 24, H = compact ? 34 : 50;
+  const lbl = [];
+  const body = groups.map((g) => {
+    const c = POS_ROLE[g.role].color, now = X(g.index);
+    const was = g.index4w == null ? null : X(g.index4w);
+    const trail = was != null && Math.abs(now - was) > 3
+      ? `<line x1="${was}" y1="${ty}" x2="${now}" y2="${ty}" stroke="${c}" stroke-width="2.5" stroke-opacity="0.45" stroke-linecap="round"/>${posMarker(g.role, was, ty, 4, `fill="var(--panel)" stroke="${c}" stroke-opacity="0.6" stroke-width="1.5"`)}` : '';
+    lbl.push({ x: now, v: g.index, c });
+    return trail + posMarker(g.role, now, ty, 6, `fill="${c}" stroke="var(--bg)" stroke-width="1.5"`);
+  }).join('');
+  // Number labels above the markers; nudge apart when the two sit close together.
+  lbl.sort((a, b) => a.x - b.x);
+  if (lbl.length === 2 && lbl[1].x - lbl[0].x < 22) { lbl[0].x -= 11; lbl[1].x += 11; }
+  const labels = lbl.map((l) => `<text x="${Math.min(R, Math.max(L, l.x))}" y="${ty - 10}" text-anchor="middle" class="g-num" fill="${l.c}">${l.v}</text>`).join('');
+  const scale = compact ? '' : `<text x="${L}" y="${H - 3}" class="g-axis">0 short</text><text x="${X(20)}" y="${H - 3}" text-anchor="middle" class="g-axis">20</text>
+    <text x="${X(50)}" y="${H - 3}" text-anchor="middle" class="g-axis">3-year range</text><text x="${X(80)}" y="${H - 3}" text-anchor="middle" class="g-axis">80</text><text x="${R}" y="${H - 3}" text-anchor="end" class="g-axis">long 100</text>`;
+  const title = groups.map((g) => `${g.name} ${g.index}${g.index4w != null ? ` (4 weeks ago ${g.index4w})` : ''}`).join('; ');
+  return `<svg class="pos-gauge" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}"><title>${esc(title)}</title>
+    <rect x="${L}" y="${ty - 4}" width="${R - L}" height="8" rx="4" fill="var(--panel-2)" stroke="var(--line)"/>
+    <rect x="${L}" y="${ty - 4}" width="${X(20) - L}" height="8" rx="4" fill="var(--warn-bg)"/><rect x="${X(80)}" y="${ty - 4}" width="${R - X(80)}" height="8" rx="4" fill="var(--warn-bg)"/>
+    <line x1="${X(50)}" x2="${X(50)}" y1="${ty - 6}" y2="${ty + 6}" stroke="var(--faint)"/>${body}${labels}${scale}</svg>`;
+}
+
+// 26-week trend of each group's index, crowded zones shaded.
+function posTrend(x) {
+  const groups = posPair(x).filter((g) => (g.spark || []).length > 1);
+  if (!groups.length) return '';
+  const W = 300, H = 74, T = 6, B = 62, Y = (v) => B - ((B - T) * v) / 100;
+  const lines = groups.map((g) => {
+    const n = g.spark.length, X = (i) => 4 + ((W - 8) * i) / (n - 1);
+    const pts = g.spark.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+    return `<polyline fill="none" stroke="${POS_ROLE[g.role].color}" stroke-width="2" stroke-linejoin="round" points="${pts}"/>${posMarker(g.role, X(n - 1), Y(g.spark[n - 1]), 4, `fill="${POS_ROLE[g.role].color}"`)}`;
+  }).join('');
+  return `<svg class="pos-trend" viewBox="0 0 ${W} ${H}" role="img" aria-label="Positioning index over the last 26 weeks"><title>Last 26 weeks</title>
+    <rect x="0" y="${Y(100)}" width="${W}" height="${Y(80) - Y(100)}" fill="var(--warn-bg)"/><rect x="0" y="${Y(20)}" width="${W}" height="${Y(0) - Y(20)}" fill="var(--warn-bg)"/>
+    <line x1="0" x2="${W}" y1="${Y(50)}" y2="${Y(50)}" stroke="var(--line)" stroke-dasharray="3 3"/>${lines}
+    <text x="2" y="${H - 1}" class="g-axis">26 weeks ago</text><text x="${W - 2}" y="${H - 1}" text-anchor="end" class="g-axis">now</text></svg>`;
+}
+const posLegend = (x) => posPair(x).map((g) => `<span class="pos-key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">${posMarker(g.role, 6, 6, 4.5, `fill="${POS_ROLE[g.role].color}"`)}</svg>${esc(g.name)} <b class="num">${g.index}</b> ${posTagPill(g.tag)}</span>`).join('');
+const posSqueeze = (x) => (x?.squeeze ? `<div class="small warn-t">Squeeze risk: ${esc(x.squeeze)}</div>` : '');
+// One card per currency or market: name, gauge, trend, legend.
+const posCard = (title, x, sub = '') => `<div class="pos-card"><div class="pos-card-head"><b>${title}</b>${sub ? ` <span class="small faint">${sub}</span>` : ''}</div>
+  ${posGauge(x)}${posTrend(x)}<div class="pos-legend">${posLegend(x)}</div>${posSqueeze(x)}</div>`;
+
+// Pair read: base against quote, for one trader group. Positive gap = that group is longer the base than the quote.
+const posPairRead = (C, pair, role) => {
+  const b = posGrp(C[pair.slice(0, 3)], role), q = posGrp(C[pair.slice(3)], role);
+  return b && q ? { b, q, gap: b.index - q.index } : null;
+};
+// Crowded my way: the group already sits at an extreme in my direction on either leg. Against me: the opposite.
+function posPairVerdict(C, pair, dir) {
+  const s = dir === 'LONG' ? 1 : -1, out = [];
+  for (const role of ['slow', 'fast']) {
+    const r = posPairRead(C, pair, role); if (!r) continue;
+    const name = role === 'slow' ? 'asset managers' : 'leveraged funds';
+    const mine = (s > 0 ? r.b.index >= 80 || r.q.index <= 20 : r.b.index <= 20 || r.q.index >= 80);
+    const against = (s > 0 ? r.b.index <= 20 || r.q.index >= 80 : r.b.index >= 80 || r.q.index <= 20);
+    if (mine) out.push(`<span class="pill warn">${name} crowded my way</span>`);
+    else if (against) out.push(`<span class="pill flat">${name} positioned against me</span>`);
+  }
+  return out.join(' ') || '<span class="pill flat">no extreme either side</span>';
+}
+// Pair as a tug of war: base leg's index against the quote leg's, per group. Bar runs from the centre toward the
+// leg that group favours.
+function posPairBar(C, pair) {
+  const rows = ['slow', 'fast'].map((role) => ({ role, r: posPairRead(C, pair, role) })).filter((x) => x.r);
+  if (!rows.length) return '';
+  const W = 160, M = W / 2, rh = 11;
+  const bars = rows.map(({ role, r }, i) => {
+    const w = (Math.abs(r.gap) / 100) * (M - 4), y = 2 + i * (rh + 3), c = POS_ROLE[role].color;
+    return `<rect x="${r.gap >= 0 ? M : M - w}" y="${y}" width="${Math.max(w, 1.5)}" height="${rh}" rx="2" fill="${c}" fill-opacity="0.85"/>`;
+  }).join('');
+  const h = rows.length * (rh + 3) + 1;
+  const t = rows.map(({ role, r }) => `${role === 'slow' ? 'Asset managers' : 'Leveraged funds'}: ${pair.slice(0, 3)} ${r.b.index} vs ${pair.slice(3)} ${r.q.index}`).join('; ');
+  return `<svg class="pos-pairbar" width="${W}" height="${h}" viewBox="0 0 ${W} ${h}" role="img" aria-label="${esc(t)}"><title>${esc(t)}</title>
+    <line x1="${M}" x2="${M}" y1="0" y2="${h}" stroke="var(--faint)"/>${bars}</svg>`;
+}
+// The markets and currencies an idea touches, as positioning cards. Shared by the Positioning and Ideas pages.
+function posIdeaCards(pos, idea) {
+  const C = pos.currencies || {}, M = Object.fromEntries((pos.markets || []).map((m) => [m.key, m]));
+  const L = posLinks(idea);
+  const cards = [
+    ...L.markets.map((k) => M[k]).filter(Boolean).map((m) => posCard(esc(m.label), m, esc(m.group))),
+    ...L.ccys.filter((c) => C[c]).map((c) => posCard(`<span class="ccy">${c}</span>`, C[c], C[c].derived ? 'derived' : '')),
+  ];
+  const pairs = L.pairs.filter((p) => posPairRead(C, p, 'slow')).map((p) => `<div class="pos-pairline"><b>${p}</b> ${posPairBar(C, p)} <span class="small faint">right of the line: favours ${p.slice(0, 3)}</span></div>`).join('');
+  const none = L.none.map((n) => `<p class="small faint">${esc(n)}</p>`).join('');
+  if (!cards.length && !pairs && !none) return '<p class="small faint">No market or currency on the Positioning page matches this idea\'s words. Name the market or currency in the idea to link it.</p>';
+  return `${cards.length ? `<div class="pos-grid">${cards.join('')}</div>` : ''}${pairs}${none}`;
+}
+
+// Does positioning agree with "crowded my way" for a currency call? +1 = I see it underpriced (bullish), -1 = overpriced.
+function posCrowdedMyWay(x, callSign) {
+  if (!x || !callSign) return null;
+  const hits = posPair(x).filter((g) => (callSign > 0 ? g.index >= 80 : g.index <= 20));
+  return { yes: hits.length > 0, why: hits.map((g) => `${g.name} ${g.index}`).join(', ') };
+}
+
 render.positioning = async (main) => {
   const [pos, ideas, index] = await Promise.all([loadLive('positioning', true), loadLive('ideas', true), loadLive('scorecard-index', true)]);
   if (!pos) { main.innerHTML = head('Positioning', '') + '<section class="panel"><div class="empty">No positioning file yet. It is written by <code>scripts/desk-positioning.mjs</code> in the daily CI run.</div></section>'; return; }
-  const C = pos.currencies || {}, M = Object.fromEntries((pos.markets || []).map((m) => [m.key, m]));
-  const grp = (x, role) => x?.groups?.find((g) => g.role === role) || null;
-  const tagPill = (t) => (t && POS_TAG[t] ? `<span class="pill ${POS_TAG[t][1]}">${POS_TAG[t][0]}</span>` : '');
+  const C = pos.currencies || {};
+  const grp = posGrp;
   const ageDays = Math.round((Date.now() - Date.parse(pos.cotDate + 'T12:00:00Z')) / 864e5);
 
-  // 0-100 index as a bar: the marker is where the net sits in its 3y range; the shaded ends are the extreme zones.
-  const idxBar = (g) => !g ? '<span class="faint">—</span>' : `<span class="idx" title="${esc(g.name)}: index ${g.index} of 100 (1 week ago ${g.index1w ?? '—'}, 4 weeks ago ${g.index4w ?? '—'})">
-    <span class="idx-track"><span class="idx-mark" style="left:${g.index}%"></span></span><b class="num">${g.index}</b></span>`;
-  const spark = (vals, w = 64, h = 18) => {
-    if (!vals?.length) return '';
-    const lo = Math.min(0, ...vals), hi = Math.max(100, ...vals);
-    const pts = vals.map((v, i) => `${(i / Math.max(1, vals.length - 1)) * w},${h - ((v - lo) / (hi - lo || 1)) * h}`).join(' ');
-    return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><line x1="0" x2="${w}" y1="${h * 0.2}" y2="${h * 0.2}" stroke="var(--line)"/><line x1="0" x2="${w}" y1="${h * 0.8}" y2="${h * 0.8}" stroke="var(--line)"/><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="${pts}"/></svg>`;
-  };
-  const chg = (g) => (g?.index4w == null ? '' : `<span class="small ${g.index - g.index4w >= 10 ? 'up' : g.index - g.index4w <= -10 ? 'down' : 'muted'} num">${sign(g.index - g.index4w)} in 4w</span>`);
-  const groupCell = (g) => !g ? '<td class="faint">—</td>' : `<td class="nowrap">${idxBar(g)} ${spark(g.spark)}<div>${tagPill(g.tag)} ${chg(g)}</div></td>`;
-  const sqz = (x) => (x?.squeeze ? `<div class="small warn-t">Squeeze risk: ${esc(x.squeeze)}</div>` : '');
-
-  // Pair read: base against quote, for one trader group. Positive gap = that group is longer the base than the quote.
-  const pairRead = (pair, role) => {
-    const b = grp(C[pair.slice(0, 3)], role), q = grp(C[pair.slice(3)], role);
-    return b && q ? { b, q, gap: b.index - q.index } : null;
-  };
-  // Crowded my way: the group already sits at an extreme in my direction on either leg. Against me: the opposite.
-  const pairVerdict = (pair, dir) => {
-    const s = dir === 'LONG' ? 1 : -1, out = [];
-    for (const role of ['slow', 'fast']) {
-      const r = pairRead(pair, role); if (!r) continue;
-      const name = role === 'slow' ? 'asset managers' : 'leveraged funds';
-      const mine = (s > 0 ? r.b.index >= 80 || r.q.index <= 20 : r.b.index <= 20 || r.q.index >= 80);
-      const against = (s > 0 ? r.b.index <= 20 || r.q.index >= 80 : r.b.index >= 80 || r.q.index <= 20);
-      if (mine) out.push(`<span class="pill warn">${name} crowded my way</span>`);
-      else if (against) out.push(`<span class="pill flat">${name} positioned against me</span>`);
-    }
-    return out.join(' ') || '<span class="pill flat">no extreme either side</span>';
-  };
+  const sqz = posSqueeze;
+  const pairRead = (pair, role) => posPairRead(C, pair, role);
+  const pairVerdict = (pair, dir) => posPairVerdict(C, pair, dir);
   const gapCell = (r) => (!r ? '<td class="faint">—</td>' : `<td class="nowrap num ${r.gap >= 40 ? 'up' : r.gap <= -40 ? 'down' : 'muted'}">${sign(r.gap)}<div class="small faint">${r.b.index} vs ${r.q.index}</div></td>`);
 
   // ---- my pairs ----
   const week = (index?.weeks || []).find((w) => (w.pairs || []).length);
   const myPairs = week?.pairs || [];
   const pairsPanel = panel(week ? `My pairs, week of ${fmtDate(week.monday)}` : 'My pairs', myPairs.length ? `<div class="table-wrap"><table>
-      <thead><tr><th>Pair</th><th>Asset managers, base vs quote</th><th>Leveraged funds, base vs quote</th><th>Against my direction</th></tr></thead>
-      <tbody>${myPairs.map((p) => `<tr><td class="nowrap"><b>${esc(p.pair)}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span></td>
+      <thead><tr><th>Pair</th><th>Base vs quote</th><th>Asset managers</th><th>Leveraged funds</th><th>Against my direction</th></tr></thead>
+      <tbody>${myPairs.map((p) => `<tr><td class="nowrap"><b>${esc(p.pair)}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span></td><td>${posPairBar(C, p.pair)}</td>
         ${gapCell(pairRead(p.pair, 'slow'))}${gapCell(pairRead(p.pair, 'fast'))}<td>${pairVerdict(p.pair, p.dir)}${sqz(C[p.pair.slice(0, 3)])}${sqz(C[p.pair.slice(3)])}</td></tr>`).join('')}</tbody></table></div>`
     : '<div class="empty">No pairs confirmed on a scorecard yet. Once a week has pairs, they show here against positioning. All 28 pairs are below.</div>',
     { href: 'scorecard.html', label: 'Scorecard' });
 
-  // ---- currencies ----
+  // ---- currencies: one card each, longest asset-manager positioning first ----
   const ccyRows = CCYS.filter((c) => C[c]).sort((a, b) => (grp(C[b], 'slow')?.index ?? 0) - (grp(C[a], 'slow')?.index ?? 0));
-  const ccyPanel = panel('Currencies', `<div class="table-wrap"><table>
-      <thead><tr><th>Currency</th><th>Asset managers <span class="faint">slow</span></th><th>Leveraged funds <span class="faint">fast</span></th><th>Dealers <span class="faint">hedging</span></th></tr></thead>
-      <tbody>${ccyRows.map((c) => { const x = C[c]; return `<tr><td><span class="ccy">${c}</span>${x.derived ? '<div class="small faint">derived</div>' : ''}${sqz(x)}</td>
-        ${groupCell(grp(x, 'slow'))}${groupCell(grp(x, 'fast'))}${x.derived ? '<td class="small faint">not derived</td>' : groupCell(grp(x, 'hedging'))}</tr>`; }).join('')}</tbody></table></div>
-    <p class="small faint">USD has no futures contract of its own in the COT data: its line is the dollar side of the seven currency futures, converted to dollars at each week's close.</p>`);
+  const dealerLine = (x) => { const d = grp(x, 'hedging'); return d ? `<div class="small faint">Dealers ${d.index} (hedging, not a view)</div>` : ''; };
+  const ccyPanel = panel('Currencies', `<div class="pos-grid">${ccyRows.map((c) => posCard(`<span class="ccy">${c}</span>`, C[c], C[c].derived ? 'derived from the seven' : '').replace(/<\/div>$/, `${dealerLine(C[c])}</div>`)).join('')}</div>
+    <p class="small faint">● asset managers (slow, real money) · ◆ leveraged funds (fast money). Hollow marker: 4 weeks ago. Shaded ends: crowded. USD has no futures contract of its own in the COT data: its line is the dollar side of the seven currency futures, converted to dollars at each week's close.</p>`);
 
-  // ---- JPY flows ----
+  // ---- JPY flows: diverging bars, last 4 weeks, coloured by what they do to the yen ----
   const jf = pos.jpyFlows;
-  const jpyPanel = !jf ? '' : panel('JPY: Japan\'s real-money flows', `<div class="table-wrap"><table>
-      <thead><tr><th>Flow</th><th>Week to ${esc(fmtDate(jf.weekEnding))}</th><th>Last 4 weeks</th><th>4 weeks vs 3y</th><th>For JPY</th></tr></thead>
-      <tbody>${jf.lines.map((l) => { const effect = Math.sign(l.sum4w) * l.jpy; return `<tr><td>${esc(l.label)}</td>
-        <td class="num">${sign(l.week)}</td><td class="num">${sign(l.sum4w)}</td><td class="nowrap">${idxBar({ name: l.label, index: l.index })}</td>
-        <td><span class="pill ${effect > 0 ? 'bull' : effect < 0 ? 'bear' : 'flat'}">${effect > 0 ? 'JPY inflow' : effect < 0 ? 'JPY outflow' : 'flat'}</span></td></tr>`; }).join('')}</tbody></table></div>
-    <p class="small faint">${esc(jf.source)}. ${esc(jf.unit)}. Published Thursdays. Japanese buying abroad sells yen unless hedged; foreigners buying Japan buys yen unless hedged.</p>`);
-
-  // ---- ideas ----
-  const openIdeas = (ideas?.ideas || []).filter((i) => i.status !== 'dropped').sort((a, b) => (a.date < b.date ? 1 : -1));
-  const mktRow = (m) => `<tr><td><b>${esc(m.label)}</b><div class="small faint">${esc(m.group)}</div>${sqz(m)}</td>${m.groups.map(groupCell).join('')}</tr>`;
-  const mktHead = (rep) => rep === 'disagg'
-    ? '<tr><th>Market</th><th>Managed money <span class="faint">fast</span></th><th>Producers <span class="faint">hedging</span></th><th>Swap dealers <span class="faint">hedging</span></th></tr>'
-    : '<tr><th>Market</th><th>Asset managers <span class="faint">slow</span></th><th>Leveraged funds <span class="faint">fast</span></th><th>Dealers <span class="faint">hedging</span></th></tr>';
-  const ideaBlock = (i) => {
-    const L = posLinks(i), mk = L.markets.map((k) => M[k]).filter(Boolean);
-    const title = i.text.split('\n')[0].slice(0, 110);
-    const byRep = (rep) => mk.filter((m) => m.report === rep);
-    const ccyLine = L.ccys.filter((c) => C[c]).map((c) => { const s = grp(C[c], 'slow'), f = grp(C[c], 'fast'); return `<li><span class="ccy">${c}</span> asset managers <b class="num">${s?.index ?? '—'}</b> ${tagPill(s?.tag)} · leveraged funds <b class="num">${f?.index ?? '—'}</b> ${tagPill(f?.tag)}</li>`; }).join('');
-    const empty = !mk.length && !ccyLine && !L.none.length;
-    return `<details class="research pos-idea" ${empty ? '' : 'open'}><summary>${esc(title)} <span class="faint small">${esc(fmtDate(i.date))} · ${esc(i.status)}</span></summary>
-      ${['tff', 'disagg'].map((rep) => byRep(rep).length ? `<div class="table-wrap"><table><thead>${mktHead(rep)}</thead><tbody>${byRep(rep).map(mktRow).join('')}</tbody></table></div>` : '').join('')}
-      ${ccyLine ? `<ul class="list">${ccyLine}</ul>` : ''}
-      ${L.pairs.map((p) => { const s = pairRead(p, 'slow'); return s ? `<p class="small muted">${esc(p)}: asset managers ${sign(s.gap)} base vs quote (${s.b.index} vs ${s.q.index}).</p>` : ''; }).join('')}
-      ${L.none.map((n) => `<p class="small faint">${esc(n)}</p>`).join('')}
-      ${empty ? '<p class="small faint">Nothing on this page matches this idea\'s words. Name the market or currency in the idea to link it.</p>' : ''}</details>`;
+  const jpyBars = () => {
+    const max = Math.max(...jf.lines.map((l) => Math.abs(l.sum4w)), 1), W = 300, M = W / 2;
+    return jf.lines.map((l) => {
+      const effect = Math.sign(l.sum4w) * l.jpy, w = (Math.abs(l.sum4w) / max) * (M - 10);
+      const col = effect > 0 ? 'var(--bull)' : effect < 0 ? 'var(--bear)' : 'var(--flat)';
+      return `<div class="jpy-row"><div class="small">${esc(l.label)} <span class="faint">· week ${sign(l.week)}</span></div>
+        <svg viewBox="0 0 ${W} 18" class="jpy-bar" role="img" aria-label="${esc(l.label)}: ${sign(l.sum4w)} bn over 4 weeks"><line x1="${M}" x2="${M}" y1="0" y2="18" stroke="var(--faint)"/>
+        <rect x="${l.sum4w >= 0 ? M : M - w}" y="3" width="${Math.max(w, 1.5)}" height="12" rx="2" fill="${col}"/>
+        <text x="${l.sum4w >= 0 ? M - 4 : M + 4}" y="13" text-anchor="${l.sum4w >= 0 ? 'end' : 'start'}" class="g-num" fill="var(--muted)">${sign(l.sum4w)}</text></svg>
+        <span class="pill ${effect > 0 ? 'bull' : effect < 0 ? 'bear' : 'flat'}">${effect > 0 ? 'JPY inflow' : effect < 0 ? 'JPY outflow' : 'flat'}</span> <span class="small faint">4-week total sits at ${l.index} of its 3-year range</span></div>`;
+    }).join('');
   };
+  const jpyPanel = !jf ? '' : panel(`JPY: Japan's real-money flows, 4 weeks to ${fmtDate(jf.weekEnding)}`, `${jpyBars()}
+    <p class="small faint">${esc(jf.source)}. ${esc(jf.unit)}. Bars left of the line are net selling, right net buying. Published Thursdays. Japanese buying abroad sells yen unless hedged; foreigners buying Japan buys yen unless hedged.</p>`);
+
+  // ---- ideas: a card per linked market and currency ----
+  const openIdeas = (ideas?.ideas || []).filter((i) => i.status !== 'dropped').sort((a, b) => (a.date < b.date ? 1 : -1));
+  const ideaBlock = (i) => `<details class="research pos-idea" open><summary>${esc(i.text.split('\n')[0].slice(0, 110))} <span class="faint small">${esc(fmtDate(i.date))} · ${esc(i.status)}</span></summary>${posIdeaCards(pos, i)}</details>`;
   const ideasPanel = panel('My ideas', openIdeas.map(ideaBlock).join('') || '<div class="empty">No open ideas.</div>', { href: 'ideas.html', label: 'Ideas' });
 
-  // ---- all pairs ----
+  // ---- all pairs: tug-of-war bars ----
   const allPairs = ALL_PAIRS.map((p) => ({ p, s: pairRead(p, 'slow'), f: pairRead(p, 'fast') })).filter((r) => r.s).sort((a, b) => Math.abs(b.s.gap) - Math.abs(a.s.gap));
-  const allPanel = panel('All 28 pairs', `<details class="research"><summary>Sorted by how far apart asset managers are on the two legs</summary><div class="table-wrap"><table>
-      <thead><tr><th>Pair</th><th>Asset managers, base vs quote</th><th>Leveraged funds, base vs quote</th><th>Squeeze risk on a leg</th></tr></thead>
-      <tbody>${allPairs.map((r) => `<tr><td><b>${r.p}</b></td>${gapCell(r.s)}${gapCell(r.f)}<td class="small">${[r.p.slice(0, 3), r.p.slice(3)].filter((c) => C[c]?.squeeze).map((c) => `${c}: ${esc(C[c].squeeze)}`).join('<br>') || '<span class="faint">none</span>'}</td></tr>`).join('')}</tbody></table></div></details>`);
+  const allPanel = panel('All 28 pairs', `<details class="research"><summary>Sorted by how far apart asset managers are on the two legs. Bar right of the line: that group favours the base currency.</summary><div class="table-wrap"><table>
+      <thead><tr><th>Pair</th><th>Base vs quote</th><th>Asset managers</th><th>Leveraged funds</th><th>Squeeze risk on a leg</th></tr></thead>
+      <tbody>${allPairs.map((r) => `<tr><td><b>${r.p}</b></td><td>${posPairBar(C, r.p)}</td>${gapCell(r.s)}${gapCell(r.f)}<td class="small">${[r.p.slice(0, 3), r.p.slice(3)].filter((c) => C[c]?.squeeze).map((c) => `${c}: ${esc(C[c].squeeze)}`).join('<br>') || '<span class="faint">none</span>'}</td></tr>`).join('')}</tbody></table></div></details>`);
 
-  // ---- all markets ----
-  const marketsPanel = panel('Markets', ['tff', 'disagg'].map((rep) => `<div class="table-wrap"><table><thead>${mktHead(rep)}</thead><tbody>${(pos.markets || []).filter((m) => m.report === rep).map(mktRow).join('')}</tbody></table></div>`).join(''));
+  // ---- all markets: cards grouped by kind ----
+  const kinds = [...new Set((pos.markets || []).map((m) => m.group))];
+  const marketsPanel = panel('Markets', kinds.map((k) => `<div class="small muted pos-kind">${esc(k)}</div><div class="pos-grid">${(pos.markets || []).filter((m) => m.group === k).map((m) => posCard(esc(m.label), m, m.report === 'disagg' ? 'managed money only: commodities have no asset-manager split' : '')).join('')}</div>`).join(''));
 
   main.innerHTML = head('Positioning', `How capital is positioned in my currencies, my pairs and the markets my ideas touch. CFTC report of ${esc(fmtDate(pos.cotDate))} (Tuesday snapshot, released the Friday after). Each number is where that group's net position sits in its own ${pos.lookbackYears}-year range: 0 is the shortest it has been, 100 the longest.`,
       `<span class="pill ${ageDays > 11 ? 'warn' : 'flat'}">COT ${ageDays} days old</span>`) +

@@ -16,11 +16,11 @@ Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://
 | Page | File | Holds |
 |---|---|---|
 | Today | `index.html` | This week's confirmed pairs against live prices (last, today, week, 1 month, with or against his call, a live TradingView mini chart, his events, levels and kill switches for the pair); every currency's score against its move; the seven-question daily read with links; the three-line daily note |
-| Scorecard | `scorecard.html` | The weekly build: his read per currency, his call, score, ranking, pair proposals, week-ahead events with if/then |
+| Scorecard | `scorecard.html` | The weekly build: his read per currency, his call, score, ranking, pair proposals, week-ahead events with if/then. A positioning map (COT gauge per currency) heads it; each currency card carries its gauge; "COT crowded my way" fills itself from positioning once a call is made (`crowdedBy: cot`) until he ticks it himself (`crowdedBy: me`); each proposed pair shows a base-vs-quote bar and whether positioning is crowded his way |
 | Kill Switches | `kill-switches.html` | Conditions that change or end a bias |
 | Key Levels | `levels.html` | His own levels, sorted by distance from the live price |
-| Positioning | `positioning.html` | How capital is positioned: his confirmed pairs against positioning (crowded his way or against him), the eight currencies (asset managers, leveraged funds, dealers), each open idea's markets and currencies, Japan's weekly real-money flows for JPY, all 28 pairs, and the markets list. Read-only |
-| Ideas | `ideas.html` | Inbox for ideas from podcasts, videos, calls: open, kept or dropped |
+| Positioning | `positioning.html` | How capital is positioned: his confirmed pairs against positioning (crowded his way or against him), the eight currencies (asset managers, leveraged funds, dealers), each open idea's markets and currencies, Japan's weekly real-money flows for JPY, all 28 pairs, and the markets list. Read-only. Visuals shared with Scorecard and Ideas: `posGauge` (0-100 track, crowded ends shaded, ● asset managers, ◆ leveraged funds / managed money, hollow = 4 weeks ago), `posTrend` (26 weeks), `posPairBar` (base vs quote) |
+| Ideas | `ideas.html` | Inbox for ideas from podcasts, videos, calls: open, kept or dropped. Once an idea has research, positioning cards for its markets and currencies show under it, open |
 | Review | `review.html` | Each saved week graded from prices: pairs by their move in his direction, currency calls by the currency against the other seven |
 
 All pages are thin shells (`<body data-page="…">`); `assets/desk.js` draws the nav and one renderer per page.
