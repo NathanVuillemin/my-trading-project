@@ -71,6 +71,12 @@ published file predates yesterday's final close, pages flag the day change as ap
 The TradingView mini charts on Today are the only tick-live element.
 Local: `npm run desk:live` writes `data/live.json` (git-ignored), which the local preview also reads.
 
+## As an app on the laptop and the iPad
+The desk carries a web app manifest (`manifest.webmanifest`, icons in `assets/icons/`). On the iPad: Safari → Share → Add to
+Home Screen. On the laptop: Chrome or Edge → Install app. Both are a window around the live site, so every deploy reaches
+them on the next open (after Pages' ten-minute cache); nothing to reinstall. The installed copy has its own storage, so the
+token and the brief links are pasted once more inside it. No service worker, so no offline mode and no stale-cache trap.
+
 ## Saving
 Pages are static, so saves go straight to the repo. Nathan pastes a fine-grained token (this repo only,
 Contents read and write) once per device on any page; it stays in that browser's localStorage and is sent only

@@ -40,6 +40,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
   background: rgba(11, 15, 20, 0.92);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top); /* installed app on iPad: keep the bar below the status bar */
 }
 .topbar-inner {
   max-width: 1280px; margin: 0 auto; padding: 0 16px;
