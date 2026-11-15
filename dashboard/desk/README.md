@@ -4,7 +4,8 @@ Nathan's own layer on top of what he already receives. Market Context and his co
 the data; this desk holds what he does with it: his weekly scorecard and pairs, his if/then lines, kill
 switches, key levels, daily notes, ideas, and a review of whether his calls were right.
 
-**Rule: the desk shows no data he is sent elsewhere.** The one thing it reads is a small live price file,
+**Rule: the desk shows no data he is sent elsewhere.** One exception Nathan asked for (2026-11-15): the Positioning
+page, which reads official positioning data for his currencies and the markets his ideas touch. Otherwise the one thing it reads is a small live price file,
 used only to hold his own entries against the market.
 
 Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://localhost:8787/desk/
@@ -18,6 +19,7 @@ Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://
 | Scorecard | `scorecard.html` | The weekly build: his read per currency, his call, score, ranking, pair proposals, week-ahead events with if/then |
 | Kill Switches | `kill-switches.html` | Conditions that change or end a bias |
 | Key Levels | `levels.html` | His own levels, sorted by distance from the live price |
+| Positioning | `positioning.html` | How capital is positioned: his confirmed pairs against positioning (crowded his way or against him), the eight currencies (asset managers, leveraged funds, dealers), each open idea's markets and currencies, Japan's weekly real-money flows for JPY, all 28 pairs, and the markets list. Read-only |
 | Ideas | `ideas.html` | Inbox for ideas from podcasts, videos, calls: open, kept or dropped |
 | Review | `review.html` | Each saved week graded from prices: pairs by their move in his direction, currency calls by the currency against the other seven |
 
@@ -33,6 +35,7 @@ Everything Nathan types is one JSON file per domain in `data/`, committed throug
 | `killswitches.json` | Kill switches | `kinds{}, effects{}, killSwitches[{id, currency, kind, condition, now, effect, status (armed/near/fired), firedOn, by, created, edited}]` |
 | `levels.json` | Key levels | `note, families{}, types{key: {family, desc}}, statuses{}, levels[{id, instrument, level, type, side, who, evidence, status, lastTouch, created, edited}]` |
 | `ideas.json` | Ideas | `ideas[{id, date, source, text, status (open/kept/dropped), research?}]`. `research` is written by the `idea-researcher` agent through `scripts/idea-research.mjs --apply`: thesis, instruments, claims with verdicts and sources, what is priced, what confirms and kills it, fit with the routine, a keep/drop/watch suggestion. Read-only on the page; the decision is Nathan's |
+| `positioning.json` | Positioning | Written by `scripts/desk-positioning.mjs` (`npm run positioning`) in the daily CI run: `cotDate, lookbackYears, currencies{CCY: {groups[{name, role (slow/fast/hedging), net, index, index1w, index4w, shareOfOi, tag, spark}], squeeze}}, markets[...], jpyFlows{weekEnding, lines[]}, warns`. Index = percentile of the net inside its own 3-year range. CFTC TFF for FX and financials, disaggregated for commodities; USD derived from the seven legs in dollars (no dollar-index contract exists in COT). Ideas link to markets by keywords in `desk.js` (`POS_IDEA_MARKETS`). Not included: CME daily open interest (CME blocks scripts and its terms forbid scraping) and retail sentiment (Myfxbook behind Cloudflare, others need an account) |
 | `correlations.json` | Not used by any page. Still written daily by `scripts/correlations.mjs` until Nathan decides whether to keep that job | |
 
 ## Ideas: from a podcast to a checked idea

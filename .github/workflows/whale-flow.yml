@@ -96,6 +96,11 @@ jobs:
         continue-on-error: true
         run: node scripts/correlations.mjs
 
+      - name: Positioning for the desk (CFTC COT + Japan MoF flows)
+        id: positioning
+        continue-on-error: true
+        run: node scripts/desk-positioning.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -117,6 +122,7 @@ jobs:
             echo "| macro-pulse | ${{ steps.pulse.outcome }} |"
             echo "| rates | ${{ steps.rates.outcome }} |"
             echo "| correlations | ${{ steps.corr.outcome }} |"
+            echo "| positioning | ${{ steps.positioning.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —

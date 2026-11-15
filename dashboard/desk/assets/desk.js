@@ -9,6 +9,7 @@ const PAGES = [
   { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard' },
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
+  { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
   { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
@@ -961,6 +962,151 @@ render.ideas = async (main) => {
     }
   });
   draw();
+};
+
+// ---------- positioning (how capital is positioned in my currencies, pairs and ideas) ----------
+// Read-only. scripts/desk-positioning.mjs writes data/positioning.json in CI from CFTC COT (TFF for FX and
+// financials, disaggregated for commodities) and Japan's MoF weekly flows. Every number is an index: where a
+// group's net sits in its own three-year range. Tags follow fixed rules shown at the foot of the page, so the
+// page reports positioning and never makes a call.
+const POS_TAG = {
+  'crowded-long': ['crowded long', 'warn'], 'crowded-short': ['crowded short', 'warn'],
+  'unwinding-long': ['longs unwinding', 'bear'], 'unwinding-short': ['shorts covering', 'bull'],
+  'building-long': ['building long', 'bull'], 'building-short': ['building short', 'bear'], neutral: ['no extreme', 'flat'],
+};
+// Words in an idea that point at a market on this page. Uranium has no CFTC futures, so it is named, not matched.
+const POS_IDEA_MARKETS = [
+  [/\bgold\b|xau|precious/i, ['GOLD']], [/silver|xag/i, ['SILVER']], [/copper/i, ['COPPER']], [/platinum/i, ['PLATINUM']],
+  [/\boil\b|crude|\bwti\b|brent|opec/i, ['WTI', 'BRENT']], [/natural gas|nat ?gas|\blng\b/i, ['NATGAS']],
+  [/nasdaq|\bndx\b|\bnq\b|nvidia|nvda|semis|\bsmh\b|\bsox\b|\bai\b|tech/i, ['NDX']], [/s&p|\bspx\b|\bes\b|equities|stocks/i, ['SPX']],
+  [/\bvix\b|volatility/i, ['VIX']], [/treasur|\b10y\b|10-year|yields?\b/i, ['UST10']], [/\b2y\b|2-year/i, ['UST2']],
+];
+const POS_NO_MARKET = [[/uranium|\bura\b|urnm|cameco|\bccj\b/i, 'Uranium: no regulated futures positioning is published.']];
+const POS_CCY_WORDS = [[/dollar|greenback|\bdxy\b/i, 'USD'], [/\byen\b/i, 'JPY'], [/\beuro\b/i, 'EUR'], [/sterling|\bpound\b/i, 'GBP'], [/\bfranc\b/i, 'CHF'], [/loonie/i, 'CAD'], [/aussie/i, 'AUD'], [/\bkiwi\b/i, 'NZD']];
+
+function posLinks(idea) {
+  const text = [idea.text, ...(idea.research?.instruments || [])].join(' \n ');
+  const markets = new Set(), ccys = new Set(), pairs = new Set(), none = [];
+  for (const [re, keys] of POS_IDEA_MARKETS) if (re.test(text)) keys.forEach((k) => markets.add(k));
+  for (const [re, msg] of POS_NO_MARKET) if (re.test(text)) none.push(msg);
+  for (const [re, c] of POS_CCY_WORDS) if (re.test(text)) ccys.add(c);
+  for (const m of text.matchAll(/\b(USD|EUR|GBP|JPY|CHF|CAD|AUD|NZD)(USD|EUR|GBP|JPY|CHF|CAD|AUD|NZD)?\b/g)) {
+    ccys.add(m[1]); if (m[2]) { ccys.add(m[2]); pairs.add(m[1] + m[2]); }
+  }
+  return { markets: [...markets], ccys: [...ccys], pairs: [...pairs], none };
+}
+
+render.positioning = async (main) => {
+  const [pos, ideas, index] = await Promise.all([loadLive('positioning', true), loadLive('ideas', true), loadLive('scorecard-index', true)]);
+  if (!pos) { main.innerHTML = head('Positioning', '') + '<section class="panel"><div class="empty">No positioning file yet. It is written by <code>scripts/desk-positioning.mjs</code> in the daily CI run.</div></section>'; return; }
+  const C = pos.currencies || {}, M = Object.fromEntries((pos.markets || []).map((m) => [m.key, m]));
+  const grp = (x, role) => x?.groups?.find((g) => g.role === role) || null;
+  const tagPill = (t) => (t && POS_TAG[t] ? `<span class="pill ${POS_TAG[t][1]}">${POS_TAG[t][0]}</span>` : '');
+  const ageDays = Math.round((Date.now() - Date.parse(pos.cotDate + 'T12:00:00Z')) / 864e5);
+
+  // 0-100 index as a bar: the marker is where the net sits in its 3y range; the shaded ends are the extreme zones.
+  const idxBar = (g) => !g ? '<span class="faint">—</span>' : `<span class="idx" title="${esc(g.name)}: index ${g.index} of 100 (1 week ago ${g.index1w ?? '—'}, 4 weeks ago ${g.index4w ?? '—'})">
+    <span class="idx-track"><span class="idx-mark" style="left:${g.index}%"></span></span><b class="num">${g.index}</b></span>`;
+  const spark = (vals, w = 64, h = 18) => {
+    if (!vals?.length) return '';
+    const lo = Math.min(0, ...vals), hi = Math.max(100, ...vals);
+    const pts = vals.map((v, i) => `${(i / Math.max(1, vals.length - 1)) * w},${h - ((v - lo) / (hi - lo || 1)) * h}`).join(' ');
+    return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><line x1="0" x2="${w}" y1="${h * 0.2}" y2="${h * 0.2}" stroke="var(--line)"/><line x1="0" x2="${w}" y1="${h * 0.8}" y2="${h * 0.8}" stroke="var(--line)"/><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="${pts}"/></svg>`;
+  };
+  const chg = (g) => (g?.index4w == null ? '' : `<span class="small ${g.index - g.index4w >= 10 ? 'up' : g.index - g.index4w <= -10 ? 'down' : 'muted'} num">${sign(g.index - g.index4w)} in 4w</span>`);
+  const groupCell = (g) => !g ? '<td class="faint">—</td>' : `<td class="nowrap">${idxBar(g)} ${spark(g.spark)}<div>${tagPill(g.tag)} ${chg(g)}</div></td>`;
+  const sqz = (x) => (x?.squeeze ? `<div class="small warn-t">Squeeze risk: ${esc(x.squeeze)}</div>` : '');
+
+  // Pair read: base against quote, for one trader group. Positive gap = that group is longer the base than the quote.
+  const pairRead = (pair, role) => {
+    const b = grp(C[pair.slice(0, 3)], role), q = grp(C[pair.slice(3)], role);
+    return b && q ? { b, q, gap: b.index - q.index } : null;
+  };
+  // Crowded my way: the group already sits at an extreme in my direction on either leg. Against me: the opposite.
+  const pairVerdict = (pair, dir) => {
+    const s = dir === 'LONG' ? 1 : -1, out = [];
+    for (const role of ['slow', 'fast']) {
+      const r = pairRead(pair, role); if (!r) continue;
+      const name = role === 'slow' ? 'asset managers' : 'leveraged funds';
+      const mine = (s > 0 ? r.b.index >= 80 || r.q.index <= 20 : r.b.index <= 20 || r.q.index >= 80);
+      const against = (s > 0 ? r.b.index <= 20 || r.q.index >= 80 : r.b.index >= 80 || r.q.index <= 20);
+      if (mine) out.push(`<span class="pill warn">${name} crowded my way</span>`);
+      else if (against) out.push(`<span class="pill flat">${name} positioned against me</span>`);
+    }
+    return out.join(' ') || '<span class="pill flat">no extreme either side</span>';
+  };
+  const gapCell = (r) => (!r ? '<td class="faint">—</td>' : `<td class="nowrap num ${r.gap >= 40 ? 'up' : r.gap <= -40 ? 'down' : 'muted'}">${sign(r.gap)}<div class="small faint">${r.b.index} vs ${r.q.index}</div></td>`);
+
+  // ---- my pairs ----
+  const week = (index?.weeks || []).find((w) => (w.pairs || []).length);
+  const myPairs = week?.pairs || [];
+  const pairsPanel = panel(week ? `My pairs, week of ${fmtDate(week.monday)}` : 'My pairs', myPairs.length ? `<div class="table-wrap"><table>
+      <thead><tr><th>Pair</th><th>Asset managers, base vs quote</th><th>Leveraged funds, base vs quote</th><th>Against my direction</th></tr></thead>
+      <tbody>${myPairs.map((p) => `<tr><td class="nowrap"><b>${esc(p.pair)}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span></td>
+        ${gapCell(pairRead(p.pair, 'slow'))}${gapCell(pairRead(p.pair, 'fast'))}<td>${pairVerdict(p.pair, p.dir)}${sqz(C[p.pair.slice(0, 3)])}${sqz(C[p.pair.slice(3)])}</td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="empty">No pairs confirmed on a scorecard yet. Once a week has pairs, they show here against positioning. All 28 pairs are below.</div>',
+    { href: 'scorecard.html', label: 'Scorecard' });
+
+  // ---- currencies ----
+  const ccyRows = CCYS.filter((c) => C[c]).sort((a, b) => (grp(C[b], 'slow')?.index ?? 0) - (grp(C[a], 'slow')?.index ?? 0));
+  const ccyPanel = panel('Currencies', `<div class="table-wrap"><table>
+      <thead><tr><th>Currency</th><th>Asset managers <span class="faint">slow</span></th><th>Leveraged funds <span class="faint">fast</span></th><th>Dealers <span class="faint">hedging</span></th></tr></thead>
+      <tbody>${ccyRows.map((c) => { const x = C[c]; return `<tr><td><span class="ccy">${c}</span>${x.derived ? '<div class="small faint">derived</div>' : ''}${sqz(x)}</td>
+        ${groupCell(grp(x, 'slow'))}${groupCell(grp(x, 'fast'))}${x.derived ? '<td class="small faint">not derived</td>' : groupCell(grp(x, 'hedging'))}</tr>`; }).join('')}</tbody></table></div>
+    <p class="small faint">USD has no futures contract of its own in the COT data: its line is the dollar side of the seven currency futures, converted to dollars at each week's close.</p>`);
+
+  // ---- JPY flows ----
+  const jf = pos.jpyFlows;
+  const jpyPanel = !jf ? '' : panel('JPY: Japan\'s real-money flows', `<div class="table-wrap"><table>
+      <thead><tr><th>Flow</th><th>Week to ${esc(fmtDate(jf.weekEnding))}</th><th>Last 4 weeks</th><th>4 weeks vs 3y</th><th>For JPY</th></tr></thead>
+      <tbody>${jf.lines.map((l) => { const effect = Math.sign(l.sum4w) * l.jpy; return `<tr><td>${esc(l.label)}</td>
+        <td class="num">${sign(l.week)}</td><td class="num">${sign(l.sum4w)}</td><td class="nowrap">${idxBar({ name: l.label, index: l.index })}</td>
+        <td><span class="pill ${effect > 0 ? 'bull' : effect < 0 ? 'bear' : 'flat'}">${effect > 0 ? 'JPY inflow' : effect < 0 ? 'JPY outflow' : 'flat'}</span></td></tr>`; }).join('')}</tbody></table></div>
+    <p class="small faint">${esc(jf.source)}. ${esc(jf.unit)}. Published Thursdays. Japanese buying abroad sells yen unless hedged; foreigners buying Japan buys yen unless hedged.</p>`);
+
+  // ---- ideas ----
+  const openIdeas = (ideas?.ideas || []).filter((i) => i.status !== 'dropped').sort((a, b) => (a.date < b.date ? 1 : -1));
+  const mktRow = (m) => `<tr><td><b>${esc(m.label)}</b><div class="small faint">${esc(m.group)}</div>${sqz(m)}</td>${m.groups.map(groupCell).join('')}</tr>`;
+  const mktHead = (rep) => rep === 'disagg'
+    ? '<tr><th>Market</th><th>Managed money <span class="faint">fast</span></th><th>Producers <span class="faint">hedging</span></th><th>Swap dealers <span class="faint">hedging</span></th></tr>'
+    : '<tr><th>Market</th><th>Asset managers <span class="faint">slow</span></th><th>Leveraged funds <span class="faint">fast</span></th><th>Dealers <span class="faint">hedging</span></th></tr>';
+  const ideaBlock = (i) => {
+    const L = posLinks(i), mk = L.markets.map((k) => M[k]).filter(Boolean);
+    const title = i.text.split('\n')[0].slice(0, 110);
+    const byRep = (rep) => mk.filter((m) => m.report === rep);
+    const ccyLine = L.ccys.filter((c) => C[c]).map((c) => { const s = grp(C[c], 'slow'), f = grp(C[c], 'fast'); return `<li><span class="ccy">${c}</span> asset managers <b class="num">${s?.index ?? '—'}</b> ${tagPill(s?.tag)} · leveraged funds <b class="num">${f?.index ?? '—'}</b> ${tagPill(f?.tag)}</li>`; }).join('');
+    const empty = !mk.length && !ccyLine && !L.none.length;
+    return `<details class="research pos-idea" ${empty ? '' : 'open'}><summary>${esc(title)} <span class="faint small">${esc(fmtDate(i.date))} · ${esc(i.status)}</span></summary>
+      ${['tff', 'disagg'].map((rep) => byRep(rep).length ? `<div class="table-wrap"><table><thead>${mktHead(rep)}</thead><tbody>${byRep(rep).map(mktRow).join('')}</tbody></table></div>` : '').join('')}
+      ${ccyLine ? `<ul class="list">${ccyLine}</ul>` : ''}
+      ${L.pairs.map((p) => { const s = pairRead(p, 'slow'); return s ? `<p class="small muted">${esc(p)}: asset managers ${sign(s.gap)} base vs quote (${s.b.index} vs ${s.q.index}).</p>` : ''; }).join('')}
+      ${L.none.map((n) => `<p class="small faint">${esc(n)}</p>`).join('')}
+      ${empty ? '<p class="small faint">Nothing on this page matches this idea\'s words. Name the market or currency in the idea to link it.</p>' : ''}</details>`;
+  };
+  const ideasPanel = panel('My ideas', openIdeas.map(ideaBlock).join('') || '<div class="empty">No open ideas.</div>', { href: 'ideas.html', label: 'Ideas' });
+
+  // ---- all pairs ----
+  const allPairs = ALL_PAIRS.map((p) => ({ p, s: pairRead(p, 'slow'), f: pairRead(p, 'fast') })).filter((r) => r.s).sort((a, b) => Math.abs(b.s.gap) - Math.abs(a.s.gap));
+  const allPanel = panel('All 28 pairs', `<details class="research"><summary>Sorted by how far apart asset managers are on the two legs</summary><div class="table-wrap"><table>
+      <thead><tr><th>Pair</th><th>Asset managers, base vs quote</th><th>Leveraged funds, base vs quote</th><th>Squeeze risk on a leg</th></tr></thead>
+      <tbody>${allPairs.map((r) => `<tr><td><b>${r.p}</b></td>${gapCell(r.s)}${gapCell(r.f)}<td class="small">${[r.p.slice(0, 3), r.p.slice(3)].filter((c) => C[c]?.squeeze).map((c) => `${c}: ${esc(C[c].squeeze)}`).join('<br>') || '<span class="faint">none</span>'}</td></tr>`).join('')}</tbody></table></div></details>`);
+
+  // ---- all markets ----
+  const marketsPanel = panel('Markets', ['tff', 'disagg'].map((rep) => `<div class="table-wrap"><table><thead>${mktHead(rep)}</thead><tbody>${(pos.markets || []).filter((m) => m.report === rep).map(mktRow).join('')}</tbody></table></div>`).join(''));
+
+  main.innerHTML = head('Positioning', `How capital is positioned in my currencies, my pairs and the markets my ideas touch. CFTC report of ${esc(fmtDate(pos.cotDate))} (Tuesday snapshot, released the Friday after). Each number is where that group's net position sits in its own ${pos.lookbackYears}-year range: 0 is the shortest it has been, 100 the longest.`,
+      `<span class="pill ${ageDays > 11 ? 'warn' : 'flat'}">COT ${ageDays} days old</span>`) +
+    ((pos.warns || []).length ? `<div class="note small">Data warnings: ${pos.warns.map(esc).join(' · ')}</div>` : '') +
+    pairsPanel + ccyPanel + ideasPanel + jpyPanel + allPanel + marketsPanel +
+    `<section class="panel"><div class="panel-head"><h2>How to read it</h2></div><ul class="small muted">
+      <li><b>Crowded</b>: index 80 or higher (long) or 20 or lower (short). Crowded is not a signal on its own: extremes can last months.</li>
+      <li><b>Longs unwinding / shorts covering</b>: was at an extreme in the last 8 weeks and has come back 15+ points. This is when crowding starts to move price.</li>
+      <li><b>Building</b>: moved 20+ points in 4 weeks without reaching an extreme: fresh positioning.</li>
+      <li><b>Squeeze risk</b>: fast money at one extreme (25 or lower, or 75 or higher) while real money sits at the other.</li>
+      <li><b>Hedging groups</b> (dealers, producers, swap dealers) take the other side of flow by obligation. Their extremes mark size, not a crowd, so they carry no tag.</li>
+      <li>For commodities the disaggregated report is used; for currencies and financials the TFF report. Legacy "commercials" are never used for currencies: they mix dealer hedging with real money.</li>
+      <li>Not here: CME daily open interest (CME blocks automated access) and retail sentiment (no open source found).</li>
+    </ul></section>`;
 };
 
 // ---------- review (were my calls right? graded from prices, not from memory) ----------
