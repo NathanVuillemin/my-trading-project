@@ -7,6 +7,8 @@
 const PAGES = [
   { id: 'hub', href: 'index.html', label: 'Today' },
   { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard' },
+  { id: 'countries', href: 'countries.html', label: 'Countries' },
+  { id: 'playbook', href: 'playbook.html', label: 'Playbook' },
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
   { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
@@ -360,7 +362,7 @@ render.hub = async (main) => {
 
   const callsHtml = () => {
     const order = prices ? [...CCYS].sort((a, b) => prices.currencies[a].rankWtd - prices.currencies[b].rankWtd) : CCYS;
-    return `<div class="table-wrap"><table><thead><tr><th>Ccy</th><th>My score</th><th>Today</th><th>This week</th><th>1M rank</th><th>Week vs my call</th></tr></thead><tbody>${order.map((c) => {
+    return `<div class="table-wrap"><table><thead><tr><th>Ccy</th><th>My score</th><th>Today</th><th>This week</th><th title="Where the currency's move over the last month ranks against the other seven: 1 = strongest, 8 = weakest">1-month move rank</th><th>Week vs my call</th></tr></thead><tbody>${order.map((c) => {
       const sc = card && card.active?.includes(c) ? scScore(card.currencies[c]) : null, s = prices?.currencies?.[c];
       return `<tr><td><span class="ccy">${c}</span></td><td>${sc == null ? '<span class="faint">no call</span>' : scoreChip(sc)}</td><td>${pctHtml(s?.dayPct)}</td><td>${pctHtml(s?.wtdPct)}</td>
         <td class="num small">${s ? `${s.rankM1} of 8` : '—'}</td><td>${sc && s ? wayPill(Math.sign(sc) * signOf(s.wtdPct)) : '<span class="faint">—</span>'}</td></tr>`;
@@ -547,17 +549,48 @@ render.scorecard = async (main) => {
     <p class="small faint" style="margin:6px 0 0">● asset managers (slow) · ◆ leveraged funds (fast) · hollow = 4 weeks ago · shaded ends = crowded. "COT crowded my way" in each currency fills itself from this once I make a call; ticking it myself overrides.</p></section>`);
   dirty = applyCot() || dirty;
 
+  // The course's five layers against my call for this currency. Each layer reads one thing already on the card:
+  //   Country = context only (link). Data = growth, inflation, unemployment directions (rising growth and inflation,
+  //   falling unemployment lean bullish). Markets = 1-month move rank (top 3 / bottom 3). Expectations = the bank's
+  //   lean against my call. Positioning = COT: crowded my way is a risk, positioned against me is room.
+  const FUNNEL = ['Country', 'Economic data', 'Markets', 'Expectations', 'Positioning'];
+  const layerReads = (code) => {
+    const r = card.currencies[code], s = callSign(r);
+    const d = { rising: 1, falling: -1 }, dataSum = (d[r.growth.dir] || 0) + (d[r.inflation.dir] || 0) - (d[r.labour.dir] || 0);
+    const dataKnown = r.growth.dir || r.inflation.dir || r.labour.dir;
+    const rank = r.rank1m ?? liveRank(code), mk = rank == null ? null : rank <= 3 ? 1 : rank >= 6 ? -1 : 0;
+    const lean = { hawkish: 1, dovish: -1, neutral: 0 }[r.lean];
+    const cot = cotFor(code), pc = PC[code];
+    const against = pc && s ? posPair(pc).some((g) => (s > 0 ? g.index <= 20 : g.index >= 80)) : false;
+    const vs = (v) => (v == null || !s ? 'flat' : v === 0 ? 'flat' : Math.sign(v) === s ? 'bull' : 'bear');
+    return [
+      { tone: 'flat', text: `<a href="countries.html#${code}">profile →</a>` },
+      { tone: dataKnown ? vs(Math.sign(dataSum)) : 'flat', text: !dataKnown ? 'not filled' : dataSum > 0 ? 'data leans stronger' : dataSum < 0 ? 'data leans weaker' : 'data mixed' },
+      { tone: vs(mk), text: rank == null ? 'no price yet' : `ranked ${rank} of 8 over a month` },
+      { tone: vs(lean), text: lean == null ? 'bank lean not set' : `bank ${r.lean}${s ? ` vs ${s > 0 ? 'too little' : 'too much'} priced` : ''}` },
+      { tone: !s || !pc ? 'flat' : cot?.yes ? 'warn' : against ? 'bull' : 'flat', text: !pc ? 'no COT data' : !s ? 'make a call' : cot?.yes ? 'crowded my way: late' : against ? 'positioned against me: room' : 'no extreme' },
+    ];
+  };
+  const funnelBlock = (code) => {
+    const reads = layerReads(code), s = callSign(card.currencies[code]);
+    const lined = reads.slice(1).filter((x) => x.tone === 'bull').length, opposed = reads.slice(1).filter((x) => x.tone === 'bear').length;
+    return `<div class="sc-funnel">${pbFunnel(FUNNEL.map((name) => ({ name })), { tones: reads.map((x) => x.tone), compact: true, links: false })}
+      <ol class="fn-reads">${reads.map((x, i) => `<li><span class="fn-dot ${x.tone}"></span><b>${FUNNEL[i]}</b> <span class="small muted">${x.text}</span></li>`).join('')}</ol>
+      <div class="small fn-sum">${s ? `<b>${lined} of 4</b> layers line up with my call${opposed ? `, <span class="down">${opposed} against</span>` : ''}` : '<span class="faint">Make a call to see which layers line up.</span>'}</div></div>`;
+  };
+
   const rowPanel = (code) => {
     const r = card.currencies[code];
     return `<section class="panel sc-row" data-ccy="${code}">
       <div class="panel-head"><h2><span class="ccy">${code}</span></h2><span data-score>${scoreHtml(code)}</span></div>
+      <div data-funnel>${funnelBlock(code)}</div>
       <div data-evidence>${evidence(code)}</div>
       ${cotBlock(code)}
       <div class="form-grid">
         ${pick('Growth level', 'growth.level', same(SC_LEVELS), r.growth.level)}${pick('Growth direction', 'growth.dir', same(SC_DIRS), r.growth.dir)}
         ${pick('Inflation level', 'inflation.level', same(SC_LEVELS), r.inflation.level)}${pick('Inflation direction', 'inflation.dir', same(SC_DIRS), r.inflation.dir)}
         ${pick('Unemployment level', 'labour.level', same(SC_LEVELS), r.labour.level)}${pick('Unemployment direction', 'labour.dir', same(SC_DIRS), r.labour.dir)}
-        ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num(r.rank1m == null && liveRank(code) != null ? '1M rank (live)' : '1M rank (1-8)', 'rank1m', r.rank1m ?? liveRank(code), 'min="1" max="8" step="1" title="From the desk\'s own live prices unless you type another; stored when you save"')}
+        ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num(r.rank1m == null && liveRank(code) != null ? '1-month move rank (live, 1 = strongest)' : '1-month move rank (1 = strongest)', 'rank1m', r.rank1m ?? liveRank(code), 'min="1" max="8" step="1" title="From the desk\'s own live prices unless you type another; stored when you save"')}
         <label class="full">My sentence<textarea rows="2" data-f="sentence" placeholder="Growth is __, inflation is __, labour is __, so the bank leans __.">${esc(r.sentence)}</textarea></label>
         ${num('Priced 12m (bp)', 'priced12m', r.priced12m)}${num("Week's change (bp)", 'weekChange', r.weekChange)}
         ${pick('My call', 'call', Object.entries(SC_CALLS), r.call, 'wide')}
@@ -624,6 +657,7 @@ render.scorecard = async (main) => {
       $('[data-score]', el).innerHTML = scoreHtml(code); $('[data-evidence]', el).innerHTML = evidence(code);
       $('[data-f="crowded"]', el).checked = !!card.currencies[code].crowded;
       const hint = $('[data-cothint]', el); if (hint) hint.innerHTML = cotHint(code);
+      $('[data-funnel]', el).innerHTML = funnelBlock(code);
     });
     $('#sc-rank').innerHTML = rankBody();
     $('#sc-save').innerHTML = saveBar();
@@ -1225,6 +1259,134 @@ render.positioning = async (main) => {
       <li>For commodities the disaggregated report is used; for currencies and financials the TFF report. Legacy "commercials" are never used for currencies: they mix dealer hedging with real money.</li>
       <li>Not here: CME daily open interest (CME blocks automated access) and retail sentiment (no open source found).</li>
     </ul></section>`;
+};
+
+// ---------- countries (layer 1: the slow structural profile behind each currency) ----------
+// Read-only reference written from the course's seven-part country profile (data/countries.json). Figures are
+// approximate and structural; refreshed once a year, not daily.
+const COMMOD_TONE = { long: ['long', 'bull'], short: ['short', 'bear'], flat: ['neutral', 'flat'] };
+const MIX = [['C', 'Consumption', 'var(--pos-slow)'], ['I', 'Investment', 'var(--pos-fast)'], ['G', 'Government', 'var(--flat)']];
+function mixBar(mix, w = 300) {
+  const tot = MIX.reduce((s, [k]) => s + Math.max(0, mix[k] || 0), 0) || 1;
+  let x = 0;
+  const segs = MIX.map(([k, label, c]) => {
+    const sw = (Math.max(0, mix[k] || 0) / tot) * w, seg = `<rect x="${x}" y="0" width="${sw}" height="18" fill="${c}" fill-opacity="0.85"><title>${label} ${mix[k]}% of GDP</title></rect>${sw > 34 ? `<text x="${x + 5}" y="13" class="g-num" fill="var(--bg)">${k} ${mix[k]}%</text>` : ''}`;
+    x += sw; return seg;
+  }).join('');
+  return `<svg class="mix-bar" viewBox="0 0 ${w} 18" role="img" aria-label="GDP mix: consumption ${mix.C}%, investment ${mix.I}%, government ${mix.G}%, net exports ${mix.NX}%">${segs}</svg>`;
+}
+// Small horizontal bar for one stat across the eight countries; diverging when values can be negative.
+function statBars(list, key, { unit = '', diverging = false, digits = 0 } = {}) {
+  const vals = list.map((c) => c.stats[key]), max = Math.max(...vals.map(Math.abs), 1), W = 160;
+  return list.map((c) => {
+    const v = c.stats[key], w = (Math.abs(v) / max) * (diverging ? W / 2 - 2 : W);
+    const x = diverging ? (v >= 0 ? W / 2 : W / 2 - w) : 0;
+    const col = diverging ? (v >= 0 ? 'var(--bull)' : 'var(--bear)') : 'var(--accent)';
+    return `<div class="stat-row"><span class="ccy">${c.code}</span><svg viewBox="0 0 ${W} 12" class="stat-bar" aria-hidden="true">${diverging ? `<line x1="${W / 2}" x2="${W / 2}" y1="0" y2="12" stroke="var(--faint)"/>` : ''}<rect x="${x}" y="1" width="${Math.max(w, 1.5)}" height="10" rx="2" fill="${col}" fill-opacity="0.8"/></svg><b class="num small">${v > 0 && diverging ? '+' : ''}${Number(v).toFixed(digits)}${unit}</b></div>`;
+  }).join('');
+}
+
+render.countries = async (main) => {
+  const [data, pos] = await Promise.all([load('countries'), loadLive('positioning', true).catch(() => null)]);
+  const list = data.countries, keys = Object.entries(data.commodityKeys);
+  let sel = (location.hash || '').slice(1).toUpperCase();
+  if (!list.some((c) => c.code === sel)) sel = list[0].code;
+
+  const heat = `<div class="table-wrap"><table class="heat"><thead><tr><th></th>${keys.map(([, l]) => `<th>${esc(l)}</th>`).join('')}</tr></thead>
+    <tbody>${list.map((c) => `<tr><td><a href="#${c.code}" data-ccy="${c.code}" class="ccy">${c.code}</a></td>${keys.map(([k]) => { const [t, tone] = COMMOD_TONE[c.commodities[k]] || COMMOD_TONE.flat; return `<td class="heat-cell ${tone}">${t}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>
+    <p class="small faint">Long = net exporter (a price rise helps the currency's terms of trade), short = net importer. The classic pair: CAD long oil, JPY short oil, so CADJPY tends to track crude.</p>`;
+  const compare = `<div class="cmp-grid">
+      <div><div class="small muted cmp-h">Median age (years)</div>${statBars(list, 'medianAge')}</div>
+      <div><div class="small muted cmp-h">Aged 65 and over (% of people)</div>${statBars(list, 'over65Pct', { unit: '%' })}</div>
+      <div><div class="small muted cmp-h">Current account (% of GDP)</div>${statBars(list, 'currentAccountPct', { unit: '%', diverging: true, digits: 1 })}</div>
+      <div><div class="small muted cmp-h">Government debt (% of GDP)</div>${statBars(list, 'govDebtPct', { unit: '%' })}</div>
+      <div><div class="small muted cmp-h">Exports (% of GDP): how open</div>${statBars(list, 'exportsPct', { unit: '%' })}</div>
+      <div><div class="small muted cmp-h">What GDP is spent on</div>${list.map((c) => `<div class="stat-row"><span class="ccy">${c.code}</span>${mixBar(c.stats.mix, 160)}<b class="num small ${c.stats.mix.NX >= 0 ? 'up' : 'down'}">NX ${c.stats.mix.NX > 0 ? '+' : ''}${c.stats.mix.NX}%</b></div>`).join('')}
+        <div class="pos-legend">${MIX.map(([k, l, col]) => `<span class="pos-key"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="${col}"/></svg>${l}</span>`).join('')}<span class="pos-key">NX = net exports</span></div></div>
+    </div>`;
+
+  const SECTIONS = [['history', 'History & profile'], ['demographics', 'Demographics'], ['capacity', 'Output capacity'], ['geography', 'Geography'], ['resources', 'Resources & tech'], ['politics', 'Politics & geopolitics']];
+  const detail = (c) => {
+    const s = c.stats, p = c.profile, pc = pos?.currencies?.[c.code];
+    const tile = (label, v, sub = '') => `<div><label>${label}</label><span class="num big">${v}</span>${sub ? `<div class="small faint">${sub}</div>` : ''}</div>`;
+    return `<section class="panel country" id="c-${c.code}">
+      <div class="panel-head"><h2><span class="ccy">${c.code}</span> ${esc(c.name)}</h2><span class="small muted">${esc(c.bank)}</span></div>
+      <p class="country-char">${esc(c.character)}</p>
+      <div class="kpis">${tile('GDP', `$${s.gdpUsdTn}tn`)}${tile('People', `${s.popM}m`, `median age ${s.medianAge}`)}${tile('Aged 65+', `${s.over65Pct}%`)}${tile('Current account', `${s.currentAccountPct > 0 ? '+' : ''}${s.currentAccountPct}%`, 'of GDP')}${tile('Government debt', `${s.govDebtPct}%`, 'of GDP')}</div>
+      <div class="small muted" style="margin-bottom:4px">What GDP is spent on · net exports <b class="${s.mix.NX >= 0 ? 'up' : 'down'} num">${s.mix.NX > 0 ? '+' : ''}${s.mix.NX}%</b></div>${mixBar(s.mix, 900)}
+      <div class="chips-row">${keys.map(([k, l]) => { const [t, tone] = COMMOD_TONE[c.commodities[k]] || COMMOD_TONE.flat; return `<span class="pill ${tone}">${esc(l)}: ${t}</span>`; }).join('')}</div>
+      <div class="small muted">Main buyers: ${c.partners.map(esc).join(' · ')}</div>
+      <div class="profile-grid">${SECTIONS.map(([k, l]) => `<div class="profile-card"><div class="pc-h">${l}</div><p>${esc(p[k])}</p></div>`).join('')}</div>
+      <div class="small muted pos-kind">The three regimes: how decisions are made, and by whom</div>
+      <div class="profile-grid three">${[['currency', 'Currency'], ['monetary', 'Monetary'], ['fiscal', 'Fiscal']].map(([k, l]) => `<div class="profile-card regime-card"><div class="pc-h">${l}</div><p>${esc(p.regimes[k])}</p></div>`).join('')}</div>
+      <div class="grid sc-grid" style="margin-top:12px">
+        <div><div class="pc-h">How it shows up in price</div><ul class="list">${c.priceLinks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+        <div><div class="pc-h">What to watch</div><ul class="list">${c.watch.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+      </div>
+      ${pc ? `<div class="pc-h" style="margin-top:12px">Positioning now <a class="small" href="positioning.html">all →</a></div><div class="pos-grid">${posCard(`<span class="ccy">${c.code}</span>`, pc, `COT of ${esc(fmtDate(pos.cotDate))}`)}</div>` : ''}
+    </section>`;
+  };
+
+  const draw = () => {
+    main.innerHTML = head('Countries', 'Layer 1: who each economy is. The slow structure behind the currency: the seven-part country profile from the course, quantified. It changes over years, so read it to understand the character, not for this week\'s call.') +
+      panel('Side by side', compare) + panel('Long or short each commodity', heat) +
+      `<div class="filters"><span class="small muted">Country</span>${list.map((c) => `<button class="chip ${c.code === sel ? 'on' : ''}" data-ccy="${c.code}">${c.code} · ${esc(c.name)}</button>`).join('')}</div>` +
+      detail(list.find((c) => c.code === sel)) +
+      `<p class="small faint">${esc(data.note)} Updated ${esc(fmtDate(data.updated))}.</p>`;
+  };
+  main.addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-ccy]'); if (!b) return;
+    ev.preventDefault(); sel = b.dataset.ccy; history.replaceState(null, '', `#${sel}`); draw();
+    $(`#c-${sel}`).scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+  draw();
+};
+
+// ---------- playbook (the course's framework, protocols and reference points) ----------
+const PB_FUNNEL_FILL = ['#1d2733', '#2a3a4c', 'var(--accent)', '#4f8fd8', 'var(--pos-fast)'];
+function pbFunnel(layers, { tones = null, compact = false, links = true } = {}) {
+  const W = compact ? 200 : 520, bandH = compact ? 18 : 40, gap = compact ? 3 : 6, H = layers.length * (bandH + gap);
+  const top = W * 0.96, bottom = W * 0.3;
+  const bands = layers.map((l, i) => {
+    const w0 = top - ((top - bottom) * i) / layers.length, w1 = top - ((top - bottom) * (i + 1)) / layers.length + (compact ? 0 : 8);
+    const y = i * (bandH + gap), x0 = (W - w0) / 2, x1 = (W - w1) / 2;
+    const fill = tones ? ({ bull: 'var(--bull)', bear: 'var(--bear)', warn: 'var(--warn)', flat: 'var(--panel-2)' }[tones[i]] || 'var(--panel-2)') : PB_FUNNEL_FILL[i];
+    const txt = compact ? '' : `<text x="${W / 2}" y="${y + bandH / 2 + 5}" text-anchor="middle" class="fn-label">${i + 1} · ${esc(l.name.toUpperCase())}</text>`;
+    const poly = `<polygon points="${x0},${y} ${x0 + w0},${y} ${x1 + w1},${y + bandH} ${x1},${y + bandH}" fill="${fill}" ${tones ? 'fill-opacity="0.8" stroke="var(--line)"' : ''}><title>${esc(l.name)}${l.speed ? `: ${esc(l.speed)}` : ''}</title></polygon>`;
+    return links && l.desk ? `<a href="${l.desk}">${poly}${txt}</a>` : poly + txt;
+  }).join('');
+  return `<svg class="${compact ? 'fn-mini' : 'fn-big'}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Five-layer funnel">${bands}</svg>`;
+}
+
+render.playbook = async (main) => {
+  const data = await load('playbook');
+  let layer = 'all';
+  const T = { bull: 'bull', bear: 'bear', warn: 'warn', flat: 'flat' };
+  const sec = {
+    funnel: (s) => `<div class="fn-wrap">${pbFunnel(s.layers)}<ol class="fn-list">${s.layers.map((l) => `<li><b>${esc(l.name)}</b> <span class="faint small">${esc(l.speed)}</span><div class="small">${esc(l.question)}</div><a class="small" href="${l.desk}">On my desk: ${esc(l.deskLabel)} →</a></li>`).join('')}</ol></div>`,
+    quadrant: (s) => `<div class="quad-map"><div class="qm-y top">▲ ${esc(s.yAxis[1])}</div>
+      <div class="qm-grid">${['tl', 'tr', 'bl', 'br'].map((p) => { const b = s.boxes.find((x) => x.pos === p); return `<div class="qm-box ${T[b.tone]}-q"><div class="qm-name">${esc(b.name)}</div><ul>${b.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul><div class="small faint">${esc(b.why)}</div></div>`; }).join('')}</div>
+      <div class="qm-x"><span>◀ ${esc(s.xAxis[0])}</span><span>${esc(s.xAxis[1])} ▶</span></div><div class="qm-y">▼ ${esc(s.yAxis[0])}</div></div>`,
+    grid: (s) => `<div class="mx" style="grid-template-columns: minmax(4.5em, 9em) repeat(${s.cols.length}, minmax(0, 1fr))"><div></div>${s.cols.map((c) => `<div class="mx-h">${esc(c)}</div>`).join('')}${s.rows.map((r, i) => `<div class="mx-h row">${esc(r)}</div>${s.cells[i].map((c, j) => `<div class="mx-c ${T[s.tones[i][j]]}">${esc(c)}</div>`).join('')}`).join('')}</div>`,
+    chain: (s) => `<div class="chain-row">${s.steps.map(([a, b], i) => `${i ? '<span class="chain-arrow" aria-hidden="true">→</span>' : ''}<div class="chain-step ${i >= 3 ? 'dark' : ''}"><b>${esc(a)}</b><div class="small">${esc(b)}</div></div>`).join('')}</div>`,
+    protocols: (s) => {
+      const layers = ['all', ...new Set(s.items.map((p) => p.layer))];
+      return `<div class="filters">${layers.map((l) => `<button class="chip ${layer === l ? 'on' : ''}" data-layer="${esc(l)}">${esc(l)}</button>`).join('')}</div>
+        <div class="proto-grid">${s.items.filter((p) => layer === 'all' || p.layer === layer).map((p) => `<div class="proto"><div class="proto-h"><b>${esc(p.name)}</b><span class="pill flat">${esc(p.layer)}</span></div><ol>${p.steps.map((x) => `<li>${esc(x)}</li>`).join('')}</ol></div>`).join('')}</div>`;
+    },
+    facts: (s) => `<div class="fact-grid">${s.items.map(([k, v]) => `<div class="fact"><div class="fact-k">${esc(k)}</div><div>${esc(v)}</div></div>`).join('')}</div>`,
+  };
+  sec.matrix = sec.grid;
+  const draw = () => {
+    main.innerHTML = head('Playbook', `${esc(data.note)}`, `<a class="btn" href="countries.html">Countries →</a>`) +
+      `<div class="filters"><span class="small muted">Jump to</span>${data.sections.map((s) => `<a class="chip" href="#pb-${s.id}">${esc(s.title)}</a>`).join('')}</div>` +
+      data.sections.map((s) => `<section class="panel pb" id="pb-${s.id}"><div class="panel-head"><h2>${esc(s.title)}</h2></div>${s.intro ? `<p class="small muted">${esc(s.intro)}</p>` : ''}${(sec[s.type] || (() => ''))(s)}${s.foot ? `<p class="small faint">${esc(s.foot)}</p>` : ''}</section>`).join('');
+  };
+  main.addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-layer]'); if (!b) return;
+    layer = b.dataset.layer; const y = window.scrollY; draw(); window.scrollTo(0, y);
+  });
+  draw();
 };
 
 // ---------- review (were my calls right? graded from prices, not from memory) ----------

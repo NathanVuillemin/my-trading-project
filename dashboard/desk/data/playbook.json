@@ -1,0 +1,92 @@
+{
+  "note": "Market Macro Hub (Alfie Kerswell) framework, protocols and reference points, condensed in own words from Macro Learning/MMH Primers. A map to think with, not rules that fire trades.",
+  "updated": "2026-11-15",
+  "sections": [
+    {
+      "id": "funnel", "type": "funnel", "title": "The five-layer funnel",
+      "intro": "Slowest forces at the top, fastest at the bottom. Structure sets the stage; positioning decides the timing. Good macro trades line up several layers at once.",
+      "layers": [
+        { "name": "Country", "speed": "decades", "question": "Who is this economy? Demographics, capacity, geography, resources, politics, the three regimes.", "desk": "countries.html", "deskLabel": "Countries" },
+        { "name": "Economic data", "speed": "quarters & months", "question": "What is it doing? Growth, inflation, labour, weighted by importance.", "desk": "scorecard.html", "deskLabel": "Scorecard: growth, inflation, unemployment" },
+        { "name": "Markets & fundamentals", "speed": "months & weeks", "question": "Does my economic story connect to the price in one unbroken chain?", "desk": "index.html", "deskLabel": "Today: moves and 1-month move rank" },
+        { "name": "Expectations", "speed": "weeks & days", "question": "What is already priced, and is the data surprising against it?", "desk": "scorecard.html", "deskLabel": "Scorecard: priced 12m and my call" },
+        { "name": "Positioning", "speed": "days & hours", "question": "Who has already bet on it, and how crowded is that bet?", "desk": "positioning.html", "deskLabel": "Positioning" }
+      ]
+    },
+    {
+      "id": "quadrant", "type": "quadrant", "title": "Policy-regime map",
+      "intro": "Work out which box you are in and you know which assets the tide favours. Real yield = bond yield minus expected inflation. A default, not a law (gold held up in 2022-24 despite high real yields because central banks bought).",
+      "xAxis": ["Real yields falling", "Real yields rising"], "yAxis": ["Inflation expectations falling", "Inflation expectations rising"],
+      "boxes": [
+        { "pos": "tl", "name": "Easy money", "tone": "bull", "items": ["Gold and copper shine", "Stocks grind higher", "Dollar soft, risk FX strong", "Bonds calm, credit happy"], "why": "central bank pumping, prices heating" },
+        { "pos": "tr", "name": "Healthy expansion", "tone": "flat", "items": ["Banks, energy, value lead", "Bond yields rise", "Commodity FX outperforms", "Credit stays solid"], "why": "real growth doing the lifting" },
+        { "pos": "bl", "name": "Recession", "tone": "flat", "items": ["Government bonds are the star", "Defensive stocks", "Safe-haven FX bid (JPY, CHF)", "Oil and copper sold"], "why": "growth and inflation both rolling over" },
+        { "pos": "br", "name": "Tightening", "tone": "bear", "items": ["Cash is king, dollar strong", "Stocks and commodities struggle", "Buy downside protection", "Volatility bid"], "why": "central bank draining liquidity" }
+      ]
+    },
+    {
+      "id": "credit-grid", "type": "grid", "title": "Bonds: duration × credit",
+      "intro": "Two questions every day: what is duration doing, what is credit doing?",
+      "cols": ["Spreads calm", "Spreads widening"], "rows": ["Yields rising", "Yields falling"],
+      "cells": [["Pure rates story", "Double trouble: worst for risk"], ["Calm rally, soft landing", "Flight to safety, recession scare"]],
+      "tones": [["flat", "bear"], ["bull", "warn"]]
+    },
+    {
+      "id": "chain", "type": "chain", "title": "Transmission chain (the one after 2022)",
+      "intro": "Economic story and market view must be one continuous chain. Run it backwards too: how much must the economy slow to crack the labour market and let bonds rally?",
+      "steps": [["Jobs", "tight labour market"], ["Wages", "pay rises to compete"], ["Service prices", "services are mostly wages"], ["Central bank", "hikes to cool it"], ["Bonds", "prices fall"]]
+    },
+    {
+      "id": "matrix", "type": "matrix", "title": "Release-to-reaction matrix",
+      "intro": "Print against consensus, across price reaction. The textbook cells say little; the contradictions are the signal. Then ask: did it hold into the close, and how big was the move in standard deviations?",
+      "cols": ["Price up", "Price flat", "Price down"], "rows": ["Beat", "In line", "Miss"],
+      "cells": [["Textbook", "Absorbed: already priced", "Signal: market fears something bigger or longs flushed"], ["Something else priced", "Textbook", "Something else priced"], ["Signal: shorts flushed or it was priced", "Absorbed", "Textbook"]],
+      "tones": [["flat", "warn", "bear"], ["warn", "flat", "warn"], ["bull", "warn", "flat"]],
+      "foot": "Read 'price' as the currency or asset the print should help. Log each high-impact release with its cell; after about 30 the contradictions that led to multi-day moves stand out."
+    },
+    {
+      "id": "protocols", "type": "protocols", "title": "Protocols",
+      "items": [
+        { "name": "What's priced (before every release)", "layer": "Expectations", "steps": ["What does the market price? Rate futures for policy, breakevens or swaps for inflation, options for the size of move", "What print do I expect, and why?", "Release: which matrix cell?", "Did it hold into the close?", "How big was it in standard deviations?"] },
+        { "name": "Enough priced? (Alfie)", "layer": "Expectations", "steps": ["Compare what the curve prices over 12 months with where policy rules say rates should be", "Close together = market fair to the data", "What would have to change in the data to make the pricing wrong (how far must core inflation or unemployment move)?", "Which meeting is least priced? That segment has room to move", "How fast are hikes or cuts being added? Speed matters more than level for equities"] },
+        { "name": "Fade checklist", "layer": "Expectations", "steps": ["What exactly is priced?", "What must be true for that pricing to be right?", "Is that plausible given the data trend?", "Is positioning crowded in the priced direction?", "A clear no at step 3 plus a yes at step 4 = candidate fade"] },
+        { "name": "Positioning bounce or durable bounce? (Alfie)", "layer": "Positioning", "steps": ["Did a macro constraint change, or only the price of exposure?", "Bounce while the 2y yield rises = rates gave no relief: likely positioning (hedges sold, shorts covered)", "Positioning tells: implied vol falls below realised, skew flattens fast, heavy inflows into 3x long ETFs, momentum still down over the month", "Durable tells: bonds bottom before equities, breadth confirms (equal-weight S&P, small caps lead), high beta outperforms while yields hold"] },
+        { "name": "COT routine", "layer": "Positioning", "steps": ["Long-term level, 3-month trend and weekly change of net positioning", "Score it: where the net sits in its 3-year range, or a z-score", "Extremes are crowding flags, not timing signals: the more one-sided the crowd, the smaller the spark needed", "For FX the course rates COT weak as a predictor; implied vol, shifting cross-asset correlations and the size of data changes vs price moves read positioning better"] },
+        { "name": "Attribution check", "layer": "Markets", "steps": ["A pair is two economies: every move is a net effect", "Compare the currency against several others", "Down against everything = its own story; down only against one = the other side's story", "If attribution says the regime has not changed, a counter-move on data is an entry, not a refutation"] },
+        { "name": "Reading the data", "layer": "Economic data", "steps": ["Look at all the data, then weight by importance (consumption is about two thirds of US GDP)", "For each series: month on month, 3-month trend, year on year", "Is the move unusual? Use a z-score; beyond 2 is genuinely rare", "Map each monthly release to its quarterly GDP line (nowcasting)", "Build a thesis that explains the data that disagrees too", "The edge: knowing what is not happening"] },
+        { "name": "Country scorecard", "layer": "Country", "steps": ["History: how did it get here?", "Demographics: gaining or losing workers and spenders?", "Capacity: can supply meet a jump in demand?", "Geography: does the map help or hurt?", "Resources: long or short which commodities?", "Politics: who holds power, with which incentives?", "Regimes: how are currency, rate and budget decisions made, and by whom?"] }
+      ]
+    },
+    {
+      "id": "principles", "type": "facts", "title": "Theories to keep in mind",
+      "items": [
+        ["Flow chart of capital", "Every price is downstream of money moving somewhere. Work out where it flows and why."],
+        ["Surprise, not news", "Markets move on data better or worse than expected; the forecast is already in the price."],
+        ["Country = company", "Flows are the income statement (growth, inflation); balance sheets are the capital structure. Hence growth, inflation, policy."],
+        ["Impossible trinity", "Fixed exchange rate, free capital, independent policy: pick two. Floaters absorb shocks in the exchange rate, pegs in reserves."],
+        ["A pair is a GIP differential", "Relative growth, inflation and policy between two economies. Drivers rotate by era: rates, carry, QE and real rates, now energy and geopolitics."],
+        ["Five FX differentials", "Nominal rate spread across the curve, breakeven spread, real rate spread, hedged yields, cross-currency basis (blowing out = real dollar shortage)."],
+        ["Capacity rule", "A demand shock with little spare capacity becomes inflation; with plenty of slack it becomes growth."],
+        ["Equities = earnings × multiple", "Earnings run on the real economy, the multiple mostly on liquidity. Core inflation hits equities through real rates: long-duration tech pays first."],
+        ["Commodities are not 'inflation'", "They hit specific price components and only sometimes pass into core. Model each commodity's own supply and demand."],
+        ["Risk-off defined", "A broad widening of risk premia across assets at once, not just stocks down."],
+        ["Crowded trades unwind hardest", "The most violent moves come from crowded positioning unwinding, not from the data itself."],
+        ["Disconfirm, don't predict", "'X cannot do Y' is easier to establish than 'X will do Y'. The best trades fade what is unrealistically priced."]
+      ]
+    },
+    {
+      "id": "datapoints", "type": "facts", "title": "Data points and thresholds",
+      "items": [
+        ["US capacity utilisation", "About 78-80% is normal; above about 82% is tight (inflationary)."],
+        ["Z-score", "(latest - mean) / standard deviation. Beyond 2 either way is genuinely unusual."],
+        ["Risk proxy", "VIX above 20 or high-yield spreads widening = risk-off: smaller size on AUD and NZD, JPY and gold candidates for longs."],
+        ["Where 'priced' lives", "CME FedWatch, US 2y yield (quick policy-path proxy), 10y breakeven and 5y5y inflation swap, options straddles for the move into CPI and payrolls."],
+        ["COT timing", "Tuesday snapshot, released Friday 15:30 New York time: always 3 days old. JPY futures are JPY per USD, so long yen futures = short USDJPY."],
+        ["Commodity long / short pairs", "CAD long oil vs JPY short oil (CADJPY tracks crude); AUD long iron ore, LNG, coal; NZD long dairy; CHF and JPY short energy."],
+        ["Monthly clues to quarterly GDP (US)", "Consumption: retail sales, personal spending. Business investment: core capital goods orders. Housing: starts, permits. Net exports: advance goods trade. Nowcasts: Atlanta Fed GDPNow, NY Fed Nowcast."],
+        ["US calendar for FX", "Payrolls and wages (1st Friday), CPI (mid-month), PCE (month end), ISM (1st and 3rd business days), jobless claims (Thursdays), FOMC (8 a year), GDP advance (about 4 weeks after quarter end)."],
+        ["Regime stack", "Trend state × volatility state = four regimes (calm rise, volatile rise, quiet range, real bear). Correlations between assets change by regime."]
+      ]
+    }
+  ]
+}
