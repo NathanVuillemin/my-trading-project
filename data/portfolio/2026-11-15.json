@@ -1,17 +1,17 @@
 {
   "date": "2026-11-15",
-  "generatedAt": "2026-11-15T13:28:12.601Z",
+  "generatedAt": "2026-11-15T13:36:02.675Z",
   "usingPlaceholder": false,
   "account": {
-    "equity": 45.059856,
-    "grossNotional": 93.1953,
-    "marginUsed": 45.059856,
+    "equity": 44.511156,
+    "grossNotional": 92.6466,
+    "marginUsed": 44.511156,
     "maintenanceMargin": 0,
     "withdrawable": 0,
-    "accountLeverage": 2.068255610936706,
+    "accountLeverage": 2.081424261369442,
     "cashTotal": 0,
     "manualTotal": 0,
-    "netWorth": 45.059856
+    "netWorth": 44.511156
   },
   "positions": [
     {
@@ -19,15 +19,15 @@
       "cls": "CRYPTO",
       "side": "long",
       "size": 31,
-      "notional": 93.1953,
+      "notional": 92.6466,
       "entry": 3.0917,
-      "mark": 3.0063,
-      "uPnl": -2.6474,
-      "roe": -5.52446874,
+      "mark": 2.9886000000000004,
+      "uPnl": -3.1961,
+      "roe": -6.66946987,
       "leverage": 2,
-      "marginUsed": 45.059856,
+      "marginUsed": 44.511156,
       "liqPx": 1.7252847312,
-      "distToLiqPct": 42.611025805807806,
+      "distToLiqPct": 42.27113928929935,
       "fundingSinceOpen": -0.133929,
       "fundingAllTime": -0.133929,
       "address": "0x39D7f9c13cDf9CBc5940BB6516A7D80408615BbE",
@@ -37,21 +37,21 @@
   "manual": [],
   "cash": [],
   "risk": {
-    "gross": 93.1953,
-    "net": 93.1953,
-    "longUsd": 93.1953,
+    "gross": 92.6466,
+    "net": 92.6466,
+    "longUsd": 92.6466,
     "shortUsd": 0,
     "byAsset": [
       {
         "key": "LIT",
-        "usd": 93.1953,
+        "usd": 92.6466,
         "pct": 100
       }
     ],
     "byClass": [
       {
         "key": "CRYPTO",
-        "usd": 93.1953,
+        "usd": 92.6466,
         "pct": 100
       }
     ],
@@ -59,9 +59,9 @@
       {
         "coin": "LIT",
         "side": "long",
-        "distPct": 42.611025805807806,
+        "distPct": 42.27113928929935,
         "liqPx": 1.7252847312,
-        "mark": 3.0063
+        "mark": 2.9886000000000004
       }
     ],
     "alerts": [
@@ -288,8 +288,8 @@
       63.547351
     ],
     [
-      1794749291008,
-      63.685225
+      1794749762186,
+      63.136525
     ]
   ],
   "pnlHistory": [
@@ -478,8 +478,8 @@
       -3.00444
     ],
     [
-      1794749291008,
-      -2.866566
+      1794749762186,
+      -3.415266
     ]
   ]
 }
