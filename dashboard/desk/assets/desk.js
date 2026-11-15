@@ -1265,7 +1265,7 @@ render.positioning = async (main) => {
 // Read-only reference written from the course's seven-part country profile (data/countries.json). Figures are
 // approximate and structural; refreshed once a year, not daily.
 const COMMOD_TONE = { long: ['long', 'bull'], short: ['short', 'bear'], flat: ['neutral', 'flat'] };
-const MIX = [['C', 'Consumption', 'var(--pos-slow)'], ['I', 'Investment', 'var(--pos-fast)'], ['G', 'Government', 'var(--flat)']];
+const MIX = [['C', 'Consumption', 'var(--pos-slow)'], ['I', 'Investment', 'var(--pos-fast)'], ['G', 'Government consumption', 'var(--flat)']];
 function mixBar(mix, w = 300) {
   const tot = MIX.reduce((s, [k]) => s + Math.max(0, mix[k] || 0), 0) || 1;
   let x = 0;
@@ -1332,7 +1332,7 @@ render.countries = async (main) => {
       panel('Side by side', compare) + panel('Long or short each commodity', heat) +
       `<div class="filters"><span class="small muted">Country</span>${list.map((c) => `<button class="chip ${c.code === sel ? 'on' : ''}" data-ccy="${c.code}">${c.code} · ${esc(c.name)}</button>`).join('')}</div>` +
       detail(list.find((c) => c.code === sel)) +
-      `<p class="small faint">${esc(data.note)} Updated ${esc(fmtDate(data.updated))}.</p>`;
+      `<p class="small faint">${esc(data.note)} Updated ${esc(fmtDate(data.updated))}. Sources: ${(data.sources || []).map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(" · ")}</p>`;
   };
   main.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-ccy]'); if (!b) return;

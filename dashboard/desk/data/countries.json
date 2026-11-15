@@ -1,14 +1,47 @@
 {
-  "note": "Layer 1 of the five-layer framework (Market Macro Hub 00.1): the slow, structural profile of each economy behind the eight currencies. Figures are approximate, rounded, about 2024-25 (IMF World Economic Outlook, World Bank, OECD, national statistics). They move over years, not weeks: refresh once a year. Written for this desk in own words.",
+  "note": "Layer 1 of the five-layer framework (Market Macro Hub 00.1): the slow, structural profile of each economy behind the eight currencies. Figures checked on 2026-11-15 against official sources: GDP (current US$), population, current account and gross government debt from the IMF World Economic Outlook (DataMapper, 2024); share aged 65+, exports and the GDP spending mix from the World Bank World Development Indicators (latest year, 2024 or 2025). In the World Bank mix, government means government consumption only; public investment sits in investment. Median age is a UN estimate and was not checked. They move over years, not weeks: refresh once a year. Written for this desk in own words.",
   "updated": "2026-11-15",
-  "commodityKeys": { "oil": "Oil", "gas": "Gas / LNG", "metals": "Metals & ores", "agri": "Food & farm", "gold": "Gold" },
+  "commodityKeys": {
+    "oil": "Oil",
+    "gas": "Gas / LNG",
+    "metals": "Metals & ores",
+    "agri": "Food & farm",
+    "gold": "Gold"
+  },
   "countries": [
     {
-      "code": "USD", "name": "United States", "bank": "Federal Reserve",
+      "code": "USD",
+      "name": "United States",
+      "bank": "Federal Reserve",
       "character": "The world's reserve currency and deepest capital market. Consumer-led, energy self-sufficient, runs twin deficits that the rest of the world funds by holding dollars.",
-      "stats": { "gdpUsdTn": 29.2, "popM": 340, "medianAge": 39, "over65Pct": 18, "mix": { "C": 68, "I": 18, "G": 17, "NX": -3 }, "currentAccountPct": -3.9, "govDebtPct": 121, "exportsPct": 11 },
-      "commodities": { "oil": "long", "gas": "long", "metals": "flat", "agri": "long", "gold": "flat" },
-      "partners": ["Canada", "Mexico", "China", "EU"],
+      "stats": {
+        "gdpUsdTn": 29.4,
+        "popM": 340,
+        "medianAge": 39,
+        "over65Pct": 18,
+        "mix": {
+          "C": 68,
+          "I": 22,
+          "G": 14,
+          "NX": -3
+        },
+        "currentAccountPct": -4.1,
+        "govDebtPct": 122,
+        "exportsPct": 11
+      },
+      "commodities": {
+        "oil": "long",
+        "gas": "long",
+        "metals": "flat",
+        "agri": "long",
+        "gold": "flat"
+      },
+      "partners": [
+        "Canada",
+        "Mexico",
+        "China",
+        "EU"
+      ],
       "profile": {
         "history": "Post-war hegemon. Built the Bretton Woods system, kept the dollar at the centre after leaving gold in 1971. Most trade, debt and FX reserves are still priced in dollars.",
         "demographics": "Young for a rich country, still growing mainly through immigration. A wide working-age base keeps spending and labour supply growing; immigration policy changes feed straight into labour and wages.",
@@ -19,18 +52,58 @@
         "regimes": {
           "currency": "Free float. Global reserve currency: in stress the world needs dollars, which can make USD rise even when the shock starts in the US.",
           "monetary": "Fed has a dual mandate (stable prices, maximum employment). Formally independent; how far political pressure moves its reaction function is the open question.",
-          "fiscal": "Congress controls budgets. Persistent deficits of about 6-7% of GDP and rising debt; debt-ceiling standoffs recur."
+          "fiscal": "Congress controls budgets. Deficits of about 7-8% of GDP across all levels of government (IMF, 2024) and rising debt; debt-ceiling standoffs recur."
         }
       },
-      "priceLinks": ["US data sets the global price of money: US 2y yield and Fed pricing drive the dollar against everything", "Risk-off usually lifts USD (dollar funding scramble) unless the shock is a US policy shock", "Real yields are the main gold driver (gold vs USD real yields)"],
-      "watch": ["Nonfarm payrolls and wages", "Core CPI and core PCE", "Fed path priced (FedWatch, 2y yield)", "Tariff and fiscal headlines"]
+      "priceLinks": [
+        "US data sets the global price of money: US 2y yield and Fed pricing drive the dollar against everything",
+        "Risk-off usually lifts USD (dollar funding scramble) unless the shock is a US policy shock",
+        "Real yields are the main gold driver (gold vs USD real yields)"
+      ],
+      "watch": [
+        "Nonfarm payrolls and wages",
+        "Core CPI and core PCE",
+        "Fed path priced (FedWatch, 2y yield)",
+        "Tariff and fiscal headlines"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "EUR", "name": "Euro area", "bank": "European Central Bank",
+      "code": "EUR",
+      "name": "Euro area",
+      "bank": "European Central Bank",
       "character": "A manufacturing and export bloc that imports its energy. One central bank for twenty fiscal policies: trade surpluses support the euro, energy shocks and political fragmentation weigh on it.",
-      "stats": { "gdpUsdTn": 16.4, "popM": 350, "medianAge": 44, "over65Pct": 22, "mix": { "C": 52, "I": 21, "G": 21, "NX": 6 }, "currentAccountPct": 2.6, "govDebtPct": 88, "exportsPct": 50 },
-      "commodities": { "oil": "short", "gas": "short", "metals": "short", "agri": "flat", "gold": "flat" },
-      "partners": ["United States", "China", "United Kingdom", "Switzerland"],
+      "stats": {
+        "gdpUsdTn": 16.7,
+        "popM": 357,
+        "medianAge": 44,
+        "over65Pct": 23,
+        "mix": {
+          "C": 53,
+          "I": 22,
+          "G": 22,
+          "NX": 4
+        },
+        "currentAccountPct": 2.6,
+        "govDebtPct": 86,
+        "exportsPct": 49
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "short",
+        "metals": "short",
+        "agri": "flat",
+        "gold": "flat"
+      },
+      "partners": [
+        "United States",
+        "China",
+        "United Kingdom",
+        "Switzerland"
+      ],
       "profile": {
         "history": "Euro launched in 1999 on top of the EMS. Survived the 2010-12 debt crisis only once the ECB promised to backstop bond markets. Germany's export model (autos, machinery, chemicals) set the tone for two decades.",
         "demographics": "Old and barely growing; Italy and Germany among the oldest populations in the world. Shrinking workforce tightens labour markets but raises savings and keeps neutral rates low.",
@@ -44,15 +117,56 @@
           "fiscal": "National budgets under EU rules, no full fiscal union. Joint borrowing exists but is limited. Italian and French spreads over Germany are the stress gauge."
         }
       },
-      "priceLinks": ["EURUSD is mostly the US-Germany rate spread (2y) plus energy terms of trade", "Natural gas spikes hurt EUR", "Bond-spread stress (Italy, France vs Germany) adds a euro risk premium"],
-      "watch": ["Euro-area HICP flash (core and services)", "PMIs (Germany manufacturing)", "ECB pricing", "French and Italian spreads", "TTF gas price"]
+      "priceLinks": [
+        "EURUSD is mostly the US-Germany rate spread (2y) plus energy terms of trade",
+        "Natural gas spikes hurt EUR",
+        "Bond-spread stress (Italy, France vs Germany) adds a euro risk premium"
+      ],
+      "watch": [
+        "Euro-area HICP flash (core and services)",
+        "PMIs (Germany manufacturing)",
+        "ECB pricing",
+        "French and Italian spreads",
+        "TTF gas price"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "GBP", "name": "United Kingdom", "bank": "Bank of England",
+      "code": "GBP",
+      "name": "United Kingdom",
+      "bank": "Bank of England",
       "character": "A services and finance economy with twin deficits. Relies on foreign capital to fund itself, so fiscal credibility is priced straight into the pound and gilts.",
-      "stats": { "gdpUsdTn": 3.6, "popM": 69, "medianAge": 40, "over65Pct": 19, "mix": { "C": 61, "I": 18, "G": 21, "NX": -1 }, "currentAccountPct": -2.7, "govDebtPct": 101, "exportsPct": 30 },
-      "commodities": { "oil": "short", "gas": "short", "metals": "flat", "agri": "short", "gold": "flat" },
-      "partners": ["EU", "United States", "China", "Switzerland"],
+      "stats": {
+        "gdpUsdTn": 3.7,
+        "popM": 69,
+        "medianAge": 40,
+        "over65Pct": 20,
+        "mix": {
+          "C": 60,
+          "I": 20,
+          "G": 21,
+          "NX": -1
+        },
+        "currentAccountPct": -2.9,
+        "govDebtPct": 99,
+        "exportsPct": 31
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "short",
+        "metals": "flat",
+        "agri": "short",
+        "gold": "flat"
+      },
+      "partners": [
+        "EU",
+        "United States",
+        "China",
+        "Switzerland"
+      ],
       "profile": {
         "history": "Former reserve-currency issuer, left the gold standard in 1931, left the ERM in 1992 and the EU in 2020. The 2022 mini-budget showed markets will punish unfunded spending within days.",
         "demographics": "Ageing more slowly than Europe thanks to immigration. Post-Brexit and post-Covid shrinkage of the labour force kept wage growth high.",
@@ -66,15 +180,55 @@
           "fiscal": "Treasury sets budgets under self-imposed fiscal rules; small 'headroom' makes each budget a market event."
         }
       },
-      "priceLinks": ["Pound and gilts falling together = fiscal credibility problem (sell-UK)", "Services inflation and wages drive BoE pricing", "Gas prices hit the terms of trade"],
-      "watch": ["Services CPI and wage growth", "BoE vote split", "Budget and fiscal headroom", "Gilt 10y and 30y"]
+      "priceLinks": [
+        "Pound and gilts falling together = fiscal credibility problem (sell-UK)",
+        "Services inflation and wages drive BoE pricing",
+        "Gas prices hit the terms of trade"
+      ],
+      "watch": [
+        "Services CPI and wage growth",
+        "BoE vote split",
+        "Budget and fiscal headroom",
+        "Gilt 10y and 30y"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "JPY", "name": "Japan", "bank": "Bank of Japan",
+      "code": "JPY",
+      "name": "Japan",
+      "bank": "Bank of Japan",
       "character": "The world's largest creditor with the oldest population. A low-rate funding currency that turns into a haven when money comes home; short every major commodity.",
-      "stats": { "gdpUsdTn": 4.0, "popM": 124, "medianAge": 49, "over65Pct": 29, "mix": { "C": 54, "I": 26, "G": 21, "NX": -1 }, "currentAccountPct": 4.6, "govDebtPct": 235, "exportsPct": 22 },
-      "commodities": { "oil": "short", "gas": "short", "metals": "short", "agri": "short", "gold": "flat" },
-      "partners": ["China", "United States", "Korea", "Taiwan"],
+      "stats": {
+        "gdpUsdTn": 4.2,
+        "popM": 124,
+        "medianAge": 49,
+        "over65Pct": 30,
+        "mix": {
+          "C": 53,
+          "I": 28,
+          "G": 20,
+          "NX": -1
+        },
+        "currentAccountPct": 4.6,
+        "govDebtPct": 214,
+        "exportsPct": 22
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "short",
+        "metals": "short",
+        "agri": "short",
+        "gold": "flat"
+      },
+      "partners": [
+        "China",
+        "United States",
+        "Korea",
+        "Taiwan"
+      ],
       "profile": {
         "history": "Asset bubble burst in 1990, then three decades of deflation, zero rates and yield-curve control. Ended negative rates in March 2024 and started normalising policy.",
         "demographics": "Oldest major population and shrinking. Very high savings, low neutral rate; labour scarcity is now finally pushing wages up.",
@@ -85,18 +239,58 @@
         "regimes": {
           "currency": "Free float, but the Ministry of Finance intervenes when the yen falls too fast (2022, 2024). Huge foreign assets (net about $3tn) mean repatriation in a crisis lifts the yen.",
           "monetary": "BoJ is independent with a 2% target; its reaction function is the global swing factor because yen funding and JGB yields anchor carry trades worldwide.",
-          "fiscal": "Debt above 230% of GDP, held mostly at home, so no funding crisis, but it limits how far rates can rise."
+          "fiscal": "Gross debt about 215% of GDP (IMF, 2024), the highest in the developed world, held mostly at home, so no funding crisis, but it limits how far rates can rise."
         }
       },
-      "priceLinks": ["USDJPY tracks the US-Japan yield spread most of the time", "Risk-off and carry unwinds lift JPY (repatriation, funding cover)", "Higher oil = weaker yen (import bill)"],
-      "watch": ["Tokyo CPI and wage deals (shunto)", "BoJ pricing and governor comments", "MoF intervention signals", "Japanese foreign bond flows (weekly MoF data)"]
+      "priceLinks": [
+        "USDJPY tracks the US-Japan yield spread most of the time",
+        "Risk-off and carry unwinds lift JPY (repatriation, funding cover)",
+        "Higher oil = weaker yen (import bill)"
+      ],
+      "watch": [
+        "Tokyo CPI and wage deals (shunto)",
+        "BoJ pricing and governor comments",
+        "MoF intervention signals",
+        "Japanese foreign bond flows (weekly MoF data)"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "CHF", "name": "Switzerland", "bank": "Swiss National Bank",
+      "code": "CHF",
+      "name": "Switzerland",
+      "bank": "Swiss National Bank",
       "character": "Small, rich, low-debt and always in surplus: the classic European safe haven. The SNB leans against the franc getting too strong because Swiss inflation is already low.",
-      "stats": { "gdpUsdTn": 0.94, "popM": 9, "medianAge": 43, "over65Pct": 20, "mix": { "C": 50, "I": 25, "G": 11, "NX": 12 }, "currentAccountPct": 5, "govDebtPct": 38, "exportsPct": 75 },
-      "commodities": { "oil": "short", "gas": "short", "metals": "flat", "agri": "short", "gold": "flat" },
-      "partners": ["EU (Germany)", "United States", "China", "United Kingdom"],
+      "stats": {
+        "gdpUsdTn": 0.98,
+        "popM": 9,
+        "medianAge": 43,
+        "over65Pct": 20,
+        "mix": {
+          "C": 50,
+          "I": 30,
+          "G": 12,
+          "NX": 9
+        },
+        "currentAccountPct": 9.3,
+        "govDebtPct": 40,
+        "exportsPct": 78
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "short",
+        "metals": "flat",
+        "agri": "short",
+        "gold": "flat"
+      },
+      "partners": [
+        "EU (Germany)",
+        "United States",
+        "China",
+        "United Kingdom"
+      ],
       "profile": {
         "history": "Centuries of neutrality, rule of law and sound money. Pegged to the euro at 1.20 from 2011 to 2015; removing the floor sent the franc up about 20% in minutes.",
         "demographics": "Ageing but supported by high immigration; high incomes and savings.",
@@ -110,15 +304,54 @@
           "fiscal": "Constitutional debt brake keeps budgets near balance: one of the lowest debt loads in the developed world."
         }
       },
-      "priceLinks": ["Risk-off and European stress lift CHF, especially against EUR", "SNB intervention caps franc strength", "Low inflation means rate cuts or negative rates remain possible"],
-      "watch": ["Swiss CPI", "SNB sight deposits (a sign of intervention)", "EURCHF in euro-area stress"]
+      "priceLinks": [
+        "Risk-off and European stress lift CHF, especially against EUR",
+        "SNB intervention caps franc strength",
+        "Low inflation means rate cuts or negative rates remain possible"
+      ],
+      "watch": [
+        "Swiss CPI",
+        "SNB sight deposits (a sign of intervention)",
+        "EURCHF in euro-area stress"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "CAD", "name": "Canada", "bank": "Bank of Canada",
+      "code": "CAD",
+      "name": "Canada",
+      "bank": "Bank of Canada",
       "character": "A commodity exporter tied to one customer. Oil and the US economy drive the loonie; household debt makes it very sensitive to interest rates.",
-      "stats": { "gdpUsdTn": 2.2, "popM": 41, "medianAge": 42, "over65Pct": 19, "mix": { "C": 55, "I": 22, "G": 21, "NX": -1 }, "currentAccountPct": -0.6, "govDebtPct": 110, "exportsPct": 33 },
-      "commodities": { "oil": "long", "gas": "long", "metals": "long", "agri": "long", "gold": "long" },
-      "partners": ["United States (about 75% of exports)", "China", "Mexico", "EU"],
+      "stats": {
+        "gdpUsdTn": 2.3,
+        "popM": 41,
+        "medianAge": 42,
+        "over65Pct": 20,
+        "mix": {
+          "C": 56,
+          "I": 23,
+          "G": 22,
+          "NX": -1
+        },
+        "currentAccountPct": -0.5,
+        "govDebtPct": 110,
+        "exportsPct": 31
+      },
+      "commodities": {
+        "oil": "long",
+        "gas": "long",
+        "metals": "long",
+        "agri": "long",
+        "gold": "long"
+      },
+      "partners": [
+        "United States (about 75% of exports)",
+        "China",
+        "Mexico",
+        "EU"
+      ],
       "profile": {
         "history": "Resource economy built on furs, timber, then oil and minerals. Deeply integrated with the US through the auto industry and trade agreements (NAFTA, then USMCA).",
         "demographics": "Fast population growth from immigration in 2022-24, now being cut back; that swings housing demand and labour supply.",
@@ -132,21 +365,61 @@
           "fiscal": "Federal and provincial budgets; low net debt compared with peers once pension assets are counted."
         }
       },
-      "priceLinks": ["CAD follows oil (CADJPY is the cleanest oil trade in FX)", "US trade policy and US growth drive USDCAD", "Housing and household debt make the BoC quick to cut"],
-      "watch": ["Canadian jobs report (same day as US payrolls)", "CPI (trimmed and median)", "WTI and the Western Canadian Select discount", "US tariff headlines"]
+      "priceLinks": [
+        "CAD follows oil (CADJPY is the cleanest oil trade in FX)",
+        "US trade policy and US growth drive USDCAD",
+        "Housing and household debt make the BoC quick to cut"
+      ],
+      "watch": [
+        "Canadian jobs report (same day as US payrolls)",
+        "CPI (trimmed and median)",
+        "WTI and the Western Canadian Select discount",
+        "US tariff headlines"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "AUD", "name": "Australia", "bank": "Reserve Bank of Australia",
+      "code": "AUD",
+      "name": "Australia",
+      "bank": "Reserve Bank of Australia",
       "character": "A mining and LNG exporter to Asia, with China as the dominant buyer. Trades as a liquid proxy for global growth and risk appetite.",
-      "stats": { "gdpUsdTn": 1.8, "popM": 27, "medianAge": 38, "over65Pct": 17, "mix": { "C": 50, "I": 23, "G": 25, "NX": 2 }, "currentAccountPct": -2, "govDebtPct": 50, "exportsPct": 25 },
-      "commodities": { "oil": "short", "gas": "long", "metals": "long", "agri": "long", "gold": "long" },
-      "partners": ["China (about 35% of exports)", "Japan", "Korea", "United States"],
+      "stats": {
+        "gdpUsdTn": 1.8,
+        "popM": 27,
+        "medianAge": 38,
+        "over65Pct": 18,
+        "mix": {
+          "C": 52,
+          "I": 25,
+          "G": 23,
+          "NX": 1
+        },
+        "currentAccountPct": -2.2,
+        "govDebtPct": 51,
+        "exportsPct": 23
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "long",
+        "metals": "long",
+        "agri": "long",
+        "gold": "long"
+      },
+      "partners": [
+        "China (about 35% of exports)",
+        "Japan",
+        "Korea",
+        "United States"
+      ],
       "profile": {
         "history": "Over 30 years without a recession until Covid, thanks to the China-driven commodity boom and a floating currency that absorbs shocks.",
         "demographics": "Young for a rich country; strong population growth through immigration supports demand and housing.",
         "capacity": "Mining and LNG capacity is huge; the rest of the economy is services and housing heavy, with weak productivity.",
         "geography": "Isolated continent close to Asian demand; long shipping routes to China, Japan and Korea.",
-        "resources": "Largest iron-ore exporter, top LNG and coal exporter, big gold, lithium and farm exporter. Imports refined fuel, so short oil.",
+        "resources": "Largest iron-ore exporter, a top-three LNG exporter, a leading coal exporter, plus big gold, lithium and farm exports. Imports refined fuel, so short oil.",
         "politics": "Stable two-party system; relations with China (trade bans in 2020-22, since eased) are the big external variable.",
         "regimes": {
           "currency": "Free float that acts as the shock absorber: AUD falls in global downturns, cushioning the economy.",
@@ -154,15 +427,55 @@
           "fiscal": "Low debt by developed-market standards; mining taxes swing the budget with commodity prices."
         }
       },
-      "priceLinks": ["AUD follows iron ore and Chinese growth", "High-beta to equities: AUDJPY is the classic risk-on/off gauge", "Gold-producer exposure gives a small gold link"],
-      "watch": ["Australian monthly CPI and quarterly CPI", "Jobs report", "Iron ore and China data (credit, property)", "RBA pricing"]
+      "priceLinks": [
+        "AUD follows iron ore and Chinese growth",
+        "High-beta to equities: AUDJPY is the classic risk-on/off gauge",
+        "Gold-producer exposure gives a small gold link"
+      ],
+      "watch": [
+        "Australian monthly CPI and quarterly CPI",
+        "Jobs report",
+        "Iron ore and China data (credit, property)",
+        "RBA pricing"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
     },
     {
-      "code": "NZD", "name": "New Zealand", "bank": "Reserve Bank of New Zealand",
+      "code": "NZD",
+      "name": "New Zealand",
+      "bank": "Reserve Bank of New Zealand",
       "character": "A small dairy and farm exporter with a big current-account deficit. High-beta, liquidity-sensitive, often moves with AUD but driven by dairy and its own housing cycle.",
-      "stats": { "gdpUsdTn": 0.25, "popM": 5.3, "medianAge": 38, "over65Pct": 17, "mix": { "C": 58, "I": 23, "G": 20, "NX": -1 }, "currentAccountPct": -6.5, "govDebtPct": 46, "exportsPct": 24 },
-      "commodities": { "oil": "short", "gas": "flat", "metals": "flat", "agri": "long", "gold": "flat" },
-      "partners": ["China", "Australia", "United States", "Japan"],
+      "stats": {
+        "gdpUsdTn": 0.26,
+        "popM": 5.3,
+        "medianAge": 38,
+        "over65Pct": 18,
+        "mix": {
+          "C": 57,
+          "I": 23,
+          "G": 21,
+          "NX": -1
+        },
+        "currentAccountPct": -4.9,
+        "govDebtPct": 51,
+        "exportsPct": 25
+      },
+      "commodities": {
+        "oil": "short",
+        "gas": "flat",
+        "metals": "flat",
+        "agri": "long",
+        "gold": "flat"
+      },
+      "partners": [
+        "China",
+        "Australia",
+        "United States",
+        "Japan"
+      ],
       "profile": {
         "history": "Pioneered inflation targeting (1989) and big market reforms in the 1980s. A farm economy turned services and tourism, with dairy still the export backbone.",
         "demographics": "Young-ish, with migration flows to and from Australia swinging labour supply.",
@@ -176,8 +489,31 @@
           "fiscal": "Moderate debt; deficit funding from abroad makes the currency sensitive to global risk appetite."
         }
       },
-      "priceLinks": ["Dairy auction prices (GDT) move NZD", "RBNZ surprises are frequent and large", "Moves with AUD on China and risk; AUDNZD isolates the difference"],
-      "watch": ["Global Dairy Trade auctions (every two weeks)", "Quarterly CPI and jobs", "RBNZ meetings", "Housing data"]
+      "priceLinks": [
+        "Dairy auction prices (GDT) move NZD",
+        "RBNZ surprises are frequent and large",
+        "Moves with AUD on China and risk; AUDNZD isolates the difference"
+      ],
+      "watch": [
+        "Global Dairy Trade auctions (every two weeks)",
+        "Quarterly CPI and jobs",
+        "RBNZ meetings",
+        "Housing data"
+      ],
+      "statYears": {
+        "imf": 2024,
+        "worldBank": 2025
+      }
+    }
+  ],
+  "sources": [
+    {
+      "title": "IMF World Economic Outlook, DataMapper (NGDPD, LP, BCA_NGDPD, GGXWDG_NGDP)",
+      "url": "https://www.imf.org/external/datamapper/"
+    },
+    {
+      "title": "World Bank World Development Indicators (SP.POP.65UP.TO.ZS, NE.EXP.GNFS.ZS, NE.CON.PRVT.ZS, NE.GDI.TOTL.ZS, NE.CON.GOVT.ZS, NE.RSB.GNFS.ZS)",
+      "url": "https://data.worldbank.org/"
     }
   ]
 }
