@@ -101,6 +101,11 @@ jobs:
         continue-on-error: true
         run: node scripts/desk-positioning.mjs
 
+      - name: Drivers for the desk (FRED + Yahoo)
+        id: drivers
+        continue-on-error: true
+        run: node scripts/desk-drivers.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -123,6 +128,7 @@ jobs:
             echo "| rates | ${{ steps.rates.outcome }} |"
             echo "| correlations | ${{ steps.corr.outcome }} |"
             echo "| positioning | ${{ steps.positioning.outcome }} |"
+            echo "| drivers | ${{ steps.drivers.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —

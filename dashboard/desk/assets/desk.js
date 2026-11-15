@@ -12,6 +12,8 @@ const PAGES = [
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
   { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
+  { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
+  { id: 'risk', href: 'risk.html', label: 'Risk' },
   { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
@@ -311,7 +313,19 @@ const DAILY_QUESTIONS = [
 
 render.hub = async (main) => {
   const today = ymd(), target = scMonday();
-  const [index, ks, lv, notes] = await Promise.all([loadLive('scorecard-index', true), loadLive('killswitches', true), loadLive('levels', true), loadLive('daily-notes', true), loadPrices()]);
+  const [index, ks, lv, notes, news] = await Promise.all([loadLive('scorecard-index', true), loadLive('killswitches', true), loadLive('levels', true), loadLive('daily-notes', true), loadLive('news', true).catch(() => null), loadPrices()]);
+  let attrKey = 'wtdPct';
+  // News stays where it is published: links out, plus a short written brief (data/news.json) of what happened and
+  // what to look for. No feed on the desk.
+  const newsHtml = () => {
+    const b = news?.brief, groups = [...new Set((news?.links || []).map((l) => l.group))];
+    return `${b ? `<div class="news-brief"><div class="small muted">Brief written ${esc(fmtDate(b.date))}${b.date < ymd(new Date(Date.now() - 2 * 864e5)) ? ' <span class="pill warn">old</span>' : ''}</div>
+        <div class="nb-cols"><div><div class="pc-h">What happened</div><ul class="list">${(b.summary || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+        <div><div class="pc-h">What to look for</div><ul class="list">${(b.watch || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
+        ${(b.sources || []).length ? `<div class="small faint">Read in full: ${b.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(' · ')}</div>` : ''}</div>`
+      : '<div class="empty small">No brief yet. Ask Claude for "today\'s news brief" and it writes one here.</div>'}
+      <div class="news-links">${groups.map((g) => `<div><div class="small muted">${esc(g)}</div>${news.links.filter((l) => l.group === g).map((l) => `<a class="chip-link" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)} ↗</a>`).join('')}</div>`).join('')}</div>`;
+  };
   const weeks = index?.weeks || [];
   const wk = weeks.find((w) => w.monday === target) || weeks.find((w) => w.monday < target) || null;
   const card = wk ? await loadLive(`scorecard-${wk.monday}`, true) : null;
@@ -402,7 +416,11 @@ render.hub = async (main) => {
         <div>${panel('My calls against price', `<div id="hub-calls">${callsHtml()}</div>`, { href: 'review.html', label: 'Review' })}
           <div style="height:14px"></div>
           ${panel('Kill switches fired or near', `<ul class="list">${hot.map((x) => `<li><span class="ccy">${esc(x.currency)}</span><span class="grow">${esc(x.condition)}<div class="small faint">${esc(x.now || '')}</div></span>${trigPill(x.status)}</li>`).join('') || `<div class="empty">None. ${kills.length} armed.</div>`}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}</div>
-      </div>`;
+      </div>
+      <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Whose story is it? Each currency against each other</h2>
+        <span>${[['dayPct', 'Today'], ['wtdPct', 'This week'], ['m1Pct', '1 month']].map(([k, l]) => `<button class="chip ${attrKey === k ? 'on' : ''}" data-act="attr" data-k="${k}">${l}</button>`).join('')}</span></div>
+        <div id="hub-attr">${attributionHtml(attrKey)}</div></section>
+      ${panel('News: summary and where to read it', newsHtml())}`;
     main.querySelectorAll('.tv[data-symbol]').forEach((el) => tvMini(el, el.dataset.symbol));
   };
   // Live parts only: the forms and the charts are left alone.
@@ -410,13 +428,18 @@ render.hub = async (main) => {
     $('#hub-status').innerHTML = statusHtml();
     main.querySelectorAll('.pcard').forEach((el) => { const p = myPairs.find((x) => x.pair === el.dataset.pair); if (p) $('[data-live]', el).innerHTML = pairLive(p); });
     $('#hub-calls').innerHTML = callsHtml();
+    $('#hub-attr').innerHTML = attributionHtml(attrKey);
   };
   const say = (html) => { msg = html; $('#hub-msg').innerHTML = html ? `<div class="note">${html}</div>` : ''; };
 
   main.addEventListener('click', async (ev) => {
     const b = ev.target.closest('button[data-act]'); if (!b) return;
     ev.preventDefault();
-    if (b.dataset.act === 'save-links') {
+    if (b.dataset.act === 'attr') {
+      attrKey = b.dataset.k;
+      b.parentElement.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b));
+      $('#hub-attr').innerHTML = attributionHtml(attrKey);
+    } else if (b.dataset.act === 'save-links') {
       links.set({ ...links.get(), debrief: $('#ln-debrief').value.trim(), weekly: $('#ln-weekly').value.trim() });
       Object.assign(note, { story: $('#dn-story').value, ifThen: $('#dn-ifthen').value, biasCheck: $('#dn-bias').value, done: [...main.querySelectorAll('[data-q]:checked')].map((x) => Number(x.dataset.q)) });
       msg = 'Links saved on this device.'; draw();
@@ -477,7 +500,7 @@ render.scorecard = async (main) => {
   const asked = new URLSearchParams(location.search).get('week') || '';
   const monday = /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : scMonday();
   let index = (await loadLive('scorecard-index', true)) || { weeks: [] };
-  const [pos] = await Promise.all([loadLive('positioning', true).catch(() => null), loadPrices()]);
+  const [pos, drv] = await Promise.all([loadLive('positioning', true).catch(() => null), loadLive('drivers', true).catch(() => null), loadPrices()]);
   const PC = pos?.currencies || {};
   // Only weeks listed in the index have a file; a new week starts blank without asking for one.
   const card = (index.weeks.some((w) => w.monday === monday) && (await loadLive(`scorecard-${monday}`, true))) || scBlankCard(monday);
@@ -600,6 +623,44 @@ render.scorecard = async (main) => {
       </div></section>`;
   };
 
+  // Regime dial (MMH 04/05): every currency placed from its own fields on this card. Dimmed = not in this build.
+  const DIRV = { rising: 1, steady: 0, falling: -1 }, LEVV = { high: 1, normal: 0, low: -1 };
+  const regimePanel = () => {
+    const rows = CCYS.map((c) => ({ c, r: card.currencies[c] })).filter(({ r }) => r.growth.dir || r.inflation.dir);
+    if (!rows.length) return '';
+    const momentum = regimeDialSvg(rows.filter(({ r }) => r.growth.dir && r.inflation.dir).map(({ c, r }) => ({ code: c, x: DIRV[r.growth.dir] ?? 0, y: DIRV[r.inflation.dir] ?? 0, dim: !card.active.includes(c) })),
+      { title: 'Growth momentum by inflation momentum', xLabels: ['growth slowing', 'growth rising'], yLabels: ['inflation falling', 'inflation rising'], quads: ['Stagflation', 'Reflation', 'Deflationary slowdown', 'Goldilocks'] });
+    const level = regimeDialSvg(rows.filter(({ r }) => r.inflation.level && r.inflation.dir).map(({ c, r }) => ({ code: c, x: DIRV[r.inflation.dir] ?? 0, y: LEVV[r.inflation.level] ?? 0, dim: !card.active.includes(c) })),
+      { title: 'Inflation level by direction', xLabels: ['falling', 'rising'], yLabels: ['level low', 'level high'], quads: ['Disinflation', 'Overheat', 'Deflation scare', 'Reflation'] });
+    return `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Regime dial</h2><a href="playbook.html#pb-quadrant">Playbook →</a></div>
+      <div class="rd-grid"><div><div class="small muted">Growth momentum × inflation momentum</div>${momentum}
+        <ul class="small muted rd-keys"><li><b>Goldilocks</b>: equities and credit lead, duration fine, volatility sold</li><li><b>Reflation / overheat</b>: commodities and commodity FX lead, bonds suffer</li><li><b>Stagflation</b>: gold and energy hold, stocks and bonds both struggle</li><li><b>Deflationary slowdown</b>: long bonds and havens lead</li></ul></div>
+      <div><div class="small muted">Inflation level × direction</div>${level}
+        <ul class="small muted rd-keys"><li><b>Disinflation from a peak</b>: duration rallies, quality equities lead (2023)</li><li><b>Overheat</b>: commodities and cash lead, stock-bond hedge fails (2022)</li><li><b>Deflation scare</b>: long bonds and gold lead (2008, 2020)</li><li><b>Reflation</b>: cyclicals, value, commodity FX lead</li></ul></div></div>
+      <p class="small faint">Placed from this card's growth and inflation fields (steady sits on the middle line). Tendencies from the course, not laws. Dimmed currencies are not in this build.</p></section>`;
+  };
+  // Pages in the book (MMH 10): independent reasons for a pair. One page is a guess, five a book.
+  const dataLean = (c) => { const r = card.currencies[c]; return (DIRV[r.growth.dir] || 0) + (DIRV[r.inflation.dir] || 0) - (DIRV[r.labour.dir] || 0); };
+  const leanOf = (c) => ({ hawkish: 1, dovish: -1 }[card.currencies[c].lean] || 0);
+  const pagesOf = (p) => {
+    const b = p.pair.slice(0, 3), q = p.pair.slice(3), s = p.dir === 'LONG' ? 1 : -1;
+    const pr = prices?.pairs?.[p.pair], tr = drv?.pairs?.pairs?.[p.pair], ps = pos ? posPairState(PC, p.pair, p.dir) : null;
+    const wkEnd = new Date(Date.parse(monday + 'T12:00:00Z') + 5 * 864e5).toISOString().slice(0, 10);
+    const ev = card.events.filter((e) => (e.currency === b || e.currency === q) && e.date >= monday && e.date <= wkEnd);
+    return [
+      { name: 'Data', ok: (dataLean(b) - dataLean(q)) * s > 0, why: `data lean ${b} ${dataLean(b)} vs ${q} ${dataLean(q)}` },
+      { name: 'Banks', ok: (leanOf(b) - leanOf(q)) * s > 0, why: `${card.currencies[b].lean || '?'} vs ${card.currencies[q].lean || '?'}` },
+      { name: 'Price', ok: pr ? pr.m1Pct * s > 0 : false, why: pr ? `1 month ${sgn(pr.m1Pct)}%` : 'no price' },
+      { name: 'Trend', ok: tr ? (tr.trend === 'up') === (s > 0) : false, why: tr ? tr.regime : 'no trend data' },
+      { name: 'Positioning', ok: ps ? ps.against && !ps.mine : false, bad: ps?.mine, why: !ps ? 'no COT' : ps.mine ? 'crowded my way' : ps.against ? 'positioned against me: room' : 'no extreme' },
+      { name: 'Catalyst', ok: ev.length > 0, why: ev.length ? ev.map((e) => e.event).join(', ') : 'no event written this week' },
+    ];
+  };
+  const pagesHtml = (p) => {
+    const pg = pagesOf(p), n = pg.filter((x) => x.ok).length;
+    return `<div class="pages"><b class="small">${n} of ${pg.length} pages</b> ${pg.map((x) => `<span class="page ${x.ok ? 'on' : x.bad ? 'bad' : ''}" title="${esc(x.name)}: ${esc(x.why)}">${esc(x.name)}</span>`).join('')}</div>`;
+  };
+
   const rankBody = () => {
     const scored = card.active.map((code) => ({ code, net: scScore(card.currencies[code]) })).filter((c) => c.net != null);
     const pairs = scPairs(card), chosen = new Set(card.pairs.map((p) => p.pair));
@@ -607,17 +668,19 @@ render.scorecard = async (main) => {
       <div>${scored.length >= 2 ? strengthBars(scored) : '<div class="empty">Make a call on at least two currencies.</div>'}</div>
       <div>${pairs.length ? `<ul class="list">${pairs.map((p) => `<li><label class="check"><input type="checkbox" data-act="pair" data-pair="${p.pair}" ${chosen.has(p.pair) ? 'checked' : ''}></label>
           <span class="grow"><b>${p.pair}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${p.dir}</span> <span class="small muted">gap ${p.diff}</span>
-            ${pos ? `<div class="pos-pairline">${posPairBar(PC, p.pair)} ${posPairVerdict(PC, p.pair, p.dir)}</div>` : ''}</span>
+            ${pos ? `<div class="pos-pairline">${posPairBar(PC, p.pair)} ${posPairVerdict(PC, p.pair, p.dir)}</div>` : ''}${pagesHtml(p)}</span>
           ${p.top ? '<span class="pill warn">top vs bottom</span>' : ''}</li>`).join('')}</ul>` : '<div class="empty">No pairs yet: two currencies need different scores.</div>'}
         ${card.pairs.length > 3 ? '<div class="note" style="margin:10px 0 0">More than three pairs. The routine says two or three.</div>' : ''}</div>
     </div>`;
   };
 
   const eventsPanel = () => `<section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Week ahead: events and if / then</h2></div>
-    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Ccy</th><th>Event</th><th>If / then</th><th></th></tr></thead>
-    <tbody>${[...card.events].sort((a, b) => (a.date < b.date ? -1 : 1)).map((e) => `<tr>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Ccy</th><th>Event</th><th>If / then</th><th title="Print against consensus, for the currency (beat = better for it). The price reaction is read from the desk's closes.">Reaction</th><th></th></tr></thead>
+    <tbody>${[...card.events].sort((a, b) => (a.date < b.date ? -1 : 1)).map((e) => { const done = e.date <= ymd(), r = done ? reactionOf(e) : null; return `<tr>
       <td class="small nowrap">${fmtDate(e.date)}</td><td><span class="ccy">${esc(e.currency)}</span></td><td>${esc(e.event)}</td><td class="small">${esc(e.ifThen)}</td>
-      <td><button class="link-btn" data-act="del-event" data-id="${esc(e.id)}">Delete</button></td></tr>`).join('') || '<tr><td colspan="5" class="empty">No events yet.</td></tr>'}</tbody></table></div>
+      <td class="small">${done ? `<select data-act="rx" data-id="${esc(e.id)}"><option value="">print?</option>${Object.entries(RX_PRINT).map(([k, l]) => `<option value="${k}" ${e.reaction?.print === k ? 'selected' : ''}>${l}</option>`).join('')}</select> ${rxCell(r)}<div>${rxMove(r)}</div>` : '<span class="faint">after the release</span>'}</td>
+      <td><button class="link-btn" data-act="del-event" data-id="${esc(e.id)}">Delete</button></td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">No events yet.</td></tr>'}</tbody></table></div>
+    <p class="small faint" style="margin:6px 0 0">Reaction: pick how the print landed against consensus for the currency (Market Context shows it). The desk reads how the currency moved against the other seven that day, in σ of a normal day, whether it held, and the next three days. Contradictions are the signal; the Review page tallies them.</p>
     <div class="form-grid" style="margin-top:12px">
       <label>Date<input type="date" id="ev-date"></label>
       <label>Currency<select id="ev-ccy">${card.active.map((c) => `<option>${c}</option>`).join('')}</select></label>
@@ -644,7 +707,7 @@ render.scorecard = async (main) => {
       (card.autoFill ? `<div class="note"><b>Data fields filled from ${esc(card.autoFill.source)}</b>, read ${new Date(card.autoFill.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, for ${esc((card.autoFill.currencies || []).join(', '))}.
         Level and direction for inflation, growth and unemployment, and the bank's lean, are ${esc(card.autoFill.source)}'s own labels, copied as they stood. Check them, then write the sentence and make the call yourself.${(card.autoFill.missing || []).length ? ` <span class="warn-t">Not filled: ${esc(card.autoFill.missing.join('; '))}.</span>` : ''}</div>` : '') +
       `<div class="filters"><span class="small muted">Currencies in this build</span>${CCYS.map((c) => `<button class="chip ${card.active.includes(c) ? 'on' : ''}" data-act="toggle" data-ccy="${c}">${c}</button>`).join('')}</div>
-      ${posMap()}<div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
+      ${posMap()}${regimePanel()}<div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Rank and pairs</h2></div><div id="sc-rank">${rankBody()}</div></section>` +
       eventsPanel() + `<div id="sc-save">${saveBar()}</div>`;
   };
@@ -677,6 +740,10 @@ render.scorecard = async (main) => {
     if (t.id === 'sc-week') {
       if (dirty && !confirm('Leave this week without saving?')) { t.value = monday; return; }
       dirty = false; location.search = `?week=${t.value}`;
+    } else if (t.dataset.act === 'rx') {
+      const e = card.events.find((x) => x.id === t.dataset.id);
+      if (e) { if (t.value) e.reaction = { print: t.value }; else delete e.reaction; }
+      dirty = true; draw();
     } else if (t.dataset.act === 'pair') {
       const p = scPairs(card).find((x) => x.pair === t.dataset.pair);
       card.pairs = card.pairs.filter((x) => x.pair !== t.dataset.pair);
@@ -1150,6 +1217,16 @@ function posPairVerdict(C, pair, dir) {
   }
   return out.join(' ') || '<span class="pill flat">no extreme either side</span>';
 }
+// Same rule as a yes/no per pair: any group crowded my way, any group positioned against me.
+function posPairState(C, pair, dir) {
+  const s = dir === 'LONG' ? 1 : -1; let mine = false, against = false;
+  for (const role of ['slow', 'fast']) {
+    const r = posPairRead(C, pair, role); if (!r) continue;
+    if (s > 0 ? r.b.index >= 80 || r.q.index <= 20 : r.b.index <= 20 || r.q.index >= 80) mine = true;
+    else if (s > 0 ? r.b.index <= 20 || r.q.index >= 80 : r.b.index >= 80 || r.q.index <= 20) against = true;
+  }
+  return { mine, against };
+}
 // Pair as a tug of war: base leg's index against the quote leg's, per group. Bar runs from the centre toward the
 // leg that group favours.
 function posPairBar(C, pair) {
@@ -1259,6 +1336,233 @@ render.positioning = async (main) => {
       <li>For commodities the disaggregated report is used; for currencies and financials the TFF report. Legacy "commercials" are never used for currencies: they mix dealer hedging with real money.</li>
       <li>Not here: CME daily open interest (CME blocks automated access) and retail sentiment (no open source found).</li>
     </ul></section>`;
+};
+
+// ---------- shared charts ----------
+// Line chart for [[date, value], ...]. extra: more series drawn on the same scale. hlines: reference lines.
+function lineSvg(data, { w = 300, h = 90, color = 'var(--accent)', extra = [], hlines = [], bands = [], min = null, max = null, label = '' } = {}) {
+  const all = [data, ...extra.map((e) => e.data)].flat().map((x) => x[1]).filter((v) => v != null && Number.isFinite(v));
+  if (all.length < 2) return '<span class="faint small">no data</span>';
+  const lo = min ?? Math.min(...all, ...hlines.map((l) => l.v)), hi = max ?? Math.max(...all, ...hlines.map((l) => l.v));
+  const axis = h >= 50, pad = (hi - lo) * 0.08 || 1, L = lo - pad, U = hi + pad, T = 4, B = axis ? h - 12 : h - 3;
+  const n = Math.max(data.length, ...extra.map((e) => e.offset ? e.offset + e.data.length : e.data.length));
+  const Y = (v) => B - ((v - L) / (U - L)) * (B - T), X = (i) => 2 + ((w - 4) * i) / Math.max(1, n - 1);
+  const path = (d, off = 0) => d.map((p, i) => (p[1] == null ? null : `${X(i + off).toFixed(1)},${Y(p[1]).toFixed(1)}`)).filter(Boolean).join(' ');
+  const bandSvg = bands.map((b) => `<rect x="0" y="${Y(Math.min(U, b.to))}" width="${w}" height="${Math.max(0, Y(Math.max(L, b.from)) - Y(Math.min(U, b.to)))}" fill="${b.fill || 'var(--warn-bg)'}"/>`).join('');
+  const hl = hlines.map((l) => `<line x1="0" x2="${w}" y1="${Y(l.v)}" y2="${Y(l.v)}" stroke="${l.color || 'var(--faint)'}" stroke-dasharray="${l.dash || '3 3'}"/>${l.label ? `<text x="${l.anchor === 'start' ? 4 : w - 2}" y="${Y(l.v) - 3}" text-anchor="${l.anchor === 'start' ? 'start' : 'end'}" class="g-axis">${esc(l.label)}</text>` : ''}`).join('');
+  const lines = extra.map((e) => `<polyline fill="none" stroke="${e.color}" stroke-width="${e.width || 1.6}" ${e.dash ? `stroke-dasharray="${e.dash}"` : ''} points="${path(e.data, e.offset || 0)}"/>`).join('');
+  const lastPt = data.filter((p) => p[1] != null).at(-1);
+  return `<svg class="line-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}">${bandSvg}${hl}<polyline fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" points="${path(data)}"/>${lines}
+    ${lastPt ? `<circle cx="${X(data.lastIndexOf(lastPt))}" cy="${Y(lastPt[1])}" r="3" fill="${color}"/>` : ''}
+    ${axis ? `<text x="2" y="${h - 1}" class="g-axis">${esc(String(data[0]?.[0] || '').slice(0, 7))}</text><text x="${w - 2}" y="${h - 1}" text-anchor="end" class="g-axis">${esc(String(lastPt?.[0] || '').slice(0, 10))}</text>` : ''}</svg>`;
+}
+const pctileBar = (p, { goodHigh = null } = {}) => `<span class="idx" title="Where today sits in its 1-year range: ${p} of 100"><span class="idx-track"><span class="idx-mark" style="left:${p}%"></span></span><b class="num small">${p}</b></span>`;
+const sgn = (n, d = 2) => (n == null ? '—' : `${n > 0 ? '+' : ''}${Number(n).toFixed(d)}`);
+
+// ---------- release-to-reaction (MMH 00.7) ----------
+// How a currency's basket (against the other seven) moved on an event day, read from the desk's own closes.
+// Market Context already shows the print against consensus; this adds the half it does not: the price reaction.
+const RX_PRINT = { beat: 'Beat', inline: 'In line', miss: 'Miss' }, RX_PRICE = { up: 'Up', flat: 'Flat', down: 'Down' };
+function reactionOf(e) {
+  const H = prices?.history, dates = H?.dates || [];
+  if (!H || !CCYS.includes(e.currency)) return null;
+  const i = dates.indexOf(e.date);
+  if (i < 21) return { pending: dates.length && e.date > dates[dates.length - 1] ? 'after the last close' : 'outside the price history' };
+  const hv = (c, k) => (c === 'USD' ? 1 : H.usd[c][k]);
+  const basket = (k) => { const o = CCYS.filter((x) => x !== e.currency); return o.reduce((s, x) => s + ((hv(e.currency, k) / hv(x, k)) / (hv(e.currency, k - 1) / hv(x, k - 1)) - 1) * 100, 0) / o.length; };
+  const move = basket(i), typ = Array.from({ length: 20 }, (_, j) => Math.abs(basket(i - 1 - j))).reduce((a, b) => a + b, 0) / 20;
+  const price = move > 0.5 * typ ? 'up' : move < -0.5 * typ ? 'down' : 'flat';
+  const N = dates.length, s = Math.sign(move) || 1;
+  const held = i + 1 < N ? basket(i + 1) * s > -0.5 * Math.abs(move) : null;
+  let follow3 = null;
+  if (i + 1 < N) { let acc = 0; for (let k = i + 1; k <= Math.min(i + 3, N - 1); k++) acc += basket(k); follow3 = acc * s; }
+  const p = e.reaction?.print;
+  const tone = !p ? null : price === 'flat' ? (p === 'inline' ? 'textbook' : 'absorbed') : p === 'inline' ? 'else' : (p === 'beat') === (price === 'up') ? 'textbook' : 'signal';
+  return { move, sigma: move / typ, price, held, follow3, tone };
+}
+const RX_TONE = { textbook: ['textbook', 'flat'], absorbed: ['absorbed: already priced', 'warn'], signal: ['contradiction: signal', 'bear'], else: ['moved on an in-line print: something else priced', 'warn'] };
+const rxCell = (r) => (r?.tone ? `<span class="pill ${RX_TONE[r.tone][1]}">${RX_TONE[r.tone][0]}</span>` : '');
+const rxMove = (r) => (!r ? '' : r.pending ? `<span class="small faint">${esc(r.pending)}</span>` : `<span class="small">${RX_PRICE[r.price]} ${pctHtml(r.move)} <span class="faint">(${sgn(r.sigma, 1)}σ)</span>${r.held == null ? '' : r.held ? ' · held next day' : ' · <span class="warn-t">given back next day</span>'}${r.follow3 == null ? '' : ` · next 3 days ${r.follow3 >= 0 ? 'continued' : 'reversed'} ${Math.abs(r.follow3).toFixed(2)}%`}</span>`);
+
+// ---------- attribution (MMH 01 FX I, 01.4 FX V) ----------
+// Each currency (row) against each other (column). Down against everything = its own story; down against one = the other side's.
+function attributionHtml(key = 'wtdPct') {
+  if (!prices) return '<div class="empty">No prices yet.</div>';
+  const mv = (b, q) => { const p = prices.pairs[b + q]; if (p) return p[key]; const r = prices.pairs[q + b]; return r ? (1 / (1 + r[key] / 100) - 1) * 100 : 0; };
+  const order = [...CCYS].sort((a, b) => prices.currencies[b][key] - prices.currencies[a][key]);
+  const max = Math.max(0.2, ...order.flatMap((b) => order.filter((q) => q !== b).map((q) => Math.abs(mv(b, q)))));
+  const cell = (v) => { const a = Math.min(1, Math.abs(v) / max); return `background:${v >= 0 ? `rgba(52,195,122,${(0.12 + a * 0.6).toFixed(2)})` : `rgba(240,96,106,${(0.12 + a * 0.6).toFixed(2)})`}`; };
+  const story = (c) => { const o = order.filter((x) => x !== c).map((x) => mv(c, x)), up = o.filter((v) => v > 0).length; return up >= 6 ? `<span class="pill bull">${c} story: up vs ${up} of 7</span>` : up <= 1 ? `<span class="pill bear">${c} story: down vs ${7 - up} of 7</span>` : `<span class="pill flat">mixed ${up} up / ${7 - up} down</span>`; };
+  return `<div class="table-wrap"><table class="attr"><thead><tr><th></th>${order.map((c) => `<th>${c}</th>`).join('')}<th>Read</th></tr></thead>
+    <tbody>${order.map((b) => `<tr><th class="ccy">${b}</th>${order.map((q) => (b === q ? '<td class="attr-self"></td>' : `<td style="${cell(mv(b, q))}" title="${b}${q}: ${sgn(mv(b, q))}%">${sgn(mv(b, q), 2)}</td>`)).join('')}<td>${story(b)}</td></tr>`).join('')}</tbody></table></div>
+    <p class="small faint">Row currency against column currency, in %. A row that is green across the board is that currency's own story; a single red or green column is the other side's story.</p>`;
+}
+
+// ---------- regime dial (MMH 04 Growth, 05 Inflation) ----------
+// Plots each currency from the Scorecard's own fields. Growth momentum x inflation momentum, and inflation level x direction.
+function regimeDialSvg(points, { xLabels, yLabels, quads, title }) {
+  const W = 320, H = 260, M = 30, cx = W / 2, cy = H / 2;
+  const seen = {};
+  const dots = points.map((p) => {
+    const key = `${p.x},${p.y}`, k = (seen[key] = (seen[key] || 0) + 1) - 1;
+    const ang = k * 1.1, rad = k ? 14 + k * 3 : 0;
+    const x = cx + p.x * (W / 2 - M) * 0.52 + Math.cos(ang) * rad, y = cy - p.y * (H / 2 - M) * 0.5 + Math.sin(ang) * rad;
+    return `<g class="rd-dot ${p.dim ? 'dim' : ''}"><circle cx="${x}" cy="${y}" r="13" fill="${p.color || 'var(--panel-2)'}" stroke="var(--accent)"/><text x="${x}" y="${y + 4}" text-anchor="middle" class="rd-txt">${p.code}</text></g>`;
+  }).join('');
+  const q = (x, y, t, a) => `<text x="${x}" y="${y}" text-anchor="${a}" class="rd-q">${esc(t)}</text>`;
+  return `<svg class="rd" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">
+    <rect x="${M}" y="${M - 10}" width="${W - 2 * M}" height="${H - 2 * M + 10}" rx="10" fill="none" stroke="var(--line)"/>
+    <line x1="${cx}" x2="${cx}" y1="${M - 10}" y2="${H - M}" stroke="var(--line)"/><line x1="${M}" x2="${W - M}" y1="${cy}" y2="${cy}" stroke="var(--line)"/>
+    ${q(M + 6, M + 6, quads[0], 'start')}${q(W - M - 6, M + 6, quads[1], 'end')}${q(M + 6, H - M - 6, quads[2], 'start')}${q(W - M - 6, H - M - 6, quads[3], 'end')}
+    <text x="${M}" y="${H - 8}" class="g-axis">◀ ${esc(xLabels[0])}</text><text x="${W - M}" y="${H - 8}" text-anchor="end" class="g-axis">${esc(xLabels[1])} ▶</text>
+    <text x="${cx}" y="${M - 14}" text-anchor="middle" class="g-axis">▲ ${esc(yLabels[1])}</text><text x="${cx}" y="${H - 18}" text-anchor="middle" class="g-axis" dy="-2"> </text>
+    ${dots}<text x="${cx}" y="${H - 20}" text-anchor="middle" class="g-axis">▼ ${esc(yLabels[0])}</text></svg>`;
+}
+
+// ---------- drivers (cross-asset readings Market Context does not carry) ----------
+// From data/drivers.json (scripts/desk-drivers.mjs, daily in CI). Each panel follows one course module and reports,
+// it never calls a direction.
+render.drivers = async (main) => {
+  const [d, pos] = await Promise.all([loadLive('drivers'), loadLive('positioning', true).catch(() => null)]);
+  const tone = (good) => (good == null ? 'flat' : good ? 'bull' : 'bear');
+  const chg = (v, unit = '', d = 2) => `<span class="num ${v > 0 ? 'up' : v < 0 ? 'down' : 'muted'}">${sgn(v, d)}${unit}</span>`;
+
+  const liq = d.liquidity;
+  const liqPanel = !liq ? '' : panel('Liquidity tide (US)', `<div class="drv-2"><div>
+      <div class="kpis"><div><label>Net liquidity</label><span class="num big">$${(liq.netBn / 1000).toFixed(2)}tn</span></div>
+        <div><label>4 weeks</label>${chg(liq.chg4wBn, 'bn', 0)}</div><div><label>13 weeks</label>${chg(liq.chg13wBn, 'bn', 0)}</div></div>
+      <div class="small muted">Fed assets $${liq.parts.fedBn}bn − Treasury account $${liq.parts.tgaBn}bn − reverse repo $${liq.parts.rrpBn}bn · week of ${esc(fmtDate(liq.asOf))}</div>
+      <p class="small">${liq.chg13wBn > 0 ? '<span class="pill bull">tide coming in</span> the far end of the risk curve feels it first' : '<span class="pill bear">tide going out</span> the far end of the risk curve feels it first'}</p></div>
+    <div>${lineSvg(liq.history, { label: 'Net liquidity, 2 years', h: 110 })}</div></div>
+    <p class="small faint">Module 06: QE and QT are the famous tap, but the Treasury account and reverse repo move the water level too.</p>`);
+
+  const g = d.gold, mm = pos?.markets?.find((m) => m.key === 'GOLD'), mmg = mm ? posGrp(mm, 'fast') : null;
+  const goldRow = (n, name, blk, unit, readFn) => !blk ? '' : `<div class="stack-row"><span class="stack-n">${n}</span><div class="stack-name"><b>${name}</b><div class="small faint">${esc(fmtDate(blk.asOf))}</div></div>
+    <div class="num">${blk.value}${unit}<div class="small">${chg(blk.chg1w, unit)} 1w · ${chg(blk.chg3m, unit)} 3m</div></div>
+    <div>${lineSvg(blk.history, { h: 46, w: 220, label: name })}</div><div>${pctileBar(blk.pctile1y)}<div class="small faint">1-year range</div></div><div>${readFn(blk)}</div></div>`;
+  const goldPanel = !g ? '' : panel('Gold: the driver stack, in the course\'s order', `<div class="stack">
+      ${goldRow(1, 'Real yields (US 10y TIPS)', g.realYield10y, '%', (b) => `<span class="pill ${tone(b.chg3m < 0)}">${b.chg3m < 0 ? 'falling: tailwind' : 'rising: headwind'}</span>`)}
+      ${goldRow(2, 'Dollar (broad index)', g.dollarBroad, '', (b) => `<span class="pill ${tone(b.chg3m < 0)}">${b.chg3m < 0 ? 'weaker: tailwind' : 'stronger: headwind'}</span>`)}
+      ${liq ? `<div class="stack-row"><span class="stack-n">3</span><div class="stack-name"><b>Liquidity</b><div class="small faint">net, US</div></div><div class="num">$${(liq.netBn / 1000).toFixed(2)}tn<div class="small">${chg(liq.chg13wBn, 'bn', 0)} 13w</div></div><div>${lineSvg(liq.history.slice(-52), { h: 46, w: 220 })}</div><div></div><div><span class="pill ${tone(liq.chg13wBn > 0)}">${liq.chg13wBn > 0 ? 'expanding: tailwind' : 'draining: headwind'}</span></div></div>` : ''}
+      ${mmg ? `<div class="stack-row"><span class="stack-n">4</span><div class="stack-name"><b>Flows: COT managed money</b><div class="small faint">${esc(fmtDate(mm.date))}</div></div><div class="num">${mmg.index}<div class="small">of 100 in 3 years</div></div><div>${posGauge(mm, { compact: true })}</div><div></div><div>${posTagPill(mmg.tag)}</div></div>` : ''}
+      ${goldRow(5, 'Stress: VIX', g.vix, '', (b) => `<span class="pill ${b.value > 20 ? 'warn' : 'flat'}">${b.value > 20 ? 'above 20: risk-off' : 'calm'}</span>`)}
+      ${goldRow('5b', 'Stress: high-yield spread', g.hySpread, '%', (b) => `<span class="pill ${b.chg3m > 0 ? 'warn' : 'flat'}">${b.chg3m > 0 ? 'widening' : 'tightening'}</span>`)}
+      ${goldRow('', 'Gold futures', g.goldFutures, '', () => '')}
+    </div><p class="small faint">Module 23: real rates anchor the trend, flows set the tempo, stress events bend the curve. Central-bank buying can override the real-yield link (2022-24).</p>`);
+
+  const cv = d.curve, mats = ['3M', '2Y', '5Y', '10Y', '30Y'];
+  const curveShape = () => {
+    const W = 300, H = 120, all = mats.flatMap((m) => [cv.yields[m].now, cv.yields[m].m3]), lo = Math.min(...all) - 0.15, hi = Math.max(...all) + 0.15;
+    const X = (i) => 20 + (i * (W - 40)) / (mats.length - 1), Y = (v) => H - 18 - ((v - lo) / (hi - lo)) * (H - 30);
+    const line = (k, col, dash = '') => `<polyline fill="none" stroke="${col}" stroke-width="2" ${dash ? `stroke-dasharray="${dash}"` : ''} points="${mats.map((m, i) => `${X(i)},${Y(cv.yields[m][k])}`).join(' ')}"/>`;
+    return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="US yield curve now, 1 month and 3 months ago">${line('m3', 'var(--faint)', '4 3')}${line('m1', 'var(--pos-fast)', '2 2')}${line('now', 'var(--accent)')}
+      ${mats.map((m, i) => `<text x="${X(i)}" y="${H - 3}" text-anchor="middle" class="g-axis">${m}</text><text x="${X(i)}" y="${Y(cv.yields[m].now) - 6}" text-anchor="middle" class="g-num" fill="var(--accent)">${cv.yields[m].now}</text>`).join('')}</svg>
+      <div class="pos-legend"><span class="pos-key" style="color:var(--accent)">— now</span><span class="pos-key" style="color:var(--pos-fast)">-- 1 month ago</span><span class="pos-key">-- 3 months ago</span></div>`;
+  };
+  const rgTone = (t) => (/bull/.test(t) ? 'bull' : /bear/.test(t) ? 'bear' : 'flat');
+  const curvePanel = !cv ? '' : panel('US yield curve: the four moves', `<div class="drv-2"><div>${curveShape()}</div>
+    <div class="table-wrap"><table><thead><tr><th>Curve</th><th>Spread</th><th>1 week</th><th>1 month</th><th>Spread, 1 year</th></tr></thead><tbody>${cv.pairs.map((p) => `<tr><td><b>${p.front}-${p.back}</b></td><td class="num">${p.spreadBp}bp</td>
+      <td><span class="pill ${rgTone(p.w1.tag)}">${esc(p.w1.tag)}</span></td><td><span class="pill ${rgTone(p.m1.tag)}">${esc(p.m1.tag)}</span></td><td>${lineSvg(p.history, { h: 36, w: 140, hlines: [{ v: 0 }] })}</td></tr>`).join('')}</tbody></table></div></div>
+    <p class="small faint">Modules 03 and 03.1. Bull = yields fell, bear = yields rose; steepener = the long end rose relative to the short end. Different parts of the curve in different regimes at the same time is information.</p>`);
+
+  const gr = d.growth, GROUP = { leading: 'Leading: turns first', coincident: 'Coincident: the pulse now', lagging: 'Lagging: confirms after' };
+  const disagree = gr && gr.breadth.leading.weaker > gr.breadth.leading.stronger && gr.breadth.coincident.stronger >= gr.breadth.coincident.weaker;
+  const growthPanel = !gr ? '' : panel('US growth: what leads, what lags', `${disagree ? '<div class="note"><b>Leaders weakening while the coincident data still looks fine.</b> The course calls that disagreement the trade: it shows what the market will have to reprice if the leaders are right.</div>' : ''}
+    <div class="gr-grid">${Object.entries(GROUP).map(([k, title]) => { const b = gr.breadth[k]; return `<div><div class="pc-h">${title}</div>
+      <div class="breadth"><span class="bar-up" style="flex:${b.stronger || 0.001}"></span><span class="bar-dn" style="flex:${b.weaker || 0.001}"></span></div><div class="small muted">${b.stronger} stronger · ${b.weaker} weaker of ${b.n}</div>
+      <ul class="list">${gr.series.filter((s) => s.group === k).map((s) => `<li class="gr-row"><div><b class="small">${esc(s.label)}</b><div class="small faint">${s.value}${s.unit ? ' ' + s.unit : ''} · ${sgn(s.chg3m, 2)}${s.chg3mUnit} in 3 months · ${esc(fmtDate(s.asOf))}</div></div><div class="gr-right">${lineSvg(s.history, { h: 30, w: 110 })}<div><span class="pill ${s.read === 'stronger' ? 'bull' : s.read === 'weaker' ? 'bear' : 'flat'}">${s.read}</span> <span class="small faint" title="Is the 3-month change better than the 3 months before?">${s.turning}</span></div></div></li>`).join('')}</ul></div>`; }).join('')}</div>
+    <p class="small faint">Module 04: trade the turn, not the level. "Accelerating / decelerating" is the second derivative: bad to less bad is where risk assets historically do best.</p>`);
+
+  const inf = d.inflation;
+  const glide = (blk) => {
+    const hist = blk.history, labels = Object.keys(blk.paths), cols = ['var(--bear)', 'var(--warn)', 'var(--accent)', 'var(--bull)'];
+    const extra = labels.map((k, i) => ({ data: [[hist.at(-1)[0], hist.at(-1)[1]], ...blk.paths[k].map((v, j) => [`+${j + 1}m`, v])], color: cols[i], dash: '4 3', offset: hist.length - 1 }));
+    const padded = [...hist, ...Array.from({ length: 6 }, (_, j) => [`+${j + 1}m`, null])];
+    return `${lineSvg(padded, { h: 130, extra, hlines: [{ v: inf.target, label: '2% target' }, { v: inf.breakeven5y.value, label: `5y breakeven ${inf.breakeven5y.value}%`, color: 'var(--pos-fast)', anchor: 'start' }], label: `${blk.label} year on year and six-month paths` })}
+      <div class="pos-legend">${labels.map((k, i) => `<span class="pos-key"><svg width="14" height="6"><line x1="0" x2="14" y1="3" y2="3" stroke="${cols[i]}" stroke-width="2" stroke-dasharray="4 3"/></svg>${esc(k)}: ${blk.paths[k][5]}%</span>`).join('')}</div>`;
+  };
+  const infPanel = !inf ? '' : panel('US inflation: the pace, and where it leads', `<div class="drv-2">${[inf.core, inf.headline].map((b) => `<div><div class="kpis"><div><label>${esc(b.label)} y/y</label><span class="num big">${b.yoy}%</span></div><div><label>3-month pace</label><span class="num big ${b.ann3m > b.yoy ? 'warn-t' : ''}">${b.ann3m}%</span><div class="small faint">annualised</div></div><div><label>6-month pace</label><span class="num">${b.ann6m}%</span></div><div><label>Last month</label><span class="num">${sgn(b.lastMoM)}%</span></div></div>${glide(b)}</div>`).join('')}</div>
+    <p class="small faint">Modules 05 and FX II. Year on year is where inflation has been; the 3-month annualised pace is where it is now. The dashed paths hold today's monthly pace, double it, halve it or stop it, and show where year on year lands over six months: pricing that no path reaches is the one to fade. As of ${esc(fmtDate(inf.core.asOf))}.</p>`);
+
+  const bc = d.bounce;
+  const bouncePanel = !bc ? '' : panel('Bounce check: positioning or durable?', `<div class="kpis"><div><label>S&P 5 days</label>${chg(bc.spy5d, '%', 1)}</div><div><label>S&P 20 days</label>${chg(bc.spy20d, '%', 1)}</div><div><label>Durable tells</label><span class="num big">${bc.durable} of ${bc.n}</span></div></div>
+    <div class="dots-row">${bc.checks.map((c) => `<span class="page ${c.read === 'durable' ? 'on' : 'bad'}" title="${esc(c.why)}">${esc(c.key)}</span>`).join('')}</div>
+    <ul class="list">${bc.checks.map((c) => `<li><span class="grow"><b class="small">${esc(c.label)}</b><div class="small faint">${esc(c.why)}</div></span><span class="num small">${esc(c.value)}</span><span class="pill ${c.read === 'durable' ? 'bull' : 'warn'}">${c.read}</span></li>`).join('')}</ul>
+    <p class="small faint">Alfie's test and module 00.4: did a macro constraint change, or only the price of exposure? Skew and leveraged-ETF flows are part of the test but have no free source, so they are not here. As of ${esc(fmtDate(bc.asOf))}.</p>`);
+
+  const sb = d.stockBond;
+  const sbPanel = !sb ? '' : panel('Stock-bond correlation', `<div class="drv-2"><div><div class="kpis"><div><label>60-day correlation, S&P vs long Treasuries</label><span class="num big">${sb.corr60d}</span></div></div><p class="small">${esc(sb.read)}</p></div>
+    <div>${lineSvg(sb.history, { h: 100, min: -1, max: 1, hlines: [{ v: 0 }], bands: [{ from: 0.2, to: 1, fill: 'var(--bear-bg)' }, { from: -1, to: -0.2, fill: 'var(--bull-bg)' }], label: 'Rolling stock-bond correlation' })}</div></div>
+    <p class="small faint">Module 08: the mix of growth, inflation and liquidity sets the correlation. Positive (red zone) = bonds stop hedging stocks, as in 2022.</p>`);
+
+  const pr = d.pairs;
+  const pairMap = () => {
+    const W = 520, H = 300, M = 34, ps = Object.entries(pr.pairs), xs = ps.map(([, p]) => p.vsEmaPct), ys = ps.map(([, p]) => p.volRatio);
+    const xMax = Math.max(1, ...xs.map(Math.abs)) * 1.1, yLo = Math.min(0.5, ...ys) * 0.95, yHi = Math.max(1.5, ...ys) * 1.05;
+    const X = (v) => W / 2 + (v / xMax) * (W / 2 - M), Y = (v) => H - M - ((v - yLo) / (yHi - yLo)) * (H - 2 * M);
+    return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="28 pairs by trend and volatility">
+      <line x1="${W / 2}" x2="${W / 2}" y1="${M / 2}" y2="${H - M}" stroke="var(--line)"/><line x1="${M}" x2="${W - M}" y1="${Y(1)}" y2="${Y(1)}" stroke="var(--line)"/>
+      <text x="${M}" y="${M / 2 + 8}" class="rd-q">Falling, high volatility (real bear)</text><text x="${W - M}" y="${M / 2 + 8}" text-anchor="end" class="rd-q">Rising, high volatility (with whiplash)</text>
+      <text x="${M}" y="${H - M - 6}" class="rd-q">Falling, low volatility (quiet)</text><text x="${W - M}" y="${H - M - 6}" text-anchor="end" class="rd-q">Rising, low volatility (calm grind)</text>
+      ${ps.map(([k, p]) => `<g><circle cx="${X(p.vsEmaPct)}" cy="${Y(p.volRatio)}" r="3.5" fill="${p.trend === 'up' ? 'var(--bull)' : 'var(--bear)'}"/><text x="${X(p.vsEmaPct) + 5}" y="${Y(p.volRatio) + 3}" class="g-axis" fill="var(--muted)">${k}</text><title>${k}: ${p.vsEmaPct}% from 50-day EMA, volatility ${p.volRatio}x its 1-year median</title></g>`).join('')}
+      <text x="${W / 2}" y="${H - 8}" text-anchor="middle" class="g-axis">% from 50-day EMA →</text><text x="8" y="${H / 2}" class="g-axis" transform="rotate(-90 8 ${H / 2})" text-anchor="middle">volatility vs 1-year median →</text></svg>`;
+  };
+  const pairsPanel = !pr ? '' : panel('The 28 pairs: trend × volatility', `${pairMap()}<p class="small faint">Module 00.9: trend state × volatility state = four regimes with different behaviour. Continuation setups tend to suit calm trends; reversals suit high volatility. ${esc(pr.method)} As of ${esc(fmtDate(pr.asOf))}.</p>`);
+
+  main.innerHTML = head('Drivers', 'Cross-asset readings that Market Context does not carry: liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, and every pair\'s trend regime. Updated daily.') +
+    ((d.warns || []).length ? `<div class="note small">Data warnings: ${d.warns.map(esc).join(' · ')}</div>` : '') +
+    liqPanel + goldPanel + curvePanel + growthPanel + infPanel + bouncePanel + sbPanel + pairsPanel;
+};
+
+// ---------- risk (MMH 00.6: how much to bet) ----------
+// A calculator, nothing saved to GitHub: inputs stay in this browser.
+render.risk = async (main) => {
+  const KEY = 'desk.risk';
+  const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
+  const st = { account: 10000, base: 0.4, ytd: 0, entry: '', stop: '', unit: 'fx', maxHeat: 10, open: [], ...saved };
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* storage blocked */ } };
+  const units = () => (st.ytd > 15 ? 3 : st.ytd > 10 ? 2 : 1);
+  const calc = () => {
+    const riskPct = st.base * units(), risk$ = (st.account * riskPct) / 100, e = Number(st.entry), s = Number(st.stop);
+    if (!e || !s || e === s) return { riskPct, risk$ };
+    const qty = risk$ / Math.abs(e - s), notional = qty * e;
+    return { riskPct, risk$, qty, notional, lots: st.unit === 'fx' ? qty / 100000 : null, lev: notional / st.account, stopPct: (Math.abs(e - s) / e) * 100 };
+  };
+  const recovery = () => {
+    const xs = [5, 10, 20, 30, 50], W = 300, H = 120, max = 100;
+    return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Gain needed to recover a loss">${xs.map((l, i) => { const need = (1 / (1 - l / 100) - 1) * 100, x = 20 + i * 56, hL = (l / max) * 80, hN = (need / max) * 80;
+      return `<rect x="${x}" y="${96 - hL}" width="18" height="${hL}" fill="var(--bear)" fill-opacity="0.8"/><rect x="${x + 20}" y="${96 - hN}" width="18" height="${hN}" fill="var(--bull)" fill-opacity="0.8"/><text x="${x + 19}" y="${110}" text-anchor="middle" class="g-axis">-${l}%</text><text x="${x + 29}" y="${92 - hN}" text-anchor="middle" class="g-num" fill="var(--bull)">+${Math.round(need)}%</text>`; }).join('')}</svg>
+      <div class="pos-legend"><span class="pos-key" style="color:var(--bear)">■ loss</span><span class="pos-key" style="color:var(--bull)">■ gain needed to get back</span></div>`;
+  };
+  const draw = () => {
+    const r = calc(), heat = st.open.reduce((s, o) => s + Number(o.risk || 0), 0) + (r.qty ? r.riskPct : 0);
+    main.innerHTML = head('Risk', 'How much to bet: risk sets the size, not the other way round. Module 00.6. Inputs stay in this browser.') +
+      `<div class="grid sc-grid">${panel('Position size', `<div class="form-grid">
+          <label>Account<input type="number" data-k="account" value="${st.account}"></label>
+          <label>Base risk per trade (%)<input type="number" step="0.05" data-k="base" value="${st.base}"></label>
+          <label>Year to date (%)<input type="number" step="0.5" data-k="ytd" value="${st.ytd}"></label>
+          <label>Instrument<select data-k="unit"><option value="fx" ${st.unit === 'fx' ? 'selected' : ''}>FX pair (lots of 100k)</option><option value="units" ${st.unit === 'units' ? 'selected' : ''}>Coins, contracts or shares</option></select></label>
+          <label>Entry<input type="number" step="any" data-k="entry" value="${st.entry}"></label>
+          <label>Stop<input type="number" step="any" data-k="stop" value="${st.stop}"></label></div>
+        <div class="kpis"><div><label>Risk this trade</label><span class="num big">${r.riskPct.toFixed(2)}%</span><div class="small faint">${units()} unit${units() > 1 ? 's' : ''} · $${Math.round(r.risk$)}</div></div>
+          <div><label>Size</label><span class="num big">${r.qty ? (r.lots != null ? `${r.lots.toFixed(2)} lots` : r.qty.toFixed(r.qty < 10 ? 4 : 0)) : '—'}</span></div>
+          <div><label>Notional</label><span class="num big">${r.notional ? `$${Math.round(r.notional).toLocaleString()}` : '—'}</span><div class="small faint">${r.lev ? `${r.lev.toFixed(1)}× the account` : ''}</div></div>
+          <div><label>Stop distance</label><span class="num">${r.stopPct ? r.stopPct.toFixed(2) + '%' : '—'}</span></div></div>
+        <p class="small faint">Market money (course example): base risk until up 10% on the year, double above 10%, triple above 15%. A wider stop means a smaller position for the same risk.</p>`)}
+        ${panel('Portfolio heat: total loss if every stop is hit', `<div class="heat-bar"><span style="width:${Math.min(100, (heat / st.maxHeat) * 100)}%" class="${heat > st.maxHeat ? 'over' : ''}"></span></div>
+          <div class="small"><b class="num">${heat.toFixed(2)}%</b> of ${st.maxHeat}% max${r.qty ? ' (including the trade above)' : ''}</div>
+          <ul class="list">${st.open.map((o, i) => `<li><span class="grow">${esc(o.name)}</span><span class="num small">${Number(o.risk).toFixed(2)}%</span><button class="link-btn" data-del="${i}">Remove</button></li>`).join('') || '<li class="small faint">No open trades listed.</li>'}</ul>
+          <div class="form-grid"><label class="wide">Open trade<input id="rk-name" placeholder="EURUSD short"></label><label>Risk (%)<input id="rk-risk" type="number" step="0.05"></label><label>Max heat (%)<input type="number" data-k="maxHeat" value="${st.maxHeat}"></label></div>
+          <div class="form-actions"><button class="btn" data-act="add">+ Add open trade</button></div>`)}</div>
+      ${panel('Why the hole matters', `<div style="max-width:440px">${recovery()}</div><p class="small faint">A 10% loss needs 11% to recover; a 50% loss needs 100%. Drawdown limits are the guardrails, not an extra. Course example limits: 5% on the starting balance, 15% on profits above it.</p>`)}`;
+  };
+  main.addEventListener('change', (ev) => { const k = ev.target.dataset.k; if (!k) return; st[k] = ev.target.type === 'number' ? Number(ev.target.value) || (k === 'entry' || k === 'stop' ? '' : 0) : ev.target.value; store(); draw(); });
+  main.addEventListener('click', (ev) => {
+    const del = ev.target.closest('[data-del]'), add = ev.target.closest('[data-act="add"]');
+    if (del) { st.open.splice(Number(del.dataset.del), 1); store(); draw(); }
+    if (add) { const name = $('#rk-name').value.trim(), risk = Number($('#rk-risk').value); if (name && risk) { st.open.push({ name, risk }); store(); draw(); } }
+  });
+  draw();
 };
 
 // ---------- countries (layer 1: the slow structural profile behind each currency) ----------
@@ -1419,11 +1723,23 @@ render.review = async (main) => {
   const closed = graded.filter((x) => x.g.state === 'closed');
   const tally = (key) => { const all = closed.flatMap((x) => x.g[key]); const right = all.filter((r) => r.mine > 0.05).length, wrong = all.filter((r) => r.mine < -0.05).length; return { n: all.length, right, wrong }; };
   const tp = tally('pairs'), tc = tally('calls');
+
+  // Release-to-reaction tally (MMH 00.7): every logged event across saved weeks, placed in the 3x3 grid.
+  const cards = await Promise.all((index?.weeks || []).map((w) => loadLive(`scorecard-${w.monday}`, true).catch(() => null)));
+  const logged = cards.filter(Boolean).flatMap((c) => (c.events || []).filter((e) => e.reaction?.print).map((e) => ({ e, r: reactionOf(e) }))).filter((x) => x.r && !x.r.pending);
+  const cellOf = (p, q) => logged.filter((x) => x.e.reaction.print === p && x.r.price === q);
+  const rxGrid = `<div class="mx" style="grid-template-columns: minmax(4.5em, 7em) repeat(3, minmax(0, 1fr))"><div></div>${Object.values(RX_PRICE).map((l) => `<div class="mx-h">Price ${l.toLowerCase()}</div>`).join('')}
+    ${Object.entries(RX_PRINT).map(([p, pl]) => `<div class="mx-h row">${pl}</div>${Object.keys(RX_PRICE).map((q) => { const xs = cellOf(p, q), f3 = xs.filter((x) => x.r.follow3 != null), avg = f3.length ? f3.reduce((s, x) => s + x.r.follow3, 0) / f3.length : null;
+      const tone = q === 'flat' ? (p === 'inline' ? 'flat' : 'warn') : p === 'inline' ? 'warn' : (p === 'beat') === (q === 'up') ? 'flat' : 'bear';
+      return `<div class="mx-c ${tone}"><b class="num">${xs.length}</b> event${xs.length === 1 ? '' : 's'}${avg != null ? `<div class="small">next 3 days ${avg >= 0 ? 'continued' : 'reversed'} ${Math.abs(avg).toFixed(2)}% on average</div>` : ''}</div>`; }).join('')}`).join('')}</div>`;
+  const rxPanel = `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Release to reaction</h2><a href="playbook.html#pb-matrix">Matrix →</a></div>
+    ${logged.length ? rxGrid + `<ul class="list" style="margin-top:10px">${logged.sort((a, b) => (a.e.date < b.e.date ? 1 : -1)).slice(0, 12).map(({ e, r }) => `<li><span class="small nowrap muted">${fmtDate(e.date)}</span><span class="grow"><b>${esc(e.event)}</b> <span class="ccy">${esc(e.currency)}</span> · ${RX_PRINT[e.reaction.print]} ${rxCell(r)}<div>${rxMove(r)}</div></span></li>`).join('')}</ul>`
+      : '<div class="empty">Nothing logged yet. On the Scorecard, once an event has printed, pick beat / in line / miss and the desk reads the price reaction. After about 30 the grid shows which contradictions led to multi-day moves.</div>'}</section>`;
   const stat = (label, t) => `<div><label>${label}</label><span class="num big">${t.n ? `${t.right} of ${t.n}` : '—'}</span><div class="small faint">${t.n ? `${t.wrong} wrong, ${t.n - t.right - t.wrong} flat` : 'no closed week yet'}</div></div>`;
 
   main.innerHTML = head('Review', 'Were my calls right? Each saved week is graded from prices: pairs by their move in my direction, currency calls by the currency against the other seven.', `<span>${priceAge()}</span>`) +
     `<section class="panel" style="margin-bottom:14px"><div class="kpis">${stat('Pairs right, closed weeks', tp)}${stat('Currency calls right, closed weeks', tc)}
-      <div><label>Weeks saved</label><span class="num big">${weeks.length}</span></div></div></section>` +
+      <div><label>Weeks saved</label><span class="num big">${weeks.length}</span></div></div></section>` + rxPanel +
     (graded.map(({ w, g }) => `<section class="panel" style="margin-bottom:14px">
       <div class="panel-head"><h2>Week of ${fmtDate(w.monday)}</h2><span><span class="pill ${g.state === 'running' ? 'warn' : 'flat'}">${esc(g.state)}</span> <a href="scorecard.html?week=${w.monday}">Scorecard →</a></span></div>
       ${g.from ? `<p class="small faint" style="margin:0 0 8px">Measured from the close of ${fmtDate(g.from)} to ${g.state === 'running' ? 'now' : `the close of ${fmtDate(g.to)}`}.</p>` : ''}
