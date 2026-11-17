@@ -1448,8 +1448,122 @@ function regimeDialSvg(points, { xLabels, yLabels, quads, title }) {
 // ---------- drivers (cross-asset readings Market Context does not carry) ----------
 // From data/drivers.json (scripts/desk-drivers.mjs, daily in CI). Each panel follows one course module and reports,
 // it never calls a direction.
+// ---------- who is driving (correlations.json, scripts/correlations.mjs) ----------
+// A link is "in control" while its 20-day correlation, read in its usual direction, is 0.5 or more; it lets go
+// below 0.3. The 3-day reading (hourly bars) warns first. Measured, never a call.
+const CORR_GROUPS = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD', 'Gold', 'Bitcoin'];
+const RG_TONE = { 'risk-on': 'rg-on', 'risk-off': 'bear', caution: 'warn', mixed: 'warn' };
+const corrSign = (typical) => (typical === 'inverse' ? -1 : 1);
+const fmtR = (r) => (r == null ? '—' : (r > 0 ? '+' : '') + r.toFixed(2));
+
+// Track from -1 to +1: normal band shaded, the "in control" zone tinted, today's reading as a dot.
+function corrDial(x, typical, label) {
+  const W = 150, H = 40, L = 8, R = W - 8, X = (v) => L + ((R - L) * (v + 1)) / 2, y = 22;
+  if (!x) return `<div class="cd"><svg viewBox="0 0 ${W} ${H}" class="cd-svg"><rect x="${L}" y="${y - 3}" width="${R - L}" height="6" rx="3" fill="var(--panel-2)" stroke="var(--line)"/><text x="${W / 2}" y="${y - 7}" text-anchor="middle" class="g-axis">no hourly data</text></svg><div class="cd-l">${esc(label)}</div></div>`;
+  const s = corrSign(typical), a = x.r == null ? null : x.r * s;
+  const col = a == null ? 'var(--faint)' : a >= 0.5 ? 'var(--accent)' : a >= 0.3 ? 'var(--muted)' : 'var(--faint)';
+  const zone = s > 0 ? [X(0.5), X(1)] : [X(-1), X(-0.5)];
+  const band = x.normal ? `<rect x="${X(x.normal.p10)}" y="${y - 5}" width="${Math.max(2, X(x.normal.p90) - X(x.normal.p10))}" height="10" rx="3" fill="var(--flat-bg)" stroke="var(--faint)" stroke-dasharray="2 2"/>` : '';
+  const dot = x.r == null ? `<text x="${W / 2}" y="${y - 7}" text-anchor="middle" class="g-axis">not enough data${x.n != null ? ` (${x.n})` : ''}</text>`
+    : `<circle cx="${X(x.r)}" cy="${y}" r="5.5" fill="${col}" stroke="var(--bg)" stroke-width="1.5"/><text x="${Math.min(R - 10, Math.max(L + 10, X(x.r)))}" y="${y - 9}" text-anchor="middle" class="g-num" fill="${col}">${fmtR(x.r)}</text>`;
+  const tip = `${label}: ${fmtR(x.r)}${x.normal ? `; normal ${fmtR(x.normal.p10)} to ${fmtR(x.normal.p90)}, middle ${fmtR(x.normal.p50)}` : ''}${x.n != null ? `; ${x.n} hourly moves` : ''}`;
+  return `<div class="cd"><svg viewBox="0 0 ${W} ${H}" class="cd-svg" role="img" aria-label="${esc(tip)}"><title>${esc(tip)}</title>
+    <rect x="${L}" y="${y - 3}" width="${R - L}" height="6" rx="3" fill="var(--panel-2)" stroke="var(--line)"/>
+    <rect x="${zone[0]}" y="${y - 3}" width="${zone[1] - zone[0]}" height="6" rx="3" fill="var(--accent)" fill-opacity="0.18"/>
+    ${band}<line x1="${X(0)}" x2="${X(0)}" y1="${y - 7}" y2="${y + 7}" stroke="var(--faint)"/>${dot}
+    <text x="${L}" y="${H - 1}" class="g-axis">-1</text><text x="${R}" y="${H - 1}" text-anchor="end" class="g-axis">+1</text></svg>
+    <div class="cd-l">${esc(label)}${x.n != null && x.r != null ? ` <span class="faint">· ${x.n} moves</span>` : ''}</div></div>`;
+}
+
+function regimeBanner(rg) {
+  if (!rg?.gauges) return '';
+  const arrow = (v) => (v == null ? '·' : v > 0 ? '▲' : v < 0 ? '▼' : '▶');
+  const readTone = { on: 'rg-on', off: 'bear', neutral: 'flat', 'no data': 'flat' };
+  const readTxt = { on: 'risk-on', off: 'risk-off', neutral: 'neutral', 'no data': 'no data' };
+  const gauges = rg.gauges.map((g) => `<div class="rg-g" title="${esc(g.why)}. Reads risk-on when it ${g.risingIsOn ? 'rises' : 'falls'}.">
+      <div class="small"><b>${esc(g.label)}</b></div>
+      <div>${lineSvg(g.spark, { h: 30, w: 140, color: g.read === 'off' ? 'var(--bear)' : g.read === 'on' ? 'var(--accent)' : 'var(--muted)', label: g.label })}</div>
+      <div class="small"><span class="num">${arrow(g.chg20)} ${g.chg20 == null ? '—' : sgn(g.chg20, g.unit === 'pt' ? 2 : 1) + (g.unit === 'pt' ? 'pt' : '%')}</span> <span class="faint">20d</span> <span class="pill ${readTone[g.read] || 'flat'}">${readTxt[g.read] || g.read}</span></div></div>`).join('');
+  const agreeTxt = { yes: 'Yes: both reads agree.', partly: 'Partly: one read is mixed or cautious. Size down.', no: 'No: they disagree. Trust neither, size down.' };
+  return panel('Market regime', `<div class="rg-top">
+      <div><label class="rg-k">VIX rule</label><span class="pill ${RG_TONE[rg.vix.rule] || 'flat'}">${esc(rg.vix.rule || '—')}</span>
+        <div class="small muted">VIX ${rg.vix.value} · S&amp;P ${rg.vix.spx} vs 200-day ${rg.vix.spx200}</div></div>
+      <div><label class="rg-k">Barometer</label><span class="pill ${RG_TONE[rg.verdict] || 'flat'}">${esc(rg.verdict)}</span>
+        <div class="small muted">${rg.gauges.filter((g) => g.read === 'on').length} risk-on · ${rg.gauges.filter((g) => g.read === 'off').length} risk-off</div></div>
+      <div><label class="rg-k">Do they agree?</label><b>${esc(agreeTxt[rg.agree] || '—')}</b></div>
+      <div><label class="rg-k">US rates</label><b>${esc(rg.rates.split || '—')}</b><div class="small muted">2Y ${sgn(rg.rates.chg63bp, 0)}bp in 3 months</div></div>
+      <div><label class="rg-k">Dollar</label><b>${esc(rg.dollar.split || '—')}</b><div class="small muted">DXY ${sgn(rg.dollar.chg63pct, 1)}% in 3 months</div></div></div>
+    <div class="rg-gauges">${gauges}</div>
+    <p class="small faint">Your Macro Tracker method: VIX below 18 with the S&amp;P above its 200-day = risk-on, above 30 = risk-off, else caution. The barometer counts five gauges on their 20-day change and needs a lead of two. As of ${esc(fmtDate(rg.asOf))}.</p>`);
+}
+
+function linkRow(l) {
+  const name = `<b>${esc(l.labelD)}</b> <span class="faint">→</span> <b>${esc(l.labelT)}</b>`;
+  if (l.level) {
+    const v = l.level;
+    return `<div class="lk lk-level"><div class="lk-name">${name}<div class="small muted">${esc(l.story)}</div></div>
+      <div class="lk-lv">${lineSvg(v.history, { h: 40, w: 300, label: 'GDT price index, last two years' })}</div>
+      <div class="lk-st"><span class="num">${v.value}</span> <span class="small">${sgn(v.chg3mPct, 1)}% in 3 months</span><div class="small faint">GDT price index · auction ${esc(fmtDate(v.asOf))} · every two weeks, so no correlation windows</div></div></div>`;
+  }
+  if (l.status) return `<div class="lk lk-missing"><div class="lk-name">${name}<div class="small muted">${esc(l.story)}</div></div><div class="small faint">No data: ${l.driver.startsWith('SPREAD_') ? 'no free daily 2Y yield for this currency' : 'source unavailable today'}.</div></div>`;
+  const inCtl = l.state === 'in';
+  const state = `<span class="pill ${inCtl ? 'rg-on' : 'flat'}">${inCtl ? 'in control' : 'not in control'}</span>${l.breaking ? ' <span class="pill warn" title="Still in control on 20 days, but the last 3 days fell below their normal range">breaking</span>' : ''}${l.wrongWay ? ' <span class="pill flat" title="20-day correlation runs the opposite way to normal">wrong way</span>' : ''}
+    <div class="small faint">since ${esc(fmtDate(l.since))}</div>`;
+  return `<div class="lk" data-link="${esc(l.id)}" role="button" tabindex="0" aria-expanded="false">
+    <div class="lk-name">${name}<div class="small muted">${esc(l.story)}</div></div>
+    <div class="lk-dials">${corrDial(l.r3d, l.typical, '3 days')}${corrDial(l.r20, l.typical, '20 days')}${corrDial(l.r60, l.typical, '60 days')}</div>
+    <div class="lk-st">${state}</div></div><div class="lk-dive" data-dive="${esc(l.id)}" hidden></div>`;
+}
+
+const DIM_ROWS = { vix: ['risk-on', 'caution', 'risk-off'], rates: ['rising', 'flat', 'falling'], dollar: ['strengthening', 'flat', 'weakening'] };
+const DIM_LABEL = { vix: 'VIX rule', rates: 'US rates', dollar: 'Dollar' };
+function linkDeepDive(l, rg, card) {
+  const s = corrSign(l.typical), lines = [0.5, 0.3].map((v) => ({ v: v * s, label: v === 0.5 ? 'in control' : 'lets go', dash: v === 0.5 ? '4 3' : '1 3' }));
+  const n = l.r60.normal, band = n ? [{ from: n.p10, to: n.p90, fill: 'var(--flat-bg)' }] : [];
+  const perUnit = l.kindD === 'yield' ? '10bp' : '1%';
+  const move = (b) => (b == null ? '—' : `${sgn(l.kindD === 'yield' ? b * 10 : b, 2)}%`);
+  const nowKey = { vix: rg?.vix?.rule, rates: rg?.rates?.split, dollar: rg?.dollar?.split };
+  const tbl = Object.keys(DIM_ROWS).map((dim) => DIM_ROWS[dim].filter((k) => l.byRegime?.[dim]?.[k]).map((k, i) => {
+    const c = l.byRegime[dim][k];
+    return `<tr class="${nowKey[dim] === k ? 'rg-now' : ''}">${i === 0 ? `<td rowspan="${DIM_ROWS[dim].filter((x) => l.byRegime?.[dim]?.[x]).length}"><b>${DIM_LABEL[dim]}</b></td>` : ''}<td>${esc(k)}${nowKey[dim] === k ? ' <span class="pill rg-on">now</span>' : ''}</td><td class="num">${fmtR(c.r60)}</td><td class="num">${move(c.beta)}</td><td class="num">${Math.round(c.shareIn * 100)}%</td><td class="num faint">${c.n}</td></tr>`;
+  }).join('')).join('');
+  const changes = (l.history.changes || []).slice(-6).reverse().map(([d, st]) => `<li><span class="grow">${st === 'in' ? 'Took control' : 'Let go'}</span><span class="small muted">${esc(fmtDate(d))} ${d.slice(0, 4)}</span></li>`).join('');
+  const ccy = CCYS.includes(l.group) ? l.group : null, row = ccy ? card?.currencies?.[ccy] : null;
+  const dir = (k) => { const own = row?.[k]?.dir, auto = row?.auto?.[k]?.dir; return own ? esc(own) : auto ? `${esc(auto)} <span class="faint">(Market Context)</span>` : '—'; };
+  const econ = ccy ? `<div class="small"><b>${ccy} economy now</b> (Scorecard, week of ${esc(fmtDate(card?.monday || ''))}): growth ${dir('growth')}, inflation ${dir('inflation')}. <a href="countries.html#${ccy}">${ccy} on Countries →</a></div>` : '';
+  return `<div class="dive">
+    <p class="small">${esc(l.story)} Usually ${l.typical === 'inverse' ? 'opposite' : 'together'}. Right now a ${perUnit} move in ${esc(l.labelD)} goes with a <b>${move(l.beta60)}</b> move in ${esc(l.labelT)} (60 days).</p>
+    ${econ}
+    <div class="drv-2"><div><div class="pc-h">5 years: 60-day (bold) and 20-day correlation</div>
+      ${lineSvg(l.history.weekly.map(([d, r60]) => [d, r60]), { h: 120, min: -1, max: 1, bands: band, hlines: [{ v: 0 }, ...lines], extra: [{ data: l.history.weekly.map(([d, , r20]) => [d, r20]), color: 'var(--faint)', width: 1 }], label: '60-day correlation, 5 years' })}
+      <div class="small faint">Shaded: its normal 60-day range (10th to 90th percentile). Dashed: in control at ${fmtR(0.5 * s)}, lets go at ${fmtR(0.3 * s)}.</div></div>
+    <div><div class="pc-h">Last 6 months: 20-day correlation</div>
+      ${lineSvg(l.history.daily, { h: 120, min: -1, max: 1, hlines: [{ v: 0 }, ...lines], label: '20-day correlation, 6 months' })}
+      <ul class="list">${changes || '<li class="small faint">No change of state in 5 years.</li>'}</ul></div></div>
+    <div class="pc-h">How it behaves by market (5 years of daily readings)</div>
+    <div class="table-wrap"><table><thead><tr><th>Split</th><th>Market</th><th>Typical 60-day r</th><th>Move per ${perUnit}</th><th>Days in control</th><th>Days</th></tr></thead><tbody>${tbl}</tbody></table></div>
+    <p class="small faint">${esc(l.labelT)} as of ${esc(l.asOfT)}, ${esc(l.labelD)} as of ${esc(l.asOfD)} · ${l.obs} shared daily moves${l.r3d ? ` · 3-day reading from ${l.r3d.n} hourly moves` : ''}.</p></div>`;
+}
+
+function whoIsDriving(c, card) {
+  if (!c?.links) return '';
+  const groups = CORR_GROUPS.map((g) => {
+    const ls = c.links.filter((l) => l.group === g);
+    if (!ls.length) return '';
+    const on = ls.filter((l) => l.state === 'in').length;
+    return `<div class="lk-group"><div class="lk-gh"><span class="ccy">${esc(g)}</span> <span class="small faint">${on} of ${ls.filter((l) => l.state).length} in control</span></div>${ls.map(linkRow).join('')}</div>`;
+  }).join('');
+  const warn = [...(c.missing || []), ...(c.errors || []).filter((e) => !/no free daily 2Y/.test(e))];
+  return panel('Who is driving', `<div class="pos-legend"><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--flat-bg)" stroke="var(--faint)" stroke-dasharray="2 2"/></svg>its normal range</span><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--accent)" fill-opacity="0.25"/></svg>in-control zone</span><span class="pos-key">Click a link for its history and how it behaves by market.</span></div>
+    ${groups}
+    ${warn.length ? `<p class="small faint">Missing: ${warn.map(esc).join(' · ')}.</p>` : ''}
+    <p class="small faint">${esc(c.method)} Updated ${esc(fmtDate(c.asOf))}.</p>`);
+}
+
 render.drivers = async (main) => {
-  const [d, pos] = await Promise.all([loadLive('drivers'), loadLive('positioning', true).catch(() => null)]);
+  const [d, pos, corr, index] = await Promise.all([loadLive('drivers'), loadLive('positioning', true).catch(() => null), loadLive('correlations', true).catch(() => null), loadLive('scorecard-index', true).catch(() => null)]);
+  const wk = index?.weeks?.[0];
+  const card = wk ? await loadLive(`scorecard-${wk.monday}`, true).catch(() => null) : null;
   const tone = (good) => (good == null ? 'flat' : good ? 'bull' : 'bear');
   const chg = (v, unit = '', d = 2) => `<span class="num ${v > 0 ? 'up' : v < 0 ? 'down' : 'muted'}">${sgn(v, d)}${unit}</span>`;
 
@@ -1535,9 +1649,20 @@ render.drivers = async (main) => {
   };
   const pairsPanel = !pr ? '' : panel('The 28 pairs: trend × volatility', `${pairMap()}<p class="small faint">Module 00.9: trend state × volatility state = four regimes with different behaviour. Continuation setups tend to suit calm trends; reversals suit high volatility. ${esc(pr.method)} As of ${esc(fmtDate(pr.asOf))}.</p>`);
 
-  main.innerHTML = head('Drivers', 'Cross-asset readings that Market Context does not carry: liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, and every pair\'s trend regime. Updated daily.') +
+  main.innerHTML = head('Drivers', 'What is driving each market, and when it stops: the market regime, each currency\'s real-world drivers and correlations against their normal, then the cross-asset readings Market Context does not carry (liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, every pair\'s trend regime). Updated daily.') +
     ((d.warns || []).length ? `<div class="note small">Data warnings: ${d.warns.map(esc).join(' · ')}</div>` : '') +
+    regimeBanner(corr?.regime) + whoIsDriving(corr, card) +
     liqPanel + goldPanel + curvePanel + growthPanel + infPanel + bouncePanel + sbPanel + pairsPanel;
+
+  const toggle = (row) => {
+    const id = row.dataset.link, box = main.querySelector(`[data-dive="${CSS.escape(id)}"]`);
+    const open = box.hidden;
+    main.querySelectorAll('.lk-dive').forEach((b) => { b.hidden = true; b.innerHTML = ''; });
+    main.querySelectorAll('.lk[aria-expanded="true"]').forEach((r) => r.setAttribute('aria-expanded', 'false'));
+    if (open) { box.innerHTML = linkDeepDive(corr.links.find((l) => l.id === id), corr.regime, card); box.hidden = false; row.setAttribute('aria-expanded', 'true'); }
+  };
+  main.addEventListener('click', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && !ev.target.closest('a')) toggle(row); });
+  main.addEventListener('keydown', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); toggle(row); } });
 };
 
 // ---------- risk (MMH 00.6: how much to bet) ----------

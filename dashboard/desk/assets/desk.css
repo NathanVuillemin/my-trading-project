@@ -415,3 +415,29 @@ table.attr td:last-child { text-align: left; font-family: inherit; }
 .list li.gr-row { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 8px; align-items: center; }
 .gr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .gr-right .line-svg { width: 110px; }
+
+/* ---------- drivers: market regime + who is driving ---------- */
+.rg-on { color: var(--accent); background: rgba(106, 168, 255, 0.14); }
+.rg-top { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.rg-k { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--faint); margin-bottom: 3px; }
+.rg-gauges { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.rg-g .line-svg { width: 100%; height: 30px; }
+@media (max-width: 960px) { .rg-top, .rg-gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lk-group { margin-top: 12px; }
+.lk-gh { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.lk { display: grid; grid-template-columns: minmax(180px, 1.2fr) minmax(0, 2.4fr) minmax(120px, 0.7fr); gap: 12px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--line); border-radius: 6px; }
+.lk[data-link] { cursor: pointer; }
+.lk[data-link]:hover, .lk[aria-expanded="true"] { background: var(--panel-2); }
+.lk-missing, .lk-level { grid-template-columns: minmax(180px, 1.2fr) minmax(0, 3.1fr); }
+.lk-level { grid-template-columns: minmax(180px, 1.2fr) minmax(0, 2.4fr) minmax(120px, 0.7fr); }
+.lk-dials { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cd-svg { width: 100%; height: 40px; display: block; }
+.cd-l { font-size: 11px; color: var(--muted); text-align: center; margin-top: -2px; }
+.lk-lv .line-svg { width: 100%; height: 40px; }
+.lk-dive { padding: 4px 6px 14px; border-bottom: 1px solid var(--line); }
+.dive .line-svg { width: 100%; }
+tr.rg-now td { background: rgba(106, 168, 255, 0.08); }
+@media (max-width: 760px) {
+  .lk, .lk-level, .lk-missing { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+}
+.dive > div.small { margin: 4px 0 12px; }
