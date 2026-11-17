@@ -2,12 +2,12 @@ name: Daily desk
 
 # Runs in GitHub's cloud so the laptop doesn't have to be on. File name kept from when this job
 # only collected whale flow.
-# Every run: the Trading Desk's feeds (COT positioning, drivers, reference closes) and macro pulse
-# -> rebuild the static dashboard -> commit the snapshots -> publish dashboard/ (desk included) to Pages.
+# Every run: the Trading Desk's feeds (COT positioning, drivers, who-is-driving correlations, reference
+# closes) -> rebuild the static dashboard -> commit the snapshots -> publish dashboard/ (desk included) to Pages.
 #
 # The old dashboard's other collectors (whale flow, smart money, trust, portfolio, insiders, macro
-# flows, 13F, rates, correlations) and the data-health check are parked since 2026-11-17: Nathan
-# works from the desk now. Their scripts are untouched. To run them, start this workflow by hand
+# flows, 13F, rates) and the data-health check are parked since 2026-11-17: Nathan works from the desk
+# now. Macro pulse (stablecoins, crypto options and sentiment) is parked too: crypto stays off the desk. Their scripts are untouched. To run them, start this workflow by hand
 # with full = true (Actions tab -> Run workflow, or: gh workflow run whale-flow.yml -f full=true),
 # or locally with npm run refresh. To bring them back every night, delete the `if: inputs.full` lines.
 
@@ -102,6 +102,7 @@ jobs:
 
       - name: Collect macro pulse (stablecoins + options + sentiment)
         id: pulse
+        if: inputs.full
         continue-on-error: true
         run: node scripts/macro-pulse.mjs
 
@@ -111,9 +112,8 @@ jobs:
         continue-on-error: true
         run: node scripts/rates.mjs
 
-      - name: Correlations for the desk (Yahoo + FRED)
+      - name: Drivers - who is driving (Yahoo + FRED + central-bank 2Y + GDT)
         id: corr
-        if: inputs.full
         continue-on-error: true
         run: node scripts/correlations.mjs
 
