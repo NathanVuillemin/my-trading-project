@@ -1,7 +1,7 @@
 {
   "mock": false,
   "asOf": "2026-11-17",
-  "generatedAt": "2026-11-17T15:49:25.177Z",
+  "generatedAt": "2026-11-17T15:57:38.486Z",
   "method": "Pearson correlation of daily moves (log returns; daily change for yields) on dates both series traded. r20 = last 20 days, r60 = last 60. Strength is read against the pair's typical direction: strong |r| ≥ 0.5, moderate ≥ 0.3, weak below, flipped = 0.3+ the wrong way. Shifting = r60 moved 0.2+ in a month.",
   "sources": "Yahoo Finance daily closes; FRED (DGS2, DGS10, DFII10).",
   "missing": [
@@ -2078,7 +2078,7 @@
       "labelB": "DXY",
       "asOf": "2026-11-17",
       "obs": 251,
-      "r20": -0.34,
+      "r20": -0.35,
       "r60": -0.41,
       "r60MonthAgo": -0.52,
       "change1m": 0.1,
@@ -2218,7 +2218,7 @@
         {
           "date": "2026-11-17",
           "r60": -0.41,
-          "r20": -0.34
+          "r20": -0.35
         }
       ]
     },
