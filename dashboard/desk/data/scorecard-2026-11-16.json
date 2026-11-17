@@ -1,8 +1,9 @@
 {
   "monday": "2026-11-16",
-  "updated": "2026-11-15",
+  "updated": "2026-11-17",
   "active": [
-    "USD"
+    "JPY",
+    "CHF"
   ],
   "currencies": {
     "USD": {
@@ -224,21 +225,21 @@
     "CHF": {
       "growth": {
         "level": "normal",
-        "dir": "rising"
+        "dir": "steady"
       },
       "inflation": {
-        "level": "high",
+        "level": "normal",
         "dir": "rising"
       },
       "labour": {
-        "level": "high",
+        "level": "normal",
         "dir": "steady"
       },
-      "sentence": "",
-      "lean": "hawkish",
-      "priced12m": null,
+      "sentence": "Current growth is slighty lower than expected and Inflation is below the 2% target meaning the SNB is unlikely to hike as much as other central banks during this inflationary period. The SNB is also looking to protect the 0.91 to 0.89 EUR/CHF level. If NVIDIAs numbers come out poor then we will likely see safe haven demand.",
+      "lean": "neutral",
+      "priced12m": 0,
       "weekChange": null,
-      "call": "",
+      "call": "aboutRight",
       "strong": false,
       "crowded": false,
       "rank1m": 5,
@@ -273,7 +274,8 @@
           "priced": "Hikes priced",
           "stance": "hawkish"
         }
-      }
+      },
+      "crowdedBy": "me"
     },
     "CAD": {
       "growth": {
