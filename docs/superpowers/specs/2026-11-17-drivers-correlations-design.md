@@ -86,7 +86,7 @@ one line, shown on the page.
 |---|---|---|---|
 | USD | DXY / US 2Y yield | + | Dollar follows the expected Fed path |
 | EUR | EURUSD / TTF gas (`TTF=F`) | - | Europe imports its energy: dearer gas, weaker euro |
-| GBP | GBPUSD / S&P 500 | + | Mildly risk-on currency. Gilts (its main driver) have no free daily data: shown as missing |
+| GBP | GBPUSD / S&P 500 | + | Mildly risk-on currency. Its gilt driver is the 2Y spread link below |
 | JPY | USDJPY / US 10Y yield | + | Wider US-Japan yield gap lifts USDJPY |
 | JPY | USDJPY / WTI oil | + | Japan imports its oil: dearer oil weakens the yen |
 | JPY | AUDJPY / S&P 500 | + | Risk barometer: risk-on sells the yen |
@@ -102,6 +102,27 @@ one line, shown on the page.
 | Gold | Gold / DXY | - | Gold is priced in dollars |
 | Gold | Gold / US 10Y real yield | - | Gold pays no yield: higher real yields raise the cost of holding it |
 | Bitcoin | Bitcoin / Nasdaq 100 | + | Bitcoin trades as a high-beta risk asset |
+
+**Rate differentials** (added after looking through Market Context, 2026-11-17). Its own model says three
+forces move a currency (data, central banks, what is priced) and its pair view puts the 2Y spread in the
+middle. The 2Y gap against the US is the most direct "expectations" driver, so each currency gets one more
+link: `<CCY>USD` (or `USD<CCY>`) against the 2Y yield spread (its 2Y minus the US 2Y, daily change), typical
+`+` as `<CCY>USD`. Free daily sources, probed 2026-11-17:
+
+| Currency | 2Y source | Probe |
+|---|---|---|
+| CAD | Bank of Canada Valet API, `BD.CDN.2YR.DQ.YLD` | works, daily, JSON |
+| GBP | Bank of England database, `IUDSNPY` (2Y gilt) | works, daily, CSV. Gives GBP its gilt driver |
+| AUD | RBA table F2 CSV | works, daily |
+| JPY | Japan MoF JGB CSV (`jgbcme_all.csv` for history) | current-month file loads; history file to check |
+| EUR | Bundesbank statistics API (German 2Y, `BBSIS` daily series) | reachable; needs the right request format (406 on the first try) |
+| CHF | SNB data portal | monthly only in the cube tried: no daily 2Y found, mark missing |
+| NZD | RBNZ B2 | blocks scripts (403): mark missing |
+
+No figures are taken from Market Context itself: it is paid material and the desk is public. Things it has
+that the desk leaves out on purpose: the rolling 30-day data-surprise line (no free consensus data), what is
+priced per bank, and per-release beat/miss counts (the Scorecard's release-to-reaction tally covers the
+reaction side). It has no commodities, cross-asset drivers or correlations.
 
 Dropped from the old list (my call): pure quote mechanics that are always correlated and say nothing about a
 driver (EURUSD/GBPUSD, AUDUSD/NZDUSD, EURUSD/USDCHF, USDJPY/USDCHF, EURUSD/DXY, AUDUSD/USDCAD). AUDUSD/copper
@@ -128,7 +149,7 @@ For every link with daily data, from aligned daily moves (log returns; daily cha
   reading from US-hours bars (my call), and the page shows the observation count next to it.
   Normal: percentiles of the same 3-day reading over the last 2 years, sampled once per trading day.
   Minimum 18 shared hourly moves, else "not enough data".
-  Links without hourly data for both sides (US 2Y, real yield, iron ore, TTF, CNY, GDT) show the 3-day slot
+  Links without hourly data for both sides (US 2Y, real yield, 2Y spreads, iron ore, TTF, CNY, GDT) show the 3-day slot
   as "no hourly data". USDJPY / US 10Y uses `^TNX` hourly.
 - `beta60`: slope of the target's daily move on the driver's daily move over 60 days, expressed as "a 1% move
   in the driver goes with an X% move in the target" (yields: per 10 bp).
@@ -206,7 +227,7 @@ Per link, opened in place under its row (one open at a time) on laptop and iPad:
    60d, state pill with "since <date>", breaking flag. Row click opens the deep dive.
 4. Existing panels unchanged below (liquidity, gold stack, curve, growth, inflation, bounce, stock-bond, 28 pairs).
    The existing stock-bond panel stays as is.
-5. Data warnings and missing drivers (gilts; GDT if parsing fails) listed at the bottom of the section.
+5. Data warnings and missing drivers (CHF and NZD 2Y spreads; GDT if parsing fails) listed at the bottom of the section.
 
 ## Risk page removal
 
