@@ -1,5 +1,13 @@
 # Status — 2026-07-25
 
+> **Update 2026-11-17: old dashboard parked.** Nathan works from the Trading Desk (`dashboard/desk/`) now.
+> The nightly CI job (`.github/workflows/whale-flow.yml`, shown as "Daily desk") runs only the desk feeds
+> (COT positioning, drivers, reference closes) and macro pulse, then deploys. The other collectors below,
+> correlations and the health check are parked, not deleted: every script is unchanged and `npm run refresh`
+> still runs them all locally. To run them in CI once: `gh workflow run whale-flow.yml -f full=true`.
+> To bring them back nightly: delete the `if: inputs.full` lines in the workflow. The rest of this file
+> describes the system as it was and still works that way when run.
+
 Written while you were at work. Everything below is on `main` and pushed.
 
 ## What runs

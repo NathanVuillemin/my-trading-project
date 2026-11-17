@@ -1,13 +1,25 @@
-name: Whale flow
+name: Daily desk
 
-# Runs the collectors in GitHub's cloud so the laptop doesn't have to be on.
-# Each run: collect Hyperliquid whale flow -> aggregate multi-venue smart money
-# -> rebuild the static dashboard -> commit the snapshots -> publish to Pages.
+# Runs in GitHub's cloud so the laptop doesn't have to be on. File name kept from when this job
+# only collected whale flow.
+# Every run: the Trading Desk's feeds (COT positioning, drivers, reference closes) and macro pulse
+# -> rebuild the static dashboard -> commit the snapshots -> publish dashboard/ (desk included) to Pages.
+#
+# The old dashboard's other collectors (whale flow, smart money, trust, portfolio, insiders, macro
+# flows, 13F, rates, correlations) and the data-health check are parked since 2026-11-17: Nathan
+# works from the desk now. Their scripts are untouched. To run them, start this workflow by hand
+# with full = true (Actions tab -> Run workflow, or: gh workflow run whale-flow.yml -f full=true),
+# or locally with npm run refresh. To bring them back every night, delete the `if: inputs.full` lines.
 
 on:
   schedule:
     - cron: '0 22 * * *'   # daily 22:00 UTC
   workflow_dispatch:        # manual "Run workflow" button
+    inputs:
+      full:
+        description: 'Also run the parked old-dashboard collectors and the health check'
+        type: boolean
+        default: false
 
 # Never let two runs write snapshots at once.
 concurrency:
@@ -35,11 +47,13 @@ jobs:
 
       - name: Collect whale flow
         id: whale
+        if: inputs.full
         continue-on-error: true
         run: node scripts/whale-flow.mjs
 
       - name: Aggregate smart money
         id: smart
+        if: inputs.full
         continue-on-error: true
         # Optional keys — connectors self-skip when these are unset.
         # NOTE: Binance geo-blocks GitHub's US runners (HTTP 451), so binance-top and
@@ -53,16 +67,19 @@ jobs:
 
       - name: Score trader trust
         id: trust
+        if: inputs.full
         continue-on-error: true
         run: node scripts/trust.mjs --top 60
 
       - name: Track own book
         id: portfolio
+        if: inputs.full
         continue-on-error: true
         run: node scripts/portfolio.mjs
 
       - name: Collect insider filings (SEC Form 4)
         id: insiders
+        if: inputs.full
         continue-on-error: true
         # SEC fair-access requires a declaring User-Agent with a real contact.
         env:
@@ -71,11 +88,13 @@ jobs:
 
       - name: Collect macro flows (CFTC COT + exchange flows)
         id: macro
+        if: inputs.full
         continue-on-error: true
         run: node scripts/macro-flows.mjs
 
       - name: Collect institutional 13F holdings
         id: inst
+        if: inputs.full
         continue-on-error: true
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT || 'my-trading-project research nathan.vuillemin@gmail.com' }}
@@ -88,11 +107,13 @@ jobs:
 
       - name: Collect rates & liquidity (FRED)
         id: rates
+        if: inputs.full
         continue-on-error: true
         run: node scripts/rates.mjs
 
       - name: Correlations for the desk (Yahoo + FRED)
         id: corr
+        if: inputs.full
         continue-on-error: true
         run: node scripts/correlations.mjs
 
@@ -136,7 +157,7 @@ jobs:
       # leaves a composite. This inspects what actually landed and prints it into the run
       # summary, so a green run with rotten data is visible rather than assumed fine.
       - name: Data health
-        if: always()
+        if: always() && inputs.full
         continue-on-error: true
         run: |
           {
