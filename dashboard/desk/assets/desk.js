@@ -13,7 +13,6 @@ const PAGES = [
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
   { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
   { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
-  { id: 'risk', href: 'risk.html', label: 'Risk' },
   { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
@@ -1663,57 +1662,6 @@ render.drivers = async (main) => {
   };
   main.addEventListener('click', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && !ev.target.closest('a')) toggle(row); });
   main.addEventListener('keydown', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); toggle(row); } });
-};
-
-// ---------- risk (MMH 00.6: how much to bet) ----------
-// A calculator, nothing saved to GitHub: inputs stay in this browser.
-render.risk = async (main) => {
-  const KEY = 'desk.risk';
-  const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
-  const st = { account: 10000, base: 0.4, ytd: 0, entry: '', stop: '', unit: 'fx', maxHeat: 10, open: [], ...saved };
-  const store = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* storage blocked */ } };
-  const units = () => (st.ytd > 15 ? 3 : st.ytd > 10 ? 2 : 1);
-  const calc = () => {
-    const riskPct = st.base * units(), risk$ = (st.account * riskPct) / 100, e = Number(st.entry), s = Number(st.stop);
-    if (!e || !s || e === s) return { riskPct, risk$ };
-    const qty = risk$ / Math.abs(e - s), notional = qty * e;
-    return { riskPct, risk$, qty, notional, lots: st.unit === 'fx' ? qty / 100000 : null, lev: notional / st.account, stopPct: (Math.abs(e - s) / e) * 100 };
-  };
-  const recovery = () => {
-    const xs = [5, 10, 20, 30, 50], W = 300, H = 120, max = 100;
-    return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Gain needed to recover a loss">${xs.map((l, i) => { const need = (1 / (1 - l / 100) - 1) * 100, x = 20 + i * 56, hL = (l / max) * 80, hN = (need / max) * 80;
-      return `<rect x="${x}" y="${96 - hL}" width="18" height="${hL}" fill="var(--bear)" fill-opacity="0.8"/><rect x="${x + 20}" y="${96 - hN}" width="18" height="${hN}" fill="var(--bull)" fill-opacity="0.8"/><text x="${x + 19}" y="${110}" text-anchor="middle" class="g-axis">-${l}%</text><text x="${x + 29}" y="${92 - hN}" text-anchor="middle" class="g-num" fill="var(--bull)">+${Math.round(need)}%</text>`; }).join('')}</svg>
-      <div class="pos-legend"><span class="pos-key" style="color:var(--bear)">■ loss</span><span class="pos-key" style="color:var(--bull)">■ gain needed to get back</span></div>`;
-  };
-  const draw = () => {
-    const r = calc(), heat = st.open.reduce((s, o) => s + Number(o.risk || 0), 0) + (r.qty ? r.riskPct : 0);
-    main.innerHTML = head('Risk', 'How much to bet: risk sets the size, not the other way round. Module 00.6. Inputs stay in this browser.') +
-      `<div class="grid sc-grid">${panel('Position size', `<div class="form-grid">
-          <label>Account<input type="number" data-k="account" value="${st.account}"></label>
-          <label>Base risk per trade (%)<input type="number" step="0.05" data-k="base" value="${st.base}"></label>
-          <label>Year to date (%)<input type="number" step="0.5" data-k="ytd" value="${st.ytd}"></label>
-          <label>Instrument<select data-k="unit"><option value="fx" ${st.unit === 'fx' ? 'selected' : ''}>FX pair (lots of 100k)</option><option value="units" ${st.unit === 'units' ? 'selected' : ''}>Coins, contracts or shares</option></select></label>
-          <label>Entry<input type="number" step="any" data-k="entry" value="${st.entry}"></label>
-          <label>Stop<input type="number" step="any" data-k="stop" value="${st.stop}"></label></div>
-        <div class="kpis"><div><label>Risk this trade</label><span class="num big">${r.riskPct.toFixed(2)}%</span><div class="small faint">${units()} unit${units() > 1 ? 's' : ''} · $${Math.round(r.risk$)}</div></div>
-          <div><label>Size</label><span class="num big">${r.qty ? (r.lots != null ? `${r.lots.toFixed(2)} lots` : r.qty.toFixed(r.qty < 10 ? 4 : 0)) : '—'}</span></div>
-          <div><label>Notional</label><span class="num big">${r.notional ? `$${Math.round(r.notional).toLocaleString()}` : '—'}</span><div class="small faint">${r.lev ? `${r.lev.toFixed(1)}× the account` : ''}</div></div>
-          <div><label>Stop distance</label><span class="num">${r.stopPct ? r.stopPct.toFixed(2) + '%' : '—'}</span></div></div>
-        <p class="small faint">Market money (course example): base risk until up 10% on the year, double above 10%, triple above 15%. A wider stop means a smaller position for the same risk.</p>`)}
-        ${panel('Portfolio heat: total loss if every stop is hit', `<div class="heat-bar"><span style="width:${Math.min(100, (heat / st.maxHeat) * 100)}%" class="${heat > st.maxHeat ? 'over' : ''}"></span></div>
-          <div class="small"><b class="num">${heat.toFixed(2)}%</b> of ${st.maxHeat}% max${r.qty ? ' (including the trade above)' : ''}</div>
-          <ul class="list">${st.open.map((o, i) => `<li><span class="grow">${esc(o.name)}</span><span class="num small">${Number(o.risk).toFixed(2)}%</span><button class="link-btn" data-del="${i}">Remove</button></li>`).join('') || '<li class="small faint">No open trades listed.</li>'}</ul>
-          <div class="form-grid"><label class="wide">Open trade<input id="rk-name" placeholder="EURUSD short"></label><label>Risk (%)<input id="rk-risk" type="number" step="0.05"></label><label>Max heat (%)<input type="number" data-k="maxHeat" value="${st.maxHeat}"></label></div>
-          <div class="form-actions"><button class="btn" data-act="add">+ Add open trade</button></div>`)}</div>
-      ${panel('Why the hole matters', `<div style="max-width:440px">${recovery()}</div><p class="small faint">A 10% loss needs 11% to recover; a 50% loss needs 100%. Drawdown limits are the guardrails, not an extra. Course example limits: 5% on the starting balance, 15% on profits above it.</p>`)}`;
-  };
-  main.addEventListener('change', (ev) => { const k = ev.target.dataset.k; if (!k) return; st[k] = ev.target.type === 'number' ? Number(ev.target.value) || (k === 'entry' || k === 'stop' ? '' : 0) : ev.target.value; store(); draw(); });
-  main.addEventListener('click', (ev) => {
-    const del = ev.target.closest('[data-del]'), add = ev.target.closest('[data-act="add"]');
-    if (del) { st.open.splice(Number(del.dataset.del), 1); store(); draw(); }
-    if (add) { const name = $('#rk-name').value.trim(), risk = Number($('#rk-risk').value); if (name && risk) { st.open.push({ name, risk }); store(); draw(); } }
-  });
-  draw();
 };
 
 // ---------- countries (layer 1: the slow structural profile behind each currency) ----------

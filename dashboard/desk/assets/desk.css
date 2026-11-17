@@ -409,9 +409,6 @@ table.attr td:last-child { text-align: left; font-family: inherit; }
 .breadth { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 2px; background: var(--panel-2); }
 .bar-up { background: var(--bull); } .bar-dn { background: var(--bear); }
 /* risk */
-.heat-bar { height: 12px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; margin: 4px 0; }
-.heat-bar span { display: block; height: 100%; background: var(--accent); }
-.heat-bar span.over { background: var(--bear); }
 .list li.gr-row { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 8px; align-items: center; }
 .gr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .gr-right .line-svg { width: 110px; }
