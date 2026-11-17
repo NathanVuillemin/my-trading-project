@@ -4,32 +4,48 @@
     "start": "2026-11-14",
     "end": "2026-11-17"
   },
-  "generatedAt": "2026-11-17T04:23:42.557Z",
+  "generatedAt": "2026-11-17T15:48:43.309Z",
   "filingsParsed": 250,
   "filingsFailed": 0,
   "codeCensus": {
-    "A": 63,
-    "F": 74,
-    "P": 70,
-    "L": 3,
-    "M": 64,
+    "M": 76,
+    "F": 88,
+    "A": 78,
+    "P": 58,
     "S": 113,
-    "D": 15,
-    "X": 5,
+    "G": 12,
+    "L": 3,
+    "D": 13,
+    "X": 3,
     "I": 1,
-    "G": 9,
-    "C": 3,
+    "C": 1,
     "J": 1
   },
   "counts": {
-    "buys": 70,
+    "buys": 58,
     "sells": 113
   },
   "totals": {
-    "buyUsd": 9457219,
-    "sellUsd": 580568933
+    "buyUsd": 6848489,
+    "sellUsd": 559185649
   },
   "clusters": [
+    {
+      "ticker": "PCT",
+      "issuer": "PureCycle Technologies, Inc.",
+      "usd": 470296,
+      "buyerCount": 2,
+      "buyers": [
+        "Olson Dustin",
+        "Musa Fernando"
+      ],
+      "weightedUsd": 1410888,
+      "anyPlanned": false,
+      "roles": [
+        "Chief Executive Officer",
+        "Executive Chairman"
+      ]
+    },
     {
       "ticker": "ADIG",
       "issuer": "ADI GLOBAL DISTRIBUTION INC.",
@@ -50,6 +66,22 @@
         "Executive VP, CFO",
         "President and CEO",
         "Exec. VP, GC, Corp. Sec. &amp; CCO"
+      ]
+    },
+    {
+      "ticker": "BW",
+      "issuer": "Babcock &amp; Wilcox Enterprises, Inc.",
+      "usd": 254100,
+      "buyerCount": 2,
+      "buyers": [
+        "BRC Group Holdings, Inc.",
+        "Frymyer Cameron M"
+      ],
+      "weightedUsd": 423250,
+      "anyPlanned": false,
+      "roles": [
+        "10% owner",
+        "Chief Financial Officer"
       ]
     },
     {
@@ -144,40 +176,16 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1650372/000166612026000035/primarydocument.xml"
     },
     {
-      "ticker": "PCQ",
-      "issuer": "PIMCO CALIFORNIA MUNICIPAL INCOME FUND",
-      "owner": "MITTAL MOHIT",
-      "role": "Insider",
-      "usd": 808990,
-      "shares": 100000,
-      "price": 8.0899,
-      "planned": false,
-      "date": "2026-11-12",
-      "url": "https://www.sec.gov/Archives/edgar/data/1140411/000162142026000026/form4-11162026_091143.xml"
-    },
-    {
-      "ticker": "BRSP",
-      "issuer": "BrightSpire Capital, Inc.",
-      "owner": "Mazzei Michael",
-      "role": "CEO",
-      "usd": 749359,
-      "shares": 228463,
-      "price": 3.28,
+      "ticker": "PCT",
+      "issuer": "PureCycle Technologies, Inc.",
+      "owner": "Olson Dustin",
+      "role": "Chief Executive Officer",
+      "usd": 371800,
+      "shares": 220000,
+      "price": 1.69,
       "planned": false,
       "date": "2026-11-16",
-      "url": "https://www.sec.gov/Archives/edgar/data/1717547/000159842426000011/wk-form4_1794878060.xml"
-    },
-    {
-      "ticker": "LEO",
-      "issuer": "BNY MELLON STRATEGIC MUNICIPALS, INC.",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 525651,
-      "shares": 90318,
-      "price": 5.82,
-      "planned": false,
-      "date": "2026-11-13",
-      "url": "https://www.sec.gov/Archives/edgar/data/818972/000151028126000438/primary_doc.xml"
+      "url": "https://www.sec.gov/Archives/edgar/data/1830033/000184707926000013/ownership.xml"
     },
     {
       "ticker": "TEAM",
@@ -204,30 +212,6 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1650372/000166612026000035/primarydocument.xml"
     },
     {
-      "ticker": "LEO",
-      "issuer": "BNY MELLON STRATEGIC MUNICIPALS, INC.",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 270033,
-      "shares": 45924,
-      "price": 5.88,
-      "planned": false,
-      "date": "2026-11-12",
-      "url": "https://www.sec.gov/Archives/edgar/data/818972/000151028126000438/primary_doc.xml"
-    },
-    {
-      "ticker": "BRSP",
-      "issuer": "BrightSpire Capital, Inc.",
-      "owner": "Mazzei Michael",
-      "role": "CEO",
-      "usd": 250822,
-      "shares": 80650,
-      "price": 3.11,
-      "planned": false,
-      "date": "2026-11-13",
-      "url": "https://www.sec.gov/Archives/edgar/data/1717547/000159842426000011/wk-form4_1794878060.xml"
-    },
-    {
       "ticker": "YUMC",
       "issuer": "Yum China Holdings, Inc.",
       "owner": "DIMITRIEF ALEXANDER",
@@ -240,6 +224,18 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1673358/000167335826000169/form4.xml"
     },
     {
+      "ticker": "BW",
+      "issuer": "Babcock &amp; Wilcox Enterprises, Inc.",
+      "owner": "BRC Group Holdings, Inc.",
+      "role": "10% owner",
+      "usd": 212000,
+      "shares": 50000,
+      "price": 4.24,
+      "planned": false,
+      "date": "2026-11-16",
+      "url": "https://www.sec.gov/Archives/edgar/data/1630805/000121390026121073/ownership.xml"
+    },
+    {
       "ticker": "KTOS",
       "issuer": "KRATOS DEFENSE &amp; SECURITY SOLUTIONS, INC.",
       "owner": "King David Arnold",
@@ -250,18 +246,6 @@
       "planned": false,
       "date": "2026-11-13",
       "url": "https://www.sec.gov/Archives/edgar/data/1069258/000180386026000005/primary_doc.xml"
-    },
-    {
-      "ticker": "DSM",
-      "issuer": "BNY MELLON STRATEGIC MUNICIPAL BOND FUND, INC.",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 179036,
-      "shares": 32317,
-      "price": 5.54,
-      "planned": false,
-      "date": "2026-11-12",
-      "url": "https://www.sec.gov/Archives/edgar/data/855887/000151028126000437/primary_doc.xml"
     },
     {
       "ticker": "PAM",
@@ -288,18 +272,6 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1712189/000171218926000065/form4.xml"
     },
     {
-      "ticker": "DSM",
-      "issuer": "BNY MELLON STRATEGIC MUNICIPAL BOND FUND, INC.",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 142191,
-      "shares": 25900,
-      "price": 5.49,
-      "planned": false,
-      "date": "2026-11-13",
-      "url": "https://www.sec.gov/Archives/edgar/data/855887/000151028126000437/primary_doc.xml"
-    },
-    {
       "ticker": "MP",
       "issuer": "MP Materials Corp. / DE",
       "owner": "Corbett Ryan",
@@ -324,30 +296,6 @@
       "url": "https://www.sec.gov/Archives/edgar/data/719413/000186667526000007/ownership.xml"
     },
     {
-      "ticker": "TLSI",
-      "issuer": "TriSalus Life Sciences, Inc.",
-      "owner": "Wahlstrom Mats",
-      "role": "Director",
-      "usd": 112000,
-      "shares": 50000,
-      "price": 2.24,
-      "planned": false,
-      "date": "2026-11-12",
-      "url": "https://www.sec.gov/Archives/edgar/data/1826667/000162828026074009/wk-form4_1794834989.xml"
-    },
-    {
-      "ticker": "MXF",
-      "issuer": "MEXICO FUND INC",
-      "owner": "Saba Capital Management, L.P.",
-      "role": "10% owner",
-      "usd": 111323,
-      "shares": 5261,
-      "price": 21.16,
-      "planned": false,
-      "date": "2026-11-12",
-      "url": "https://www.sec.gov/Archives/edgar/data/65433/000151028126000441/primary_doc.xml"
-    },
-    {
       "ticker": "PED",
       "issuer": "PEDEVCO CORP",
       "owner": "KUKES SIMON G",
@@ -358,6 +306,90 @@
       "planned": false,
       "date": "2026-11-13",
       "url": "https://www.sec.gov/Archives/edgar/data/1141197/000165495426009857/section16.xml"
+    },
+    {
+      "ticker": "TEAM",
+      "issuer": "Atlassian Corp",
+      "owner": "Cannon-Brookes Michael",
+      "role": "CEO, Co-Founder",
+      "usd": 106774,
+      "shares": 700,
+      "price": 152.5343,
+      "planned": true,
+      "date": "2026-11-13",
+      "url": "https://www.sec.gov/Archives/edgar/data/1650372/000166612026000035/primarydocument.xml"
+    },
+    {
+      "ticker": "ADIG",
+      "issuer": "ADI GLOBAL DISTRIBUTION INC.",
+      "owner": "Aarnes Robert B",
+      "role": "President and CEO",
+      "usd": 100025,
+      "shares": 10073,
+      "price": 9.93,
+      "planned": false,
+      "date": "2026-11-13",
+      "url": "https://www.sec.gov/Archives/edgar/data/2105139/000175426726000006/form4-11162026_111144.xml"
+    },
+    {
+      "ticker": "GOOD",
+      "issuer": "GLADSTONE COMMERCIAL CORP",
+      "owner": "Cooper Arthur S.",
+      "role": "CEO &amp; President",
+      "usd": 100000,
+      "shares": 10070.4934,
+      "price": 9.93,
+      "planned": false,
+      "date": "2026-11-13",
+      "url": "https://www.sec.gov/Archives/edgar/data/1234006/000187396126000004/form4.xml"
+    },
+    {
+      "ticker": "TH",
+      "issuer": "Target Hospitality Corp.",
+      "owner": "Schrenk Troy C.",
+      "role": "Chief Commercial Officer",
+      "usd": 99998,
+      "shares": 8278,
+      "price": 12.08,
+      "planned": false,
+      "date": "2026-11-12",
+      "url": "https://www.sec.gov/Archives/edgar/data/1712189/000171218926000065/form4.xml"
+    },
+    {
+      "ticker": "ADIG",
+      "issuer": "ADI GLOBAL DISTRIBUTION INC.",
+      "owner": "Carlet Michael",
+      "role": "Executive VP, CFO",
+      "usd": 99896,
+      "shares": 10288,
+      "price": 9.71,
+      "planned": false,
+      "date": "2026-11-13",
+      "url": "https://www.sec.gov/Archives/edgar/data/2105139/000187324226000009/form4-11162026_111106.xml"
+    },
+    {
+      "ticker": "PCT",
+      "issuer": "PureCycle Technologies, Inc.",
+      "owner": "Musa Fernando",
+      "role": "Executive Chairman",
+      "usd": 98496,
+      "shares": 57600,
+      "price": 1.71,
+      "planned": false,
+      "date": "2026-11-13",
+      "url": "https://www.sec.gov/Archives/edgar/data/1830033/000184706626000009/ownership.xml"
+    },
+    {
+      "ticker": "TG",
+      "issuer": "TREDEGAR CORP",
+      "owner": "DasGupta Arijit",
+      "role": "See Remarks",
+      "usd": 96730,
+      "shares": 17000,
+      "price": 5.69,
+      "planned": false,
+      "date": "2026-11-16",
+      "url": "https://www.sec.gov/Archives/edgar/data/850429/000162828026074262/wk-form4_1794866492.xml"
     }
   ]
 }
