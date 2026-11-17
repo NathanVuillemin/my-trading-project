@@ -460,7 +460,8 @@ render.hub = async (main) => {
 };
 
 // ---------- scorecard (weekly build) ----------
-// One card per trading week, named by its Monday. Nathan types every field; nothing here is pulled.
+// One card per trading week, named by its Monday. Data fields are filled from Market Context; "My view" comes from
+// the Countries page (data/views.json); the call and the rest Nathan types here.
 // Files: data/scorecard-<monday>.json (the card) and data/scorecard-index.json (weeks, newest first).
 const SC_LEVELS = ['low', 'normal', 'high'], SC_DIRS = ['rising', 'steady', 'falling'], SC_LEANS = ['hawkish', 'neutral', 'dovish'];
 const SC_CALLS = { tooLittle: 'too little priced', aboutRight: 'about right', tooMuch: 'too much priced' };
@@ -496,11 +497,27 @@ function scPairs(card) {
   return out.sort((x, y) => y.diff - x.diff || (y.top - x.top));
 }
 
+// ---------- my view per currency (written on Countries, shown on the Scorecard) ----------
+// data/views.json: { views: { CCY: [{ date, text }] } }, newest first. One entry per day; a later save that day replaces it.
+const VIEW_PLACEHOLDER = 'Growth is __, inflation is __, labour is __, so the bank leans __.';
+const loadViews = async () => { const d = await loadLive('views', true).catch(() => null); return { views: {}, ...(d || {}) }; };
+// The view in force for a scorecard week: newest entry dated on or before that week's Friday.
+function viewFor(views, code, monday) {
+  const fri = new Date(Date.parse(monday + 'T12:00:00Z') + 4 * 864e5).toISOString().slice(0, 10);
+  return (views?.views?.[code] || []).find((v) => v.date <= fri) || null;
+}
+const viewAge = (date) => { const n = Math.round((Date.parse(ymd() + 'T12:00:00Z') - Date.parse(date + 'T12:00:00Z')) / 864e5); return n <= 0 ? 'today' : n === 1 ? '1 day old' : `${n} days old`; };
+const saveView = (code, text) => ghUpdate('views', (d) => {
+  const next = { views: {}, ...(d || {}) }, date = ymd();
+  next.views[code] = [{ date, text }, ...(next.views[code] || []).filter((v) => v.date !== date)];
+  return next;
+}, `View: ${code} (desk)`);
+
 render.scorecard = async (main) => {
   const asked = new URLSearchParams(location.search).get('week') || '';
   const monday = /^\d{4}-\d{2}-\d{2}$/.test(asked) ? asked : scMonday();
   let index = (await loadLive('scorecard-index', true)) || { weeks: [] };
-  const [pos, drv] = await Promise.all([loadLive('positioning', true).catch(() => null), loadLive('drivers', true).catch(() => null), loadPrices()]);
+  const [pos, drv, views] = await Promise.all([loadLive('positioning', true).catch(() => null), loadLive('drivers', true).catch(() => null), loadViews(), loadPrices()]);
   const PC = pos?.currencies || {};
   // Only weeks listed in the index have a file; a new week starts blank without asking for one.
   const card = (index.weeks.some((w) => w.monday === monday) && (await loadLive(`scorecard-${monday}`, true))) || scBlankCard(monday);
@@ -602,6 +619,15 @@ render.scorecard = async (main) => {
       <div class="small fn-sum">${s ? `<b>${lined} of 4</b> layers line up with my call${opposed ? `, <span class="down">${opposed} against</span>` : ''}` : '<span class="faint">Make a call to see which layers line up.</span>'}</div></div>`;
   };
 
+  // My view comes from the Countries page (data/views.json): the entry in force this week, with its age.
+  // Older cards whose sentence was typed here still show it.
+  const viewBlock = (code) => {
+    const v = viewFor(views, code, monday), old = card.currencies[code].sentence;
+    const link = `<a class="small" href="countries.html#${code}">${v || old ? 'edit on Countries →' : 'Write one on Countries →'}</a>`;
+    const meta = v ? `<span class="pill ${v.date < monday ? 'warn' : 'flat'}">written ${esc(fmtDate(v.date))} · ${viewAge(v.date)}</span>` : old ? '<span class="pill flat">written on the scorecard</span>' : '<span class="faint">No view written.</span>';
+    return `<div class="sc-view"><div class="sc-view-head"><span class="sc-view-label">My view</span> ${meta} ${link}</div>${v || old ? `<p class="sc-view-text">${esc(v ? v.text : old)}</p>` : ''}</div>`;
+  };
+
   const rowPanel = (code) => {
     const r = card.currencies[code];
     return `<section class="panel sc-row" data-ccy="${code}">
@@ -614,7 +640,7 @@ render.scorecard = async (main) => {
         ${pick('Inflation level', 'inflation.level', same(SC_LEVELS), r.inflation.level)}${pick('Inflation direction', 'inflation.dir', same(SC_DIRS), r.inflation.dir)}
         ${pick('Unemployment level', 'labour.level', same(SC_LEVELS), r.labour.level)}${pick('Unemployment direction', 'labour.dir', same(SC_DIRS), r.labour.dir)}
         ${pick('Bank leans', 'lean', same(SC_LEANS), r.lean)}${num(r.rank1m == null && liveRank(code) != null ? '1-month move rank (live, 1 = strongest)' : '1-month move rank (1 = strongest)', 'rank1m', r.rank1m ?? liveRank(code), 'min="1" max="8" step="1" title="From the desk\'s own live prices unless you type another; stored when you save"')}
-        <label class="full">My sentence<textarea rows="2" data-f="sentence" placeholder="Growth is __, inflation is __, labour is __, so the bank leans __.">${esc(r.sentence)}</textarea></label>
+        <div class="full">${viewBlock(code)}</div>
         ${num('Priced 12m (bp)', 'priced12m', r.priced12m)}${num("Week's change (bp)", 'weekChange', r.weekChange)}
         ${pick('My call', 'call', Object.entries(SC_CALLS), r.call, 'wide')}
         <label class="check"><input type="checkbox" data-f="strong" ${r.strong ? 'checked' : ''}> Strong</label>
@@ -705,7 +731,7 @@ render.scorecard = async (main) => {
       `<div id="sc-msg">${msg ? `<div class="note">${msg}</div>` : ''}</div>` +
       (canSave() ? '' : connectPanel()) +
       (card.autoFill ? `<div class="note"><b>Data fields filled from ${esc(card.autoFill.source)}</b>, read ${new Date(card.autoFill.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}, for ${esc((card.autoFill.currencies || []).join(', '))}.
-        Level and direction for inflation, growth and unemployment, and the bank's lean, are ${esc(card.autoFill.source)}'s own labels, copied as they stood. Check them, then write the sentence and make the call yourself.${(card.autoFill.missing || []).length ? ` <span class="warn-t">Not filled: ${esc(card.autoFill.missing.join('; '))}.</span>` : ''}</div>` : '') +
+        Level and direction for inflation, growth and unemployment, and the bank's lean, are ${esc(card.autoFill.source)}'s own labels, copied as they stood. Check them, then make the call yourself. My view of each economy is written on Countries.${(card.autoFill.missing || []).length ? ` <span class="warn-t">Not filled: ${esc(card.autoFill.missing.join('; '))}.</span>` : ''}</div>` : '') +
       `<div class="filters"><span class="small muted">Currencies in this build</span>${CCYS.map((c) => `<button class="chip ${card.active.includes(c) ? 'on' : ''}" data-act="toggle" data-ccy="${c}">${c}</button>`).join('')}</div>
       ${posMap()}${regimePanel()}<div class="grid sc-grid">${card.active.map(rowPanel).join('')}</div>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Rank and pairs</h2></div><div id="sc-rank">${rankBody()}</div></section>` +
@@ -1591,10 +1617,29 @@ function statBars(list, key, { unit = '', diverging = false, digits = 0 } = {}) 
 }
 
 render.countries = async (main) => {
-  const [data, pos] = await Promise.all([load('countries'), loadLive('positioning', true).catch(() => null)]);
+  const monday = scMonday();
+  const [data, pos, index] = await Promise.all([load('countries'), loadLive('positioning', true).catch(() => null), loadLive('scorecard-index', true).catch(() => null)]);
+  let views = await loadViews();
+  const card = index?.weeks?.some((w) => w.monday === monday) ? await loadLive(`scorecard-${monday}`, true).catch(() => null) : null;
   const list = data.countries, keys = Object.entries(data.commodityKeys);
   let sel = (location.hash || '').slice(1).toUpperCase();
   if (!list.some((c) => c.code === sel)) sel = list[0].code;
+  let draft = null, viewMsg = ''; // draft: text typed but not saved, for the selected country
+
+  // My read: written here, dated, shown on the Scorecard. This week's Market Context labels sit beside it.
+  const myRead = (code) => {
+    const hist = views.views[code] || [], cur = hist[0], a = card?.currencies?.[code]?.auto;
+    const mc = a ? [['inflation', 'Inflation'], ['growth', 'Growth'], ['labour', 'Unemployment']].filter(([k]) => a[k]).map(([k, l]) => `<li><b>${l}</b> <span class="num">${esc(a[k].value ?? '')}</span> <span class="muted small">${esc(a[k].level)} · ${esc(a[k].dir)}</span></li>`).join('') +
+      (a.rates ? `<li><b>Bank</b> <span class="muted small">${esc(a.rates.stance || '')}</span></li>` : '') : '';
+    return `<section class="panel my-read">
+      <div class="panel-head"><h2>My read · <span class="ccy">${code}</span></h2>${cur ? `<span class="pill ${cur.date < monday ? 'warn' : 'flat'}">written ${esc(fmtDate(cur.date))} · ${viewAge(cur.date)}</span>` : '<span class="pill flat">no view yet</span>'}</div>
+      ${mc ? `<ul class="list sc-evidence">${mc}</ul><p class="small faint" style="margin:4px 0 10px">${esc(a.source || 'Market Context')}, read ${new Date(a.readAt).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.</p>` : ''}
+      <textarea id="view-text" rows="3" style="width:100%" placeholder="${VIEW_PLACEHOLDER}">${esc(draft ?? cur?.text ?? '')}</textarea>
+      <div class="form-actions"><button class="btn primary" data-act="save-view">${localMode() ? 'Save (local test)' : ghToken.get() ? 'Save to GitHub' : 'Save (connect GitHub first)'}</button>
+        <span class="small muted">Shows on the Scorecard. Saving again today replaces today's entry.</span><span id="view-msg">${viewMsg}</span></div>
+      ${hist.length > (cur ? 1 : 0) ? `<div class="pc-h" style="margin-top:12px">Earlier</div><ul class="list">${hist.slice(1).map((v) => `<li><span class="small muted nowrap">${esc(fmtDate(v.date))}</span> <span class="grow">${esc(v.text)}</span></li>`).join('')}</ul>` : ''}
+    </section>`;
+  };
 
   const heat = `<div class="table-wrap"><table class="heat"><thead><tr><th></th>${keys.map(([, l]) => `<th>${esc(l)}</th>`).join('')}</tr></thead>
     <tbody>${list.map((c) => `<tr><td><a href="#${c.code}" data-ccy="${c.code}" class="ccy">${c.code}</a></td>${keys.map(([k]) => { const [t, tone] = COMMOD_TONE[c.commodities[k]] || COMMOD_TONE.flat; return `<td class="heat-cell ${tone}">${t}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>
@@ -1632,17 +1677,35 @@ render.countries = async (main) => {
   };
 
   const draw = () => {
-    main.innerHTML = head('Countries', 'Layer 1: who each economy is. The slow structure behind the currency: the seven-part country profile from the course, quantified. It changes over years, so read it to understand the character, not for this week\'s call.') +
-      panel('Side by side', compare) + panel('Long or short each commodity', heat) +
+    main.innerHTML = head('Countries', 'Layer 1: who each economy is. The slow structure behind the currency: the seven-part country profile from the course, quantified. It changes over years, so read it to understand the character. My read, at the top of each country, is my current view of the economy; it shows on the Scorecard.') +
       `<div class="filters"><span class="small muted">Country</span>${list.map((c) => `<button class="chip ${c.code === sel ? 'on' : ''}" data-ccy="${c.code}">${c.code} · ${esc(c.name)}</button>`).join('')}</div>` +
+      myRead(sel) + panel('Side by side', compare) + panel('Long or short each commodity', heat) +
       detail(list.find((c) => c.code === sel)) +
       `<p class="small faint">${esc(data.note)} Updated ${esc(fmtDate(data.updated))}. Sources: ${(data.sources || []).map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(" · ")}</p>`;
   };
-  main.addEventListener('click', (ev) => {
+  const unsaved = () => draft != null && draft !== (views.views[sel]?.[0]?.text ?? '');
+  main.addEventListener('input', (ev) => { if (ev.target.id === 'view-text') draft = ev.target.value; });
+  main.addEventListener('click', async (ev) => {
+    if (ev.target.closest('[data-act="save-view"]')) {
+      const text = (draft ?? $('#view-text').value).trim();
+      const say = (h) => { viewMsg = h; $('#view-msg').innerHTML = h; };
+      if (!text) { say('<span class="error">Write the view first.</span>'); return; }
+      if (!canSave()) { say('<span class="error">Connect GitHub first (Kill Switches page), or use local test mode.</span>'); return; }
+      say('Saving…');
+      try {
+        const res = await saveView(sel, text);
+        views = { views: {}, ...res.data }; draft = null;
+        viewMsg = res.commit === 'local' ? 'Saved in this browser (local test mode).' : `Saved (commit ${esc(res.commit || '')}).`;
+      } catch (e) { viewMsg = `<span class="error">${esc(e.message)}</span>`; }
+      draw(); return;
+    }
     const b = ev.target.closest('[data-ccy]'); if (!b) return;
-    ev.preventDefault(); sel = b.dataset.ccy; history.replaceState(null, '', `#${sel}`); draw();
-    $(`#c-${sel}`).scrollIntoView({ block: 'start', behavior: 'smooth' });
+    ev.preventDefault();
+    if (unsaved() && !confirm(`Leave ${sel} without saving my read?`)) return;
+    sel = b.dataset.ccy; draft = null; viewMsg = ''; history.replaceState(null, '', `#${sel}`); draw();
+    $(b.tagName === 'BUTTON' ? '.my-read' : `#c-${sel}`).scrollIntoView({ block: 'start', behavior: 'smooth' });
   });
+  window.addEventListener('beforeunload', (ev) => { if (unsaved()) { ev.preventDefault(); ev.returnValue = ''; } });
   draw();
 };
 
@@ -1749,6 +1812,14 @@ render.review = async (main) => {
       </div></section>`).join('') || '<section class="panel"><div class="empty">No scorecard saved yet. This page fills itself once a week has been saved. <a href="scorecard.html">Do the weekly build →</a></div></section>') +
     `<p class="small faint">A call counts as right when price moved more than 0.05% its way over the week. This grades direction only, not entries or exits. My own verdict per call and the monthly review come next.</p>`;
 };
+
+// Text boxes grow with their text (CSS field-sizing). Where a browser lacks it (Safari), size each one to its content
+// when it appears and as it is typed in.
+if (!(window.CSS && CSS.supports('field-sizing', 'content'))) {
+  const fit = (t) => { t.style.height = 'auto'; t.style.height = `${t.scrollHeight + 2}px`; };
+  document.addEventListener('input', (ev) => { if (ev.target.tagName === 'TEXTAREA') fit(ev.target); });
+  new MutationObserver(() => document.querySelectorAll('textarea').forEach(fit)).observe(document.body, { childList: true, subtree: true });
+}
 
 // ---------- boot ----------
 (async () => {

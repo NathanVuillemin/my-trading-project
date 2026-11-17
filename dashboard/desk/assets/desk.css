@@ -219,6 +219,13 @@ select {
 .form-grid .wide { grid-column: span 2; }
 input, textarea { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; font: inherit; font-size: 13px; text-transform: none; letter-spacing: 0; }
 .form-grid select, .form-grid input, .form-grid textarea { width: 100%; text-transform: none; letter-spacing: 0; }
+/* Text boxes grow with their text: no inner scrollbar. JS in desk.js sizes them where field-sizing is unsupported. */
+textarea { resize: none; overflow: hidden; field-sizing: content; min-height: 3.2em; box-sizing: border-box; }
+.sc-view { border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; background: var(--panel-2); }
+.sc-view-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sc-view-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--faint); }
+.sc-view-text { margin: 6px 0 0; font-size: 13px; color: var(--text); white-space: pre-wrap; }
+.my-read { margin-bottom: 14px; border-color: var(--accent); }
 .form-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
 @media (max-width: 640px) { .form-grid { grid-template-columns: minmax(0, 1fr); } .form-grid .wide { grid-column: auto; } }
 
