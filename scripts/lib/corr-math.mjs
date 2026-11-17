@@ -214,7 +214,7 @@ export function buildRegime(s) {
         key: g.key, label: g.label, why: g.why, risingIsOn: g.risingIsOn,
         chg20: r2(chgs[g.key][L] == null ? null : chgs[g.key][L] * (g.key === 'hy' ? 1 : 100)), unit: g.key === 'hy' ? 'pt' : '%',
         read: now.reads[k] ?? 'no data',
-        spark: g.key === 'havens' ? dates.slice(-60).map((d, j) => [d, r2(chgs.havens[L - 59 + j] == null ? null : chgs.havens[L - 59 + j] * 100)]) : dates.slice(-60).map((d, j) => [d, r2(lvl[g.key][L - 59 + j], 4)]),
+        spark: g.key === 'havens' ? dates.slice(-60).map((d, j) => [d, r2(chgs.havens[L - 59 + j] == null ? null : chgs.havens[L - 59 + j] * 100)]) : dates.slice(-60).map((d, j) => { const v = lvl[g.key][L - 59 + j]; return [d, v == null ? null : Number(v.toPrecision(5))]; }),
       })),
       verdict: now.verdict ?? 'mixed', agree: now.agree,
       rates: { chg63bp: r2(now.ratesBp, 0), split: now.rates }, dollar: { chg63pct: r2(now.dxyPct, 1), split: now.dollar },

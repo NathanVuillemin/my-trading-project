@@ -151,3 +151,12 @@ test('buildRegime: calm rising market reads risk-on, rising 2Y reads rates risin
   assert.equal(r.byDate.get(dates.at(-1)).vix, 'risk-on');
   assert.equal(r.now.verdict, 'risk-on');
 });
+
+test('buildRegime: small-valued gauge sparklines keep their shape (copper/gold ~0.0002)', () => {
+  const dates = Array.from({ length: 300 }, (_, i) => new Date(Date.UTC(2025, 0, 1) + i * 864e5).toISOString().slice(0, 10));
+  const mk = (f) => new Map(dates.map((d, i) => [d, f(i)]));
+  const flat = mk(() => 1);
+  const r = buildRegime({ vix: mk(() => 15), spx: mk((i) => 4000 + i), us2y: flat, dxy: flat, audjpy: flat, copper: mk((i) => 4 + i * 0.01), gold: mk(() => 20000), hy: flat, xly: flat, xlp: flat, usdjpy: flat, usdchf: flat, tlt: flat });
+  const sp = r.now.gauges.find((g) => g.key === 'copperGold').spark;
+  assert.notEqual(sp[0][1], sp.at(-1)[1]);
+});
