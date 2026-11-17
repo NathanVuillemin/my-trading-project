@@ -1504,7 +1504,7 @@ function linkRow(l) {
       <div class="lk-lv">${lineSvg(v.history, { h: 40, w: 300, label: 'GDT price index, last two years' })}</div>
       <div class="lk-st"><span class="num">${v.value}</span> <span class="small">${sgn(v.chg3mPct, 1)}% in 3 months</span><div class="small faint">GDT price index · auction ${esc(fmtDate(v.asOf))} · every two weeks, so no correlation windows</div></div></div>`;
   }
-  if (l.status) return `<div class="lk lk-missing"><div class="lk-name">${name}<div class="small muted">${esc(l.story)}</div></div><div class="small faint">No data: ${l.driver.startsWith('SPREAD_') ? 'no free daily 2Y yield for this currency' : 'source unavailable today'}.</div></div>`;
+  if (l.status) return `<div class="lk lk-missing"><div class="lk-name">${name}<div class="small muted">${esc(l.story)}</div></div><div class="small faint">No data: ${esc(l.reason || 'source unavailable today')}.</div></div>`;
   const inCtl = l.state === 'in';
   const state = `<span class="pill ${inCtl ? 'rg-on' : 'flat'}">${inCtl ? 'in control' : 'not in control'}</span>${l.breaking ? ' <span class="pill warn" title="Still in control on 20 days, but the last 3 days fell below their normal range">breaking</span>' : ''}${l.wrongWay ? ' <span class="pill flat" title="20-day correlation runs the opposite way to normal">wrong way</span>' : ''}
     <div class="small faint">since ${esc(fmtDate(l.since))}</div>`;
@@ -1552,7 +1552,7 @@ function whoIsDriving(c, card) {
     const on = ls.filter((l) => l.state === 'in').length;
     return `<div class="lk-group"><div class="lk-gh"><span class="ccy">${esc(g)}</span> <span class="small faint">${on} of ${ls.filter((l) => l.state).length} in control</span></div>${ls.map(linkRow).join('')}</div>`;
   }).join('');
-  const warn = [...(c.missing || []), ...(c.errors || []).filter((e) => !/no free daily 2Y/.test(e))];
+  const warn = [...(c.missing || []), ...(c.errors || []).filter((e) => !/ 2Y: /.test(e))];
   return panel('Who is driving', `<div class="pos-legend"><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--flat-bg)" stroke="var(--faint)" stroke-dasharray="2 2"/></svg>its normal range</span><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--accent)" fill-opacity="0.25"/></svg>in-control zone</span><span class="pos-key">Click a link for its history and how it behaves by market.</span></div>
     ${groups}
     ${warn.length ? `<p class="small faint">Missing: ${warn.map(esc).join(' · ')}.</p>` : ''}

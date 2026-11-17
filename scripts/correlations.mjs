@@ -74,9 +74,13 @@ const LINKS = [
 const label = (k) => (k.startsWith('SPREAD_') ? `${k.slice(7)}-US 2Y spread` : DAILY[k]?.label || k);
 const kindOf = (k) => (k.startsWith('SPREAD_') ? 'yield' : DAILY[k]?.kind || 'price');
 
+// At most `n` requests in flight, so Yahoo is not hit with ~40 at once.
+const pool = (n) => { let active = 0; const q = []; const next = () => { if (active >= n || !q.length) return; active++; const [fn, res, rej] = q.shift(); fn().then(res, rej).finally(() => { active--; next(); }); }; return (fn) => new Promise((res, rej) => { q.push([fn, res, rej]); next(); }); };
+
 async function main() {
-  const daily = {}, hourly = {}, errors = [], missing = [];
-  const tryGet = async (name, fn) => { try { return await fn(); } catch (e) { errors.push(`${name}: ${e.message}`); return null; } };
+  const daily = {}, hourly = {}, errors = [], missing = [], spreadWhy = {};
+  const limit = pool(6);
+  const tryGet = async (name, fn) => { try { return await limit(fn); } catch (e) { errors.push(`${name}: ${e.message}`); return null; } };
   const twoY = {};
   await Promise.all([
     ...Object.entries(DAILY).map(async ([k, s]) => { daily[k] = await tryGet(k, () => (s.fred ? fred(s.fred) : yahooDaily(s.y))); }),
@@ -85,7 +89,12 @@ async function main() {
     (async () => { daily.GDT = await tryGet('GDT', () => gdt()); })(),
   ]);
   for (const c of SPREADS) {
-    if (!twoY[c] || !daily.US2Y) { missing.push(`${c} 2Y yield (no free daily source)`); continue; }
+    if (!twoY[c] || !daily.US2Y) {
+      const free = errors.some((e) => e.startsWith(`${c} 2Y`) && /no free daily 2Y/.test(e));
+      spreadWhy[c] = free ? `no free daily 2Y yield for ${c}` : `${!daily.US2Y ? 'US' : c} 2Y yield unavailable today`;
+      missing.push(free ? `${c} 2Y yield (no free daily source)` : `${c} 2Y spread (${spreadWhy[c]})`);
+      continue;
+    }
     const m = new Map();
     for (const [d, v] of twoY[c]) if (daily.US2Y.has(d)) m.set(d, v - daily.US2Y.get(d));
     daily[`SPREAD_${c}`] = m;
@@ -109,6 +118,7 @@ async function main() {
     }
     const out = buildLink({ ...base, hT: HOURLY[cfg.target] ? cfg.target : null, hD: HOURLY[cfg.driver] ? cfg.driver : null }, daily, hourly, regime.byDate);
     delete out.hT; delete out.hD;
+    if (out.status && cfg.driver.startsWith('SPREAD_') && spreadWhy[cfg.driver.slice(7)]) out.reason = spreadWhy[cfg.driver.slice(7)];
     return out;
   });
 
@@ -118,18 +128,19 @@ async function main() {
     method: 'Pearson correlation of moves (log returns; daily change for yields and spreads). 3 days = hourly moves over the last 3 trading days both traded (at least 18), against its 2-year normal. 20 and 60 days = daily moves, against their 5-year normal (10th-90th percentile band). In control: 20-day correlation, read in the link\'s usual direction, at 0.5 or more; not in control below 0.3; in between the state holds. Breaking: in control, but the 3-day reading below the bottom of its normal band.',
     sources: 'Yahoo Finance (daily, hourly); FRED (DGS2, DGS10, DFII10, BAMLH0A0HYM2); 2Y yields: Bank of Canada, Bank of England, RBA, Japan Ministry of Finance, Bundesbank; Global Dairy Trade.',
     missing, errors,
-    regime: { ...regime.now, history: regime.history },
+    regime: regime.now ? { ...regime.now, history: regime.history } : null,
     links,
   };
   if (has('json')) { console.log(JSON.stringify(out, null, 2)); return; }
   const file = join(ROOT, 'dashboard', 'desk', 'data', 'correlations.json');
   writeFileSync(file, JSON.stringify(out) + '\n');
   mkdirSync(join(ROOT, 'data', 'correlations'), { recursive: true });
-  const slim = { asOf, regime: { rule: regime.now.vix.rule, verdict: regime.now.verdict }, links: links.map((l) => ({ id: l.id, r3d: l.r3d?.r ?? null, r20: l.r20?.r ?? null, r60: l.r60?.r ?? null, state: l.state ?? null })) };
+  const slim = { asOf, regime: regime.now ? { rule: regime.now.vix.rule, verdict: regime.now.verdict } : null, links: links.map((l) => ({ id: l.id, r3d: l.r3d?.r ?? null, r20: l.r20?.r ?? null, r60: l.r60?.r ?? null, state: l.state ?? null })) };
   writeFileSync(join(ROOT, 'data', 'correlations', `${asOf}.json`), JSON.stringify(slim, null, 2) + '\n');
 
   const rn = regime.now;
-  console.log(`regime ${rn.asOf}: VIX ${rn.vix.value} -> ${rn.vix.rule}; barometer ${rn.verdict} (${rn.gauges.map((g) => `${g.key} ${g.read}`).join(', ')}); agree ${rn.agree}; rates ${rn.rates.split}; dollar ${rn.dollar.split}`);
+  if (!rn) console.log('regime: no S&P series today, regime skipped');
+  else console.log(`regime ${rn.asOf}: VIX ${rn.vix.value} -> ${rn.vix.rule}; barometer ${rn.verdict} (${rn.gauges.map((g) => `${g.key} ${g.read}`).join(', ')}); agree ${rn.agree}; rates ${rn.rates.split}; dollar ${rn.dollar.split}`);
   for (const l of links) {
     if (l.level) { console.log(`${l.id.padEnd(22)} level ${l.level.value} (${l.level.chg3mPct}% vs 6 auctions ago)`); continue; }
     if (l.status) { console.log(`${l.id.padEnd(22)} ${l.status}`); continue; }

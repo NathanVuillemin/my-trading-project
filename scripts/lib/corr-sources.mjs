@@ -4,10 +4,14 @@
 // Probed 2026-11-17: see docs/superpowers/specs/2026-11-17-drivers-correlations-design.md.
 
 const UA = { 'User-Agent': 'Mozilla/5.0 (my-trading-project desk)' };
+// One retry after a short pause on rate limits and server errors (Yahoo answers 429 under load).
 const get = async (url, headers = {}) => {
-  const r = await fetch(url, { headers: { ...UA, ...headers }, signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r;
+  for (let attempt = 0; ; attempt++) {
+    const r = await fetch(url, { headers: { ...UA, ...headers }, signal: AbortSignal.timeout(30000) });
+    if (r.ok) return r;
+    if (attempt === 0 && (r.status === 429 || r.status >= 500)) { await new Promise((res) => setTimeout(res, 3000)); continue; }
+    throw new Error(`HTTP ${r.status}`);
+  }
 };
 const iso = (d) => d.toISOString().slice(0, 10);
 

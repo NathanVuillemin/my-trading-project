@@ -160,3 +160,55 @@ test('buildRegime: small-valued gauge sparklines keep their shape (copper/gold ~
   const sp = r.now.gauges.find((g) => g.key === 'copperGold').spark;
   assert.notEqual(sp[0][1], sp.at(-1)[1]);
 });
+
+test('buildRegime: no S&P series returns an empty regime instead of throwing', () => {
+  const r = buildRegime({ vix: new Map(), spx: undefined });
+  assert.equal(r.now, null);
+  assert.equal(r.byDate.size, 0);
+  assert.deepEqual(r.history, []);
+});
+
+test('threeDayWindow: Sunday-evening futures bars count as Monday, not a fourth day', () => {
+  const t = [], a = [], b = [];
+  const add = (iso, i) => { t.push(H(iso)); a.push(Math.sin(i)); b.push(Math.cos(i)); };
+  let i = 0;
+  for (const d of ['2026-11-12', '2026-11-13']) for (let h = 0; h < 22; h++) add(`${d}T${String(h).padStart(2, '0')}:00Z`, i++); // Thu, Fri
+  add('2026-11-15T22:00Z', i++); add('2026-11-15T23:00Z', i++); // Sunday open
+  for (let h = 0; h < 22; h++) add(`2026-11-16T${String(h).padStart(2, '0')}:00Z`, i++); // Mon
+  const w = threeDayWindow({ t, a, b });
+  assert.equal(w.n, 22 + 22 + 2 + 22); // Thu + Fri + (Sun stub + Mon)
+});
+
+// Synthetic daily series: driver random-ish, target = sign * driver + noise, on weekdays.
+function synth(sign, n = 400, noiseFrom = Infinity) {
+  const T = new Map(), D = new Map(); let pt = 100, pd = 100;
+  const d0 = Date.UTC(2025, 0, 6);
+  for (let i = 0, k = 0; k < n; i++) {
+    const dt = new Date(d0 + i * 864e5); if (dt.getUTCDay() === 0 || dt.getUTCDay() === 6) continue;
+    const day = dt.toISOString().slice(0, 10), m = Math.sin(k * 1.7) * 0.01, noise = k >= noiseFrom ? Math.cos(k * 2.3) * 0.03 : Math.cos(k * 2.3) * 0.001;
+    pd *= Math.exp(m); pt *= Math.exp(sign * m + noise); T.set(day, pt); D.set(day, pd); k++;
+  }
+  return { T, D };
+}
+test('buildLink: tight positive link is in control with sane fields', () => {
+  const { T, D } = synth(1);
+  const l = buildLink({ id: 'p', target: 'T', driver: 'D', typical: 'positive', kindT: 'price', kindD: 'price' }, { T, D }, {}, new Map());
+  assert.equal(l.state, 'in');
+  assert.ok(l.r20.r > 0.9 && l.r60.r > 0.9);
+  assert.ok(Math.abs(l.beta60 - 1) < 0.1);
+  assert.equal(l.history.daily.length, 126);
+  assert.equal(l.breaking, false);
+});
+test('buildLink: inverse link losing its grip goes out of control', () => {
+  const { T, D } = synth(-1, 400, 370);
+  const l = buildLink({ id: 'i', target: 'T', driver: 'D', typical: 'inverse', kindT: 'price', kindD: 'price' }, { T, D }, {}, new Map());
+  assert.equal(l.state, 'out');
+  assert.ok(l.r60.normal.p50 < -0.5);
+  assert.ok(l.history.changes.some(([, s]) => s === 'out'));
+});
+test('buildLink: too short a history says why', () => {
+  const { T, D } = synth(1, 50);
+  const l = buildLink({ id: 's', target: 'T', driver: 'D', typical: 'positive', kindT: 'price', kindD: 'price' }, { T, D }, {}, new Map());
+  assert.equal(l.status, 'no data');
+  assert.match(l.reason, /history/);
+});

@@ -76,7 +76,8 @@ export function normalBand(values) {
 }
 const median = (v) => pctl(v, 0.5);
 
-const dayOf = (t) => new Date(t * 1000).toISOString().slice(0, 10);
+// Trading day of an hourly stamp (UTC). Futures reopen on Sunday evening: those bars belong to Monday.
+const dayOf = (t) => { const d = new Date(t * 1000); if (d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); };
 
 // The moves whose UTC date is among the last 3 distinct dates present (so a Monday run skips the weekend).
 export function threeDayWindow(m, end = m.t.length - 1) {
@@ -164,6 +165,7 @@ export const GAUGES = [
   { key: 'havens', label: 'Safe havens vs S&P', risingIsOn: false, why: 'Yen, franc, gold and long Treasuries beating stocks' },
 ];
 export function buildRegime(s) {
+  if (!s.spx?.size) return { byDate: new Map(), now: null, history: [] };
   const dates = [...s.spx.keys()].sort();
   const ff = (m) => { let last = null; return dates.map((d) => { if (m?.has(d)) last = m.get(d); return last; }); };
   const S = Object.fromEntries(Object.entries(s).map(([k, m]) => [k, ff(m)]));
@@ -246,9 +248,9 @@ const yearsAgo = (iso, y) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCF
 // regimeByDate: Map date -> { vix, rates, dollar } from buildRegime.
 export function buildLink(cfg, daily, hourly, regimeByDate) {
   const T = daily[cfg.target], Dd = daily[cfg.driver];
-  if (!T || !Dd) return { ...cfg, status: 'no data' };
+  if (!T || !Dd) return { ...cfg, status: 'no data', reason: `${!T ? cfg.target : cfg.driver} unavailable today` };
   const m = dailyMoves(T, Dd, cfg.kindT, cfg.kindD);
-  if (m.a.length < 80) return { ...cfg, status: 'no data', obs: m.a.length };
+  if (m.a.length < 80) return { ...cfg, status: 'no data', reason: `only ${m.a.length} shared days of history`, obs: m.a.length };
   const L = m.a.length - 1, end = m.dates[L], from5 = yearsAgo(end, 5);
   const r20s = rolling(m, 20), r60s = rolling(m, 60), betas = rollingBeta(m, 60);
   const in5 = (i) => m.dates[i] >= from5;
