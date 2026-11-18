@@ -4,13 +4,12 @@
 //   daily & weekly charts  -> yearly + 3-month (defaults)
 //   intraday charts        -> 6-month + monthly + weekly + previous day (defaults)
 // Every level can be switched on or off per chart type in the inputs.
-// Lines start where the current period began and end a few bars right of price, label on the end.
+// Lines start where the current period began and run right; labels sit at the right edge of the visible chart.
 indicator("HTF Highs", overlay = true, max_lines_count = 20, max_labels_count = 20)
 
 usePrev = input.string("Previous period", "Level", options = ["Previous period", "Current period"],
      tooltip = "Previous period = last completed year / 6M / 3M / month / week / day (PDH, PWH...). Current period = running high of the period still open.") == "Previous period"
 col     = input.color(#b8860b, "Colour")
-extBars = input.int(8, "Extend right (bars)", minval = 1)
 
 G_HTF = "Show on daily & weekly charts"
 hY  = input.bool(true,  "Yearly",       group = G_HTF)
@@ -81,8 +80,7 @@ if barstate.islast
     add(prices, texts, starts, widths, isHTF ? hW : lW, "W",   wv, wt, p + "WH",  1)
     add(prices, texts, starts, widths, isHTF ? hD : lD, "D",   dv, dt, p + "DH",  1)
 
-    x2 = time + extBars * timeframe.in_seconds() * 1000
     for [i, v] in prices
-        lines.push(line.new(starts.get(i), v, x2, v, xloc.bar_time, color = col, width = widths.get(i)))
-        labels.push(label.new(x2, v, texts.get(i), xloc.bar_time, style = label.style_label_left,
+        lines.push(line.new(starts.get(i), v, time, v, xloc.bar_time, extend.right, col, width = widths.get(i)))
+        labels.push(label.new(chart.right_visible_bar_time, v, texts.get(i), xloc.bar_time, style = label.style_label_right,
              color = color(na), textcolor = col, size = size.small))
