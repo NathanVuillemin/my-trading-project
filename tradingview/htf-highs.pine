@@ -1,31 +1,34 @@
 //@version=6
-// HTF Highs — marks yearly / 6-month / 3-month / monthly / weekly / daily highs as liquidity levels.
+// HTF Highs — yearly / 6-month / 3-month / monthly / weekly / daily highs as liquidity levels.
 // Which levels show depends on the chart timeframe, so a 4-chart layout stays clean:
 //   daily & weekly charts  -> yearly + 3-month (defaults)
 //   intraday charts        -> 6-month + monthly + weekly + previous day (defaults)
-// Every level can be switched on or off per chart type in the inputs.
-// Lines start where the current period began and run right; labels sit at the right edge of the visible chart.
-indicator("HTF Highs", overlay = true, max_lines_count = 20, max_labels_count = 20)
+// Clean style: thin line from the wick that made the high to the right edge of the chart, one colour per level,
+// a short tag above the line end (Y, 6M, 3M, M, W, D). Hover a tag for the exact level.
+indicator("HTF Highs", overlay = true, max_lines_count = 20, max_labels_count = 20, max_bars_back = 5000)
 
 usePrev = input.string("Previous period", "Level", options = ["Previous period", "Current period"],
-     tooltip = "Previous period = last completed year / 6M / 3M / month / week / day (PDH, PWH...). Current period = running high of the period still open.") == "Previous period"
-col     = input.color(#b8860b, "Colour")
+     tooltip = "Previous period = last completed year / 6M / 3M / month / week / day. Current period = running high of the period still open.") == "Previous period"
 
-G_HTF = "Show on daily & weekly charts"
-hY  = input.bool(true,  "Yearly",       group = G_HTF)
-h6  = input.bool(false, "6-month",      group = G_HTF)
-h3  = input.bool(true,  "3-month",      group = G_HTF)
-hM  = input.bool(false, "Monthly",      group = G_HTF)
-hW  = input.bool(false, "Weekly",       group = G_HTF)
-hD  = input.bool(false, "Day",          group = G_HTF)
-
-G_LTF = "Show on intraday charts"
-lY  = input.bool(false, "Yearly",       group = G_LTF)
-l6  = input.bool(true,  "6-month",      group = G_LTF)
-l3  = input.bool(false, "3-month",      group = G_LTF)
-lM  = input.bool(true,  "Monthly",      group = G_LTF)
-lW  = input.bool(true,  "Weekly",       group = G_LTF)
-lD  = input.bool(true,  "Day",          group = G_LTF)
+G = "Show on: daily & weekly charts | intraday charts | colour"
+hY = input.bool(true,  "Yearly",  inline = "y", group = G)
+lY = input.bool(false, "",        inline = "y", group = G)
+cY = input.color(#2962ff, "",     inline = "y", group = G)
+h6 = input.bool(false, "6-month", inline = "6", group = G)
+l6 = input.bool(true,  "",        inline = "6", group = G)
+c6 = input.color(#4caf50, "",     inline = "6", group = G)
+h3 = input.bool(true,  "3-month", inline = "3", group = G)
+l3 = input.bool(false, "",        inline = "3", group = G)
+c3 = input.color(#9c27b0, "",     inline = "3", group = G)
+hM = input.bool(false, "Monthly", inline = "m", group = G)
+lM = input.bool(true,  "",        inline = "m", group = G)
+cM = input.color(#f23645, "",     inline = "m", group = G)
+hW = input.bool(false, "Weekly",  inline = "w", group = G)
+lW = input.bool(true,  "",        inline = "w", group = G)
+cW = input.color(#ff9800, "",     inline = "w", group = G)
+hD = input.bool(false, "Day",     inline = "d", group = G)
+lD = input.bool(true,  "",        inline = "d", group = G)
+cD = input.color(#787b86, "",     inline = "d", group = G)
 
 isHTF = timeframe.in_seconds() >= 86400
 
@@ -42,19 +45,27 @@ level(tf) =>
 [wv, wt] = level("W")
 [dv, dt] = level("D")
 
-// Collect enabled levels; levels at the same price share one line and one label ("PYH / P3MH").
-add(array<float> prices, array<string> texts, array<int> starts, array<int> widths, bool show, string tf, float v, int t0, string name, int w) =>
+// Time of the most recent loaded bar whose high is the level; falls back to the period start if it is older than the chart's history.
+wickTime(float v, int fallback) =>
+    int t = fallback
+    int n = math.min(bar_index, 4999)
+    for i = 0 to n
+        if math.abs(high[i] - v) <= syminfo.mintick / 2
+            t := time[i]
+            break
+    t
+
+// Collect enabled levels; levels at the same price share one line and one tag ("3M / Y"), coloured by the longer period.
+add(array<float> prices, array<string> texts, array<int> starts, array<color> cols, bool show, string tf, float v, int t0, string name, color c) =>
     if show and not na(v) and timeframe.in_seconds(tf) >= timeframe.in_seconds()
         i = prices.indexof(v)
         if i >= 0
             texts.set(i, texts.get(i) + " / " + name)
-            starts.set(i, math.min(starts.get(i), t0))
-            widths.set(i, math.max(widths.get(i), w))
         else
             prices.push(v)
             texts.push(name)
-            starts.push(t0)
-            widths.push(w)
+            starts.push(wickTime(v, t0))
+            cols.push(c)
 
 var line[]  lines  = array.new<line>()
 var label[] labels = array.new<label>()
@@ -67,20 +78,24 @@ if barstate.islast
     lines.clear()
     labels.clear()
 
-    p = usePrev ? "P" : ""
     prices = array.new<float>()
     texts  = array.new<string>()
     starts = array.new<int>()
-    widths = array.new<int>()
+    cols   = array.new<color>()
 
-    add(prices, texts, starts, widths, isHTF ? hY : lY, "12M", yv, yt, p + "YH",  3)
-    add(prices, texts, starts, widths, isHTF ? h6 : l6, "6M",  sv, st, p + "6MH", 2)
-    add(prices, texts, starts, widths, isHTF ? h3 : l3, "3M",  qv, qt, p + "3MH", 2)
-    add(prices, texts, starts, widths, isHTF ? hM : lM, "M",   mv, mt, p + "MH",  2)
-    add(prices, texts, starts, widths, isHTF ? hW : lW, "W",   wv, wt, p + "WH",  1)
-    add(prices, texts, starts, widths, isHTF ? hD : lD, "D",   dv, dt, p + "DH",  1)
+    // longest period first, so a merged tag keeps the longer period's colour
+    add(prices, texts, starts, cols, isHTF ? hY : lY, "12M", yv, yt, "Y",  cY)
+    add(prices, texts, starts, cols, isHTF ? h6 : l6, "6M",  sv, st, "6M", c6)
+    add(prices, texts, starts, cols, isHTF ? h3 : l3, "3M",  qv, qt, "3M", c3)
+    add(prices, texts, starts, cols, isHTF ? hM : lM, "M",   mv, mt, "M",  cM)
+    add(prices, texts, starts, cols, isHTF ? hW : lW, "W",   wv, wt, "W",  cW)
+    add(prices, texts, starts, cols, isHTF ? hD : lD, "D",   dv, dt, "D",  cD)
 
+    xEnd = chart.right_visible_bar_time
+    word = usePrev ? "previous" : "current"
     for [i, v] in prices
-        lines.push(line.new(starts.get(i), v, time, v, xloc.bar_time, extend.right, col, width = widths.get(i)))
-        labels.push(label.new(chart.right_visible_bar_time, v, texts.get(i), xloc.bar_time, style = label.style_label_right,
-             color = color(na), textcolor = col, size = size.small))
+        c = cols.get(i)
+        lines.push(line.new(starts.get(i), v, xEnd, v, xloc.bar_time, extend.none, c, line.style_solid, 1))
+        labels.push(label.new(xEnd, v, texts.get(i), xloc.bar_time, style = label.style_label_lower_right,
+             color = color(na), textcolor = c, size = size.small,
+             tooltip = texts.get(i) + " high (" + word + " period): " + str.tostring(v, format.mintick)))
