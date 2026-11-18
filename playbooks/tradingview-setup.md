@@ -59,6 +59,18 @@ Original "Forex" layout left untouched as backup. Why futures symbols: real exch
 ### Removed
 - %R Trend Exhaustion — oscillator, not part of the location-based system.
 
+### 7. HTF Highs (own script, `tradingview/htf-highs.pine`)
+- Added 18 Nov 2026. Pine Editor → paste → Save → Add to chart, on every pane (it reads the pane's timeframe).
+- Daily/weekly panes show yearly + 3-month highs; intraday panes show 6-month, monthly, weekly and previous-day highs. Each level has its own on/off per chart type in the inputs.
+- Default = previous completed period (PYH, P3MH, PMH, PWH, PDH). Switch "Level" to "Current period" for the running high.
+- Levels at the same price merge into one line ("PYH / P3MH"). Colour dark gold, so it clashes with nothing below.
+- PDH overlaps Sessions Liquidity's PDH/PDL: turn one off.
+
+## Drawing horizontal liquidity lines
+- Hold **Shift** while drawing a trend line: it locks to 0° / 45° / 90°, so flat is easy. Let go of the mouse before Shift.
+- Turn on **magnet** (left toolbar, Strong) so the first click lands exactly on the wick high.
+- Or use the **Horizontal ray** tool from the lines menu: one click on the wick, flat by design.
+
 ## Color discipline
 purple = value (POC/VA) · orange = AVWAP · black = structure/fractals · blue/red thin lines = session H/L, PDH/PDL · red/green = candles + heatmap zones only
 
