@@ -71,7 +71,8 @@ Original "Forex" layout left untouched as backup. Why futures symbols: real exch
 - High and low of each FOMC / CPI / NFP / PPI / retail-sales day in the last year, kept until price trades through. Dashed lines, name + date labels.
 - Source kept locally in `tradingview/third-party/` (git-ignored: someone else's code, repo is public).
 - Release dates are hard-coded (built 2026-11-17). Alfie's refresh job doesn't run here, so the chart shows a warning after 8 Dec 2026 until the dates are updated.
-- On AUD/CHF only so far (trial).
+- On every chart of all 30 layouts (28 desk pairs + Gold + silver) since 18 Nov 2026, next to HTF Highs.
+- Labels sit 2 bars right of the last candle; if they're cut off, raise the chart's right margin (right-click price scale → Settings → Canvas → Right margin, ~10–15 bars).
 - 18 Nov 2026: on every pane of all 28 desk-pair layouts (8 majors, every cross), plus Gold and silver. The 13 pairs that had no layout (EURGBP, EURAUD, EURNZD, EURCAD, GBPCAD, AUDNZD, AUDCAD, NZDUSD, NZDCAD, NZDCHF, NZDJPY, CADCHF, CADJPY) were copied from the EUR/JPY layout (D / 1H / 4H / 15m, IC Markets feed, Fractal Structure Break + HTF Highs).
 - Single-pane layouts still: GBP/USD (15m), USD/CAD (1D), GBP/CHF (1H); CHF/JPY has 3 panes.
 
