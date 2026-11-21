@@ -51,8 +51,12 @@ async function yahoo(sym, range = '2y') {
   throw new Error(`Yahoo ${sym}: ${err.message}`);
 }
 const safe = async (label, fn) => { try { return await fn(); } catch (e) { warns.push(`${label}: ${e.message}`); return null; } };
+// Monthly FRED dates (YYYY-MM-01) shifted back k months. Year-on-year and n-month paces compare a month with the
+// same calendar month k back, never "k rows back": a month the agency never published (October 2025 CPI, lost to
+// the shutdown) would otherwise turn a 12-month change into a 13-month one without saying so.
+const monthBack = (d, k) => { const [y, m] = d.split('-').map(Number), t = y * 12 + (m - 1) - k; return `${Math.floor(t / 12)}-${String((t % 12) + 1).padStart(2, '0')}-01`; };
 // Value on or before a date.
-const at = (rows, date) => { let v = null; for (const r of rows) { if (r.d > date) break; v = r.v; } return v; };
+const at =(rows, date) => { let v = null; for (const r of rows) { if (r.d > date) break; v = r.v; } return v; };
 const last = (rows) => rows[rows.length - 1];
 const weekly = (rows, n = 52) => { const out = []; for (let i = rows.length - 1; i >= 0 && out.length < n; i -= 5) out.unshift([rows[i].d, r2(rows[i].v, 3)]); return out; };
 const pctile = (arr, v) => Math.round((arr.filter((x) => x <= v).length / arr.length) * 100);
@@ -136,7 +140,7 @@ out.growth = await safe('growth', async () => {
     if (s.smooth) vals = vals.map((_, i) => (i < s.smooth - 1 ? null : vals.slice(i - s.smooth + 1, i + 1).reduce((a, b) => a + b, 0) / s.smooth));
     const dates = data.map((x) => x.d);
     let series = dates.map((d, i) => ({ d, v: vals[i] })).filter((x) => x.v != null);
-    if (s.yoy) series = series.map((x) => { const prev = at(series, new Date(Date.parse(x.d) - 365 * 864e5).toISOString().slice(0, 10)); return { d: x.d, v: prev ? (x.v / prev - 1) * 100 : null }; }).filter((x) => x.v != null && Date.parse(x.d) - Date.parse(series[0].d) > 370 * 864e5);
+    if (s.yoy) { const byD = new Map(series.map((x) => [x.d, x.v])); series = series.map((x) => { const prev = byD.get(monthBack(x.d, 12)); return { d: x.d, v: prev ? (x.v / prev - 1) * 100 : null }; }).filter((x) => x.v != null); }
     const n = series.length, now = series[n - 1];
     const back = at(series, new Date(Date.parse(now.d) - 92 * 864e5).toISOString().slice(0, 10));
     const back2 = at(series, new Date(Date.parse(now.d) - 184 * 864e5).toISOString().slice(0, 10));
@@ -163,18 +167,22 @@ out.growth = await safe('growth', async () => {
 out.inflation = await safe('inflation', async () => {
   const build = async (id, label) => {
     const s = await fred(id, 900);
-    const n = s.length, mom = s.map((x, i) => (i ? x.v / s[i - 1].v - 1 : null));
-    const yoy = (s[n - 1].v / s[n - 13].v - 1) * 100;
-    const ann = (k) => ((s[n - 1].v / s[n - 1 - k].v) ** (12 / k) - 1) * 100;
-    const pace3 = Math.pow(s[n - 1].v / s[n - 4].v, 1 / 3) - 1;   // average monthly pace, last 3 months
+    const n = s.length, byD = new Map(s.map((x) => [x.d, x.v])), lastD = s[n - 1].d, lastV = s[n - 1].v;
+    const change = (d, k) => { const b = byD.get(monthBack(d, k)), v = byD.get(d); return b && v ? v / b : null; };
+    const momPrev = byD.get(monthBack(lastD, 1));
+    // Year on year for the newest month that has its base month; yoyAsOf says which month that is.
+    const yoyRow = [...s].reverse().find((x) => change(x.d, 12) != null);
+    const yoy = yoyRow ? (change(yoyRow.d, 12) - 1) * 100 : null;
+    const ann = (k) => { const c = change(lastD, k); return c == null ? null : (c ** (12 / k) - 1) * 100; };
+    const c3 = change(lastD, 3), pace3 = c3 == null ? null : Math.pow(c3, 1 / 3) - 1;   // average monthly pace, last 3 months
     // Where year on year lands each month for the next 6 if the monthly pace is held, halved, doubled or zero.
     const scen = { 'pace doubles': pace3 * 2, 'pace held': pace3, 'pace halves': pace3 / 2, 'prices flat': 0 };
-    const paths = Object.fromEntries(Object.entries(scen).map(([k, m]) => {
-      const idx = s.map((x) => x.v), p = [];
-      for (let h = 1; h <= 6; h++) { idx.push(idx[idx.length - 1] * (1 + m)); p.push(r2((idx[idx.length - 1] / idx[idx.length - 13] - 1) * 100)); }
+    const paths = pace3 == null ? {} : Object.fromEntries(Object.entries(scen).map(([k, m]) => {
+      const p = [];
+      for (let h = 1; h <= 6; h++) { const base = byD.get(monthBack(monthBack(lastD, -h), 12)); p.push(base ? r2((lastV * (1 + m) ** h / base - 1) * 100) : null); }
       return [k, p];
     }));
-    return { id, label, asOf: s[n - 1].d, yoy: r2(yoy), ann3m: r2(ann(3)), ann6m: r2(ann(6)), lastMoM: r2(mom[n - 1] * 100, 2), history: s.slice(-25).map((x, i, a) => [x.d, i < 12 ? null : r2((x.v / a[i - 12].v - 1) * 100)]).filter((x) => x[1] != null), paths };
+    return { id, label, asOf: lastD, yoy: r2(yoy), yoyAsOf: yoyRow?.d ?? null, ann3m: r2(ann(3)), ann6m: r2(ann(6)), lastMoM: momPrev ? r2((lastV / momPrev - 1) * 100, 2) : null, history: s.slice(-25).map((x) => { const c = change(x.d, 12); return [x.d, c == null ? null : r2((c - 1) * 100)]; }).filter((x) => x[1] != null), paths };
   };
   const [headline, core, be] = await Promise.all([build('CPIAUCSL', 'CPI'), build('CPILFESL', 'Core CPI'), fred('T5YIE', 60)]);
   return { headline, core, breakeven5y: { asOf: last(be).d, value: r2(last(be).v) }, target: 2 };

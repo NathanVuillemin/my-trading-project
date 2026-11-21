@@ -1,6 +1,6 @@
 # Trading Desk
 
-Nathan's own layer on top of what he already receives. Market Context and his coach's briefs give him
+Nathan's own layer on top of what he already receives. Market Context and his coach's Markets Desk (morning debrief and weekly review in one page, since 2026-11-21) give him
 the data; this desk holds what he does with it: his weekly scorecard and pairs, his if/then lines, kill
 switches, key levels, daily notes, ideas, and a review of whether his calls were right.
 
@@ -71,6 +71,9 @@ Two inputs, combined in the browser (`derivePrices` in `assets/desk.js`):
    (a single commit, replaced each time, so main's history stays clean) and pages read it from
    `raw.githubusercontent.com/…/desk-live/live.json`.
 
+While spot FX is shut (Friday 17:00 to Sunday 17:00 New York time) the desk ignores live quotes, which keep drifting
+on thin weekend rates: prices hold the last daily close, "today" is that last session, and a pill says "FX closed".
+
 From those the browser works out, for all 28 pairs and for each currency against the other seven: last, today,
 week to date, one month, the typical daily move over the last 20 sessions, and ranks.
 
@@ -95,7 +98,7 @@ to api.github.com. Each save re-reads the file and applies one change, so a comm
 overwritten; a file that does not exist yet is created. Without a token pages are read-only. Pages read the
 repo's current file, not the deployed copy, so a save shows at once.
 
-The links to his coach's briefs used by the daily checklist are private: they are pasted once per device and
+The link to his coach's Markets Desk used by the daily checklist is private: it is pasted once per device and
 kept in localStorage, never in the repo.
 
 ## Local test mode

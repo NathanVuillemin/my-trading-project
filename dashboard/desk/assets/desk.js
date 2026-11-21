@@ -162,6 +162,13 @@ async function loadQuotes() {
     quotes = { t: Date.now(), usd };
   } catch { /* keep the last quotes */ }
 }
+// Spot FX trades from Sunday 17:00 to Friday 17:00 New York time. Outside that the quote source keeps drifting on
+// thin weekend rates, so while the market is shut the desk holds Friday's close and "today" means Friday's session.
+function fxClosed(now = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', hourCycle: 'h23' }).formatToParts(now).map((x) => [x.type, x.value]));
+  const h = Number(p.hour);
+  return (p.weekday === 'Fri' && h >= 17) || p.weekday === 'Sat' || (p.weekday === 'Sun' && h < 17);
+}
 // Every figure the pages show is worked out here from the reference closes and the latest quotes.
 function derivePrices() {
   const H = refData?.history, dates = H?.dates || [], N = dates.length;
@@ -170,11 +177,13 @@ function derivePrices() {
   const pct = (a, b) => (a / b - 1) * 100, mean = (xs) => xs.reduce((a, b) => a + b, 0) / xs.length;
   const now = new Date(), todayUtc = now.toISOString().slice(0, 10);
   const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - ((now.getUTCDay() + 6) % 7))).toISOString().slice(0, 10);
+  const closed = fxClosed(now);
   let prev = N - 1; while (prev > 0 && dates[prev] >= todayUtc) prev--;   // last session before today
+  if (closed) prev = N - 2;                                                // FX shut: today = the last session, against the one before
   let wk = prev; while (wk > 0 && dates[wk] >= monday) wk--;               // last close before this week
   const mo = Math.max(0, prev - 20), lo = Math.max(1, prev - 19);
   // Without live quotes, fall back to the newest value in the reference file.
-  const liveUsd = quotes?.usd || Object.fromEntries(CCYS.map((c) => [c, hv(c, N - 1)]));
+  const liveUsd = (!closed && quotes?.usd) || Object.fromEntries(CCYS.map((c) => [c, hv(c, N - 1)]));
   const stat = (b, q) => {
     const s = (i) => hv(b, i) / hv(q, i), px = liveUsd[b] / liveUsd[q];
     const moves = [], win = [];
@@ -193,7 +202,7 @@ function derivePrices() {
   }
   // The close for `prev` is final only if the file was written after that day ended.
   const refStale = refData.asOf.slice(0, 10) <= dates[prev];
-  prices = { pairs, currencies, history: H, liveUsd, quoteTime: quotes?.t || null, refAsOf: refData.asOf, refStale };
+  prices = { pairs, currencies, history: H, liveUsd, quoteTime: quotes?.t || null, refAsOf: refData.asOf, refStale: !closed && refStale, closed, lastClose: dates[N - 1] };
 }
 async function loadPrices() {
   await Promise.all([Date.now() - refLoadedAt > 10 * 60000 ? loadRef() : null, loadQuotes()]);
@@ -205,6 +214,7 @@ const pctHtml = (n, d = 2) => (n == null ? '<span class="faint">—</span>' : `<
 function priceAge() {
   if (!prices) return '<span class="pill warn">prices not reachable</span>';
   const stale = prices.refStale ? ' <span class="pill warn" title="Yesterday\'s final close has not been published yet, so the day change is measured from an earlier price">day change approximate</span>' : '';
+  if (prices.closed) return `<span class="pill flat" title="Spot FX is shut from Friday 17:00 to Sunday 17:00 New York time; weekend quotes are not real trading">FX closed · prices at ${esc(fmtDate(prices.lastClose))} close</span>`;
   if (!prices.quoteTime) return `<span class="pill warn" title="Live quotes could not be fetched; showing the last published prices">live quotes unreachable · prices from ${new Date(prices.refAsOf).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>${stale}`;
   const min = Math.max(0, Math.round((Date.now() - prices.quoteTime) / 60000));
   return `<span class="pill ${min > 5 ? 'warn' : 'flat'}" title="Quotes are re-read every minute; the source updates every minute or two">quotes ${min < 1 ? 'just now' : `${min} min ago`}</span>${stale}`;
@@ -215,7 +225,7 @@ const histUsd = (c, i) => (c === 'USD' ? 1 : prices.history.usd[c][i]);
 // ---------- small shared pieces ----------
 const pad2 = (n) => String(n).padStart(2, '0');
 const ymd = (d = new Date()) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-// Links Nathan opens daily (his coach's briefs) are private: kept in this browser only, never in the repo.
+// Links Nathan opens daily (his coach's Markets Desk) are private: kept in this browser only, never in the repo.
 const LINKS_KEY = 'desk.links';
 const links = {
   get() { try { return JSON.parse(localStorage.getItem(LINKS_KEY) || '{}'); } catch { return {}; } },
@@ -301,11 +311,11 @@ const render = {};
 // Nothing here repeats what Nathan is sent. It shows his pairs and calls against live prices,
 // the daily read as a checklist, his three lines for the day, and his kill switches.
 const DAILY_QUESTIONS = [
-  ['What happened, in one story?', 'Morning debrief: the summary paragraph', 'debrief'],
-  ['Did pricing move towards or away from my gap?', 'Morning debrief: central-bank pricing table, my currencies only', 'debrief'],
-  ['What happened to my pairs, and why?', 'Morning debrief: currencies in depth, my pairs only', 'debrief'],
-  ['What is due today and tomorrow, and what would each outcome do?', 'Morning debrief: scenarios for the week; Market Context: Today', 'debrief'],
-  ['Where are the levels?', 'Morning debrief: levels to watch, my pairs', 'debrief'],
+  ['What happened, in one story?', 'Markets Desk, Morning debrief: the summary paragraph', 'md'],
+  ['Did pricing move towards or away from my gap?', 'Markets Desk, Morning debrief: what\'s priced for each central bank, my currencies only', 'md'],
+  ['What happened to my pairs, and why?', 'Markets Desk, Morning debrief: currencies in depth, my pairs only', 'md'],
+  ['What is due today and tomorrow, and what would each outcome do?', 'Markets Desk, Morning debrief: scenarios for this week\'s big events; Market Context: Today', 'md'],
+  ['Where are the levels?', 'Markets Desk, Morning debrief: levels to watch, my pairs', 'md'],
   ['Anything I missed?', 'Market Context: Today, Shifts; alert emails', 'mc'],
   ['Are my biases still valid?', 'My kill switches against 1 to 6', 'ks'],
 ];
@@ -383,7 +393,7 @@ render.hub = async (main) => {
     <p class="small faint" style="margin:8px 0 0">Each currency against the other seven, averaged. Strongest this week first.</p>`;
   };
 
-  const linkFor = (kind) => ({ debrief: links.get().debrief, mc: links.get().mc || 'https://marketcontext.com/market-flow', ks: 'kill-switches.html' }[kind]);
+  const linkFor = (kind) => ({ md: links.get().marketsDesk, mc: links.get().mc || 'https://marketcontext.com/market-flow', ks: 'kill-switches.html' }[kind]);
   const prev = Object.keys(days).filter((d) => d < today).sort().at(-1);
   const readHtml = () => `<ul class="checks">${DAILY_QUESTIONS.map(([q, where, kind], i) => `<li>
       <input type="checkbox" data-q="${i + 1}" ${note.done.includes(i + 1) ? 'checked' : ''}>
@@ -398,8 +408,7 @@ render.hub = async (main) => {
     ${prev ? `<div class="note" style="margin:12px 0 0"><b>${fmtDate(prev)}:</b> ${esc(days[prev].story || '—')}<br><span class="small">Bias check: ${esc(days[prev].biasCheck || '—')}</span></div>` : ''}
     <details class="small" style="margin-top:12px"><summary class="muted">Links for the checklist (kept in this browser only)</summary>
       <div class="form-grid" style="margin-top:8px">
-        <label class="wide">Morning debrief link<input id="ln-debrief" value="${esc(links.get().debrief || '')}" placeholder="https://…"></label>
-        <label class="wide">Weekly review link<input id="ln-weekly" value="${esc(links.get().weekly || '')}" placeholder="https://…"></label>
+        <label class="wide">Markets Desk link<input id="ln-md" value="${esc(links.get().marketsDesk || '')}" placeholder="https://claude.ai/…"></label>
       </div><div class="form-actions"><button class="btn" data-act="save-links">Save links on this device</button></div></details>`;
 
   const hot = kills.filter((x) => x.status !== 'armed');
@@ -439,7 +448,7 @@ render.hub = async (main) => {
       b.parentElement.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b));
       $('#hub-attr').innerHTML = attributionHtml(attrKey);
     } else if (b.dataset.act === 'save-links') {
-      links.set({ ...links.get(), debrief: $('#ln-debrief').value.trim(), weekly: $('#ln-weekly').value.trim() });
+      links.set({ ...links.get(), marketsDesk: $('#ln-md').value.trim() });
       Object.assign(note, { story: $('#dn-story').value, ifThen: $('#dn-ifthen').value, biasCheck: $('#dn-bias').value, done: [...main.querySelectorAll('[data-q]:checked')].map((x) => Number(x.dataset.q)) });
       msg = 'Links saved on this device.'; draw();
     } else if (b.dataset.act === 'save-note') {
@@ -1055,7 +1064,7 @@ render.ideas = async (main) => {
     <div class="form-grid">
       <label>Date<input type="date" name="date" value="${esc(k.date || today())}"></label>
       <label class="wide">Source<input name="source" list="id-sources" value="${esc(k.source || '')}" placeholder="podcast, video, call, own">
-        <datalist id="id-sources">${['Podcast', 'YouTube', 'Coaching call', 'Morning debrief', 'Weekly review', 'Own idea'].map((s) => `<option value="${s}">`).join('')}</datalist></label>
+        <datalist id="id-sources">${['Podcast', 'YouTube', 'Coaching call', 'Markets Desk', 'Market Context', 'Own idea'].map((s) => `<option value="${s}">`).join('')}</datalist></label>
       <label>Status<select name="status">${opts(['open', 'kept', 'dropped'], k.status || 'open')}</select></label>
       <label class="full">The idea<textarea name="text" rows="3" placeholder="One idea, in my own words. What would I check to see if it holds?">${esc(k.text || '')}</textarea></label>
     </div>
@@ -1167,7 +1176,13 @@ function posLinks(idea) {
 
 // ---- shared positioning visuals (Positioning, Scorecard, Ideas) ----
 const posGrp = (x, role) => x?.groups?.find((g) => g.role === role) || null;
-const posTagPill = (t) => (t && POS_TAG[t] ? `<span class="pill ${POS_TAG[t][1]}">${POS_TAG[t][0]}</span>` : '');
+// Tags read the 3-year index, not the sign of the position: "crowded long" means the most long (or least short) in
+// three years. When the actual net sits on the other side, say so, so the label is never read as the position itself.
+const posTagPill = (t, net) => {
+  if (!t || !POS_TAG[t]) return '';
+  const against = (t === 'crowded-long' && net < 0) ? ' · still net short' : (t === 'crowded-short' && net > 0) ? ' · still net long' : '';
+  return `<span class="pill ${POS_TAG[t][1]}" title="3-year index ${against ? 'extreme; the position itself is on the other side' : 'extreme'}">${POS_TAG[t][0]}${against}</span>`;
+};
 const POS_ROLE = { slow: { shape: 'circle', color: 'var(--pos-slow)' }, fast: { shape: 'diamond', color: 'var(--pos-fast)' } };
 // Who is slow and who is fast differs by report: TFF has asset managers, commodities only managed money (fast).
 const posPair = (x) => [posGrp(x, 'slow'), posGrp(x, 'fast')].filter(Boolean);
@@ -1218,7 +1233,7 @@ function posTrend(x) {
     <line x1="0" x2="${W}" y1="${Y(50)}" y2="${Y(50)}" stroke="var(--line)" stroke-dasharray="3 3"/>${lines}
     <text x="2" y="${H - 1}" class="g-axis">26 weeks ago</text><text x="${W - 2}" y="${H - 1}" text-anchor="end" class="g-axis">now</text></svg>`;
 }
-const posLegend = (x) => posPair(x).map((g) => `<span class="pos-key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">${posMarker(g.role, 6, 6, 4.5, `fill="${POS_ROLE[g.role].color}"`)}</svg>${esc(g.name)} <b class="num">${g.index}</b> ${posTagPill(g.tag)}</span>`).join('');
+const posLegend = (x) => posPair(x).map((g) => `<span class="pos-key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">${posMarker(g.role, 6, 6, 4.5, `fill="${POS_ROLE[g.role].color}"`)}</svg>${esc(g.name)} <b class="num">${g.index}</b> ${posTagPill(g.tag, g.net)}</span>`).join('');
 const posSqueeze = (x) => (x?.squeeze ? `<div class="small warn-t">Squeeze risk: ${esc(x.squeeze)}</div>` : '');
 // One card per currency or market: name, gauge, trend, legend.
 const posCard = (title, x, sub = '') => `<div class="pos-card"><div class="pos-card-head"><b>${title}</b>${sub ? ` <span class="small faint">${sub}</span>` : ''}</div>
@@ -1583,7 +1598,7 @@ render.drivers = async (main) => {
       ${goldRow(1, 'Real yields (US 10y TIPS)', g.realYield10y, '%', (b) => `<span class="pill ${tone(b.chg3m < 0)}">${b.chg3m < 0 ? 'falling: tailwind' : 'rising: headwind'}</span>`)}
       ${goldRow(2, 'Dollar (broad index)', g.dollarBroad, '', (b) => `<span class="pill ${tone(b.chg3m < 0)}">${b.chg3m < 0 ? 'weaker: tailwind' : 'stronger: headwind'}</span>`)}
       ${liq ? `<div class="stack-row"><span class="stack-n">3</span><div class="stack-name"><b>Liquidity</b><div class="small faint">net, US</div></div><div class="num">$${(liq.netBn / 1000).toFixed(2)}tn<div class="small">${chg(liq.chg13wBn, 'bn', 0)} 13w</div></div><div>${lineSvg(liq.history.slice(-52), { h: 46, w: 220 })}</div><div></div><div><span class="pill ${tone(liq.chg13wBn > 0)}">${liq.chg13wBn > 0 ? 'expanding: tailwind' : 'draining: headwind'}</span></div></div>` : ''}
-      ${mmg ? `<div class="stack-row"><span class="stack-n">4</span><div class="stack-name"><b>Flows: COT managed money</b><div class="small faint">${esc(fmtDate(mm.date))}</div></div><div class="num">${mmg.index}<div class="small">of 100 in 3 years</div></div><div>${posGauge(mm, { compact: true })}</div><div></div><div>${posTagPill(mmg.tag)}</div></div>` : ''}
+      ${mmg ? `<div class="stack-row"><span class="stack-n">4</span><div class="stack-name"><b>Flows: COT managed money</b><div class="small faint">${esc(fmtDate(mm.date))}</div></div><div class="num">${mmg.index}<div class="small">of 100 in 3 years</div></div><div>${posGauge(mm, { compact: true })}</div><div></div><div>${posTagPill(mmg.tag, mmg.net)}</div></div>` : ''}
       ${goldRow(5, 'Stress: VIX', g.vix, '', (b) => `<span class="pill ${b.value > 20 ? 'warn' : 'flat'}">${b.value > 20 ? 'above 20: risk-off' : 'calm'}</span>`)}
       ${goldRow('5b', 'Stress: high-yield spread', g.hySpread, '%', (b) => `<span class="pill ${b.chg3m > 0 ? 'warn' : 'flat'}">${b.chg3m > 0 ? 'widening' : 'tightening'}</span>`)}
       ${goldRow('', 'Gold futures', g.goldFutures, '', () => '')}
@@ -1620,7 +1635,7 @@ render.drivers = async (main) => {
     return `${lineSvg(padded, { h: 130, extra, hlines: [{ v: inf.target, label: '2% target' }, { v: inf.breakeven5y.value, label: `5y breakeven ${inf.breakeven5y.value}%`, color: 'var(--pos-fast)', anchor: 'start' }], label: `${blk.label} year on year and six-month paths` })}
       <div class="pos-legend">${labels.map((k, i) => `<span class="pos-key"><svg width="14" height="6"><line x1="0" x2="14" y1="3" y2="3" stroke="${cols[i]}" stroke-width="2" stroke-dasharray="4 3"/></svg>${esc(k)}: ${blk.paths[k][5]}%</span>`).join('')}</div>`;
   };
-  const infPanel = !inf ? '' : panel('US inflation: the pace, and where it leads', `<div class="drv-2">${[inf.core, inf.headline].map((b) => `<div><div class="kpis"><div><label>${esc(b.label)} y/y</label><span class="num big">${b.yoy}%</span></div><div><label>3-month pace</label><span class="num big ${b.ann3m > b.yoy ? 'warn-t' : ''}">${b.ann3m}%</span><div class="small faint">annualised</div></div><div><label>6-month pace</label><span class="num">${b.ann6m}%</span></div><div><label>Last month</label><span class="num">${sgn(b.lastMoM)}%</span></div></div>${glide(b)}</div>`).join('')}</div>
+  const infPanel = !inf ? '' : panel('US inflation: the pace, and where it leads', `<div class="drv-2">${[inf.core, inf.headline].map((b) => `<div><div class="kpis"><div><label>${esc(b.label)} y/y${b.yoyAsOf && b.yoyAsOf !== b.asOf ? `, ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(b.yoyAsOf)} (no ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(new Date(Date.parse(b.asOf + "T12:00:00Z") - 365 * 864e5).toISOString().slice(0, 7) + "-01")} print to compare ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(b.asOf)} with)` : ""}</label><span class="num big">${b.yoy ?? "n/a"}%</span></div><div><label>3-month pace</label><span class="num big ${b.ann3m > b.yoy ? 'warn-t' : ''}">${b.ann3m}%</span><div class="small faint">annualised</div></div><div><label>6-month pace</label><span class="num">${b.ann6m}%</span></div><div><label>Last month</label><span class="num">${sgn(b.lastMoM)}%</span></div></div>${glide(b)}</div>`).join('')}</div>
     <p class="small faint">Modules 05 and FX II. Year on year is where inflation has been; the 3-month annualised pace is where it is now. The dashed paths hold today's monthly pace, double it, halve it or stop it, and show where year on year lands over six months: pricing that no path reaches is the one to fade. As of ${esc(fmtDate(inf.core.asOf))}.</p>`);
 
   const bc = d.bounce;
