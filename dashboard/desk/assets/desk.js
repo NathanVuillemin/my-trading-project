@@ -327,12 +327,16 @@ render.hub = async (main) => {
   // News stays where it is published: links out, plus a short written brief (data/news.json) of what happened and
   // what to look for. No feed on the desk.
   const newsHtml = () => {
-    const b = news?.brief, groups = [...new Set((news?.links || []).map((l) => l.group))];
-    return `${b ? `<div class="news-brief"><div class="small muted">Brief written ${esc(fmtDate(b.date))}${b.date < ymd(new Date(Date.now() - 2 * 864e5)) ? ' <span class="pill warn">old</span>' : ''}</div>
-        <div class="nb-cols"><div><div class="pc-h">What happened</div><ul class="list">${(b.summary || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
-        <div><div class="pc-h">What to look for</div><ul class="list">${(b.watch || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
-        ${(b.sources || []).length ? `<div class="small faint">Read in full: ${b.sources.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(' · ')}</div>` : ''}</div>`
-      : '<div class="empty small">No brief yet. Ask Claude for "today\'s news brief" and it writes one here.</div>'}
+    const b = news?.brief, w = news?.week, groups = [...new Set((news?.links || []).map((l) => l.group))];
+    const list = (xs) => `<ul class="list">${(xs || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    const srcs = (xs) => ((xs || []).length ? `<div class="small faint">Read in full: ${xs.map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(' · ')}</div>` : '');
+    // Two briefs, refreshed daily: the last session(s) with today's watch list, and the week (on a weekend, the week
+    // just gone and the one ahead). "old" when the daily brief is more than a day behind.
+    const day = b ? `<div class="news-brief"><div class="pc-h">Today <span class="small muted">· written ${esc(fmtDate(b.date))}</span>${b.date < ymd(new Date(Date.now() - 864e5)) ? ' <span class="pill warn">old</span>' : ''}</div>
+        <div class="nb-cols"><div><div class="small muted">What happened</div>${list(b.summary)}</div><div><div class="small muted">What to look for</div>${list(b.watch)}</div></div>${srcs(b.sources)}</div>` : '';
+    const week = w ? `<div class="news-brief"><div class="pc-h">Week of ${esc(fmtDate(w.weekOf))}</div>
+        <div class="nb-cols"><div><div class="small muted">What has happened</div>${list(w.happened)}</div><div><div class="small muted">What is ahead</div>${list(w.ahead)}</div></div>${srcs(w.sources)}</div>` : '';
+    return `${day + week || '<div class="empty small">No brief yet. The daily news task writes one here; or ask Claude for "today\'s news brief".</div>'}
       <div class="news-links">${groups.map((g) => `<div><div class="small muted">${esc(g)}</div>${news.links.filter((l) => l.group === g).map((l) => `<a class="chip-link" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)} ↗</a>`).join('')}</div>`).join('')}</div>`;
   };
   const weeks = index?.weeks || [];

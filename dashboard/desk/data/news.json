@@ -1,41 +1,129 @@
 {
-  "note": "No news feed on the desk. Links out to where news is published, plus a short brief (summary and what to look for) written on request. Ask Claude for 'today's news brief' to replace the brief.",
+  "note": "No news feed on the desk. Links out to where news is published, plus two short briefs written by Claude from checked sources: brief = the last session(s) and what to look for today and tomorrow; week = what has happened this week (on a weekend: the week just gone) and what is ahead. Refreshed daily by the \"desk-news-brief\" scheduled task (scripts/news-brief.md); facts only, never a call.",
   "brief": {
-    "date": "2026-11-15",
+    "date": "2026-11-21",
     "summary": [
-      "Nvidia: Jensen Huang resigned as CEO, president and director on 11 Nov (SEC 8-K); CFO Colette Kress is interim CEO. The stock is about 30% below its early-October close, a governance selloff rather than a numbers one.",
-      "US inflation pace: core CPI's 3-month annualised pace is 3.75% (October) against 2.6% year on year (September; October 2025 was never published, so there is no October year-on-year), so the monthly run-rate is above the yearly number (FRED).",
-      "US labour: initial jobless claims are running near 195k on a 4-week average, still low (FRED).",
-      "Positioning: the newest CFTC report is dated 3 Nov; the following one has not been published yet (likely delayed by the Veterans Day holiday)."
+      "Friday 20 Nov: the S&P 500 fell 3.7% to 6,910 and the Nasdaq Composite 5.3%; the S&P is now in correction territory and below its 200-day average (7,349). VIX closed at 35.9.",
+      "Nvidia fell 14% to $125.53 after Reuters reported the SEC is examining its accounting, three days after a Q3 beat. Gold fell 4.6% to a one-year low near $3,515; the US 10-year yield fell 14bp to 4.91%.",
+      "FX on the day: AUD the weakest of the eight (-0.7% against the other seven), USD and EUR firmest (+0.3% and +0.2%). AUDJPY -0.6%."
     ],
     "watch": [
-      "Nvidia Q3 results Tue 17 Nov after the US close (about 22:20 CET): a risk-tone event for AUDJPY that lands after the New York entry cutoff, so read it in Asia and at the London open on 18 Nov.",
-      "Whether the next US inflation prints keep the 3-month core pace near 3.75%: if so, the curve has to price more hikes (Drivers page, inflation paths).",
-      "The delayed CFTC report: check the Positioning page once it lands for any change in the crowded USD long.",
-      "Check Market Context's calendar and the economic calendars below for this week's exact release times."
+      "Weekend: any follow-up on the SEC probe or the board inquiry at Nvidia sets the tone for the Asia open.",
+      "Mon 23 Nov: flash PMIs for the euro area, Germany, the UK and the US.",
+      "Read the Sunday-evening open on AUDJPY and USDJPY as the first risk read of the week."
     ],
     "sources": [
-      { "title": "NVIDIA: CEO transition (12 Nov 2026)", "url": "https://nvidianews.nvidia.com/news/nvidia-announces-ceo-transition" },
-      { "title": "CNBC live updates", "url": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html" },
-      { "title": "FRED: core CPI", "url": "https://fred.stlouisfed.org/series/CPILFESL" },
-      { "title": "FRED: initial claims", "url": "https://fred.stlouisfed.org/series/ICSA" }
+      {
+        "title": "Motley Fool: Nvidia rout and SEC accounting probe (20 Nov)",
+        "url": "https://www.fool.com/coverage/stock-market-today/2026/11/20/stock-market-today-nov-20-nvidia-s-usd2-5-trillion-rout-deepens-as-sec-accounting-probe-adds-to-wall-street-s-ai-sell-off/"
+      },
+      {
+        "title": "Axios: Nvidia plunges as Anthropic can't stop the AI selloff (20 Nov)",
+        "url": "https://www.axios.com/2026/11/20/anthropic-ipo-nvidia-ai-tech-selloff"
+      }
     ]
   },
   "links": [
-    { "group": "My sources", "title": "Market Context: News", "url": "https://marketcontext.com" },
-    { "group": "Wires and markets", "title": "Reuters: currencies", "url": "https://www.reuters.com/markets/currencies/" },
-    { "group": "Wires and markets", "title": "Bloomberg: markets", "url": "https://www.bloomberg.com/markets" },
-    { "group": "Wires and markets", "title": "FXStreet: news", "url": "https://www.fxstreet.com/news" },
-    { "group": "Calendars and pricing", "title": "FXStreet economic calendar", "url": "https://www.fxstreet.com/economic-calendar" },
-    { "group": "Calendars and pricing", "title": "Investing.com economic calendar", "url": "https://www.investing.com/economic-calendar/" },
-    { "group": "Calendars and pricing", "title": "CME FedWatch", "url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" },
-    { "group": "Central banks", "title": "Federal Reserve", "url": "https://www.federalreserve.gov/newsevents.htm" },
-    { "group": "Central banks", "title": "ECB", "url": "https://www.ecb.europa.eu/press/html/index.en.html" },
-    { "group": "Central banks", "title": "Bank of England", "url": "https://www.bankofengland.co.uk/news" },
-    { "group": "Central banks", "title": "Bank of Japan", "url": "https://www.boj.or.jp/en/" },
-    { "group": "Central banks", "title": "Swiss National Bank", "url": "https://www.snb.ch/en/" },
-    { "group": "Central banks", "title": "Bank of Canada", "url": "https://www.bankofcanada.ca/press/" },
-    { "group": "Central banks", "title": "Reserve Bank of Australia", "url": "https://www.rba.gov.au/media-releases/" },
-    { "group": "Central banks", "title": "Reserve Bank of New Zealand", "url": "https://www.rbnz.govt.nz/news-and-events" }
-  ]
+    {
+      "group": "My sources",
+      "title": "Market Context: News",
+      "url": "https://marketcontext.com"
+    },
+    {
+      "group": "Wires and markets",
+      "title": "Reuters: currencies",
+      "url": "https://www.reuters.com/markets/currencies/"
+    },
+    {
+      "group": "Wires and markets",
+      "title": "Bloomberg: markets",
+      "url": "https://www.bloomberg.com/markets"
+    },
+    {
+      "group": "Wires and markets",
+      "title": "FXStreet: news",
+      "url": "https://www.fxstreet.com/news"
+    },
+    {
+      "group": "Calendars and pricing",
+      "title": "FXStreet economic calendar",
+      "url": "https://www.fxstreet.com/economic-calendar"
+    },
+    {
+      "group": "Calendars and pricing",
+      "title": "Investing.com economic calendar",
+      "url": "https://www.investing.com/economic-calendar/"
+    },
+    {
+      "group": "Calendars and pricing",
+      "title": "CME FedWatch",
+      "url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html"
+    },
+    {
+      "group": "Central banks",
+      "title": "Federal Reserve",
+      "url": "https://www.federalreserve.gov/newsevents.htm"
+    },
+    {
+      "group": "Central banks",
+      "title": "ECB",
+      "url": "https://www.ecb.europa.eu/press/html/index.en.html"
+    },
+    {
+      "group": "Central banks",
+      "title": "Bank of England",
+      "url": "https://www.bankofengland.co.uk/news"
+    },
+    {
+      "group": "Central banks",
+      "title": "Bank of Japan",
+      "url": "https://www.boj.or.jp/en/"
+    },
+    {
+      "group": "Central banks",
+      "title": "Swiss National Bank",
+      "url": "https://www.snb.ch/en/"
+    },
+    {
+      "group": "Central banks",
+      "title": "Bank of Canada",
+      "url": "https://www.bankofcanada.ca/press/"
+    },
+    {
+      "group": "Central banks",
+      "title": "Reserve Bank of Australia",
+      "url": "https://www.rba.gov.au/media-releases/"
+    },
+    {
+      "group": "Central banks",
+      "title": "Reserve Bank of New Zealand",
+      "url": "https://www.rbnz.govt.nz/news-and-events"
+    }
+  ],
+  "week": {
+    "weekOf": "2026-11-23",
+    "happened": [
+      "Week of 16 Nov, AI unwind: S&P 500 -8.6% to 6,910, Nasdaq Composite -10.0%, VIX 19.3 to 35.9.",
+      "Nvidia beat on Tue 17 Nov (revenue $115.8bn, up 103%; Q4 guide $130bn against about $125bn expected) yet fell 23% on the week, 14% of it on Friday on the reported SEC probe. The Anthropic IPO jumped on its first day (19 Nov) and did not stop the selloff.",
+      "Treasuries rallied (US 10-year 4.91%, -24bp), the dollar index edged up to 103.8, gold fell 9.5% to a one-year low, WTI crude -5% to $84, Bitcoin about -9% to $59k.",
+      "FX on the week: JPY strongest (+1.1% against the other seven), USD next (+1.0%), AUD weakest (-1.6%); AUDJPY -2.3%.",
+      "Positioning (CFTC, 17 Nov): USD long crowded on both groups (asset managers 85, leveraged funds 92 of 100 in three years); EUR at three-year lows for both, though asset managers are still net long."
+    ],
+    "ahead": [
+      "Mon 23 Nov: flash PMIs (euro area, Germany, UK, US).",
+      "Wed 25 Nov, the heavy US day: October PCE prices (core PCE is the one), Q3 GDP second estimate (first estimate 3.4% annualised), durable goods, new home sales, the Fed Beige Book. Australian CPI the same day.",
+      "Thu 26 Nov: US markets shut for Thanksgiving. Fri 27 Nov: early US close (13:00 New York); thin liquidity can exaggerate moves.",
+      "RBNZ: no confirmed decision date found for this week; check the RBNZ calendar. Exact release times: Market Context calendar."
+    ],
+    "sources": [
+      {
+        "title": "NVIDIA: Q3 fiscal 2027 results",
+        "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/default.aspx"
+      },
+      {
+        "title": "FinancialJuice: week ahead 23-27 Nov",
+        "url": "https://features.financialjuice.com/2026/11/20/week-ahead-economic-indicators-23rd-27th-november-us/"
+      }
+    ]
+  }
 }
