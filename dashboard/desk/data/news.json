@@ -1,25 +1,30 @@
 {
   "note": "No news feed on the desk. Links out to where news is published, plus two short briefs written by Claude from checked sources: brief = the last session(s) and what to look for today and tomorrow; week = what has happened this week (on a weekend: the week just gone) and what is ahead. Refreshed daily by the \"desk-news-brief\" scheduled task (scripts/news-brief.md); facts only, never a call.",
   "brief": {
-    "date": "2026-11-21",
+    "date": "2026-11-22",
     "summary": [
-      "Friday 20 Nov: the S&P 500 fell 3.7% to 6,910 and the Nasdaq Composite 5.3%; the S&P is now in correction territory and below its 200-day average (7,349). VIX closed at 35.9.",
-      "Nvidia fell 14% to $125.53 after Reuters reported the SEC is examining its accounting, three days after a Q3 beat. Gold fell 4.6% to a one-year low near $3,515; the US 10-year yield fell 14bp to 4.91%.",
-      "FX on the day: AUD the weakest of the eight (-0.7% against the other seven), USD and EUR firmest (+0.3% and +0.2%). AUDJPY -0.6%."
+      "Weekend after Friday 20 Nov: S&P 500 closed at 6,910 (-3.7% on the day), below its 200-day average (7,349); Nasdaq Composite -5.3%; VIX 35.9. No Sunday futures report found yet.",
+      "Nvidia: Reuters reported SEC enforcement staff are examining possible accounting issues; the inquiry is described as early stage and no charges have been brought. The stock fell 14% on Friday to $125.53 and more than 20% on the week.",
+      "Friday close: US 10-year yield 4.91% (-14bp), gold -4.6% to 3,515, WTI 83.41, dollar index 103.81. Bitcoin, trading over the weekend, at 61,007 (+1.5% on the day).",
+      "FX on Friday: AUD weakest of the eight (-0.7% against the other seven), USD and EUR firmest (+0.3% and +0.2%); AUDJPY -0.6% to 106.30."
     ],
     "watch": [
-      "Weekend: any follow-up on the SEC probe or the board inquiry at Nvidia sets the tone for the Asia open.",
-      "Mon 23 Nov: flash PMIs for the euro area, Germany, the UK and the US.",
-      "Read the Sunday-evening open on AUDJPY and USDJPY as the first risk read of the week."
+      "Any further reporting or company statement on the SEC inquiry at Nvidia before the Asia open.",
+      "Mon 23 Nov: November flash PMIs for the US, euro area, Germany, France, UK, Japan and Australia; speakers include BoE Pill, ECB Lane and Fed Williams.",
+      "Tue 24 Nov: no major release confirmed; Wednesday carries the US and Australian data."
     ],
     "sources": [
       {
-        "title": "Motley Fool: Nvidia rout and SEC accounting probe (20 Nov)",
-        "url": "https://www.fool.com/coverage/stock-market-today/2026/11/20/stock-market-today-nov-20-nvidia-s-usd2-5-trillion-rout-deepens-as-sec-accounting-probe-adds-to-wall-street-s-ai-sell-off/"
+        "title": "Business Recorder (Reuters): Nvidia accounting a focus of SEC investigation",
+        "url": "https://www.brecorder.com/news/40450203/nvidias-accounting-is-a-focus-of-us-sec-investigation-sources-say"
       },
       {
-        "title": "Axios: Nvidia plunges as Anthropic can't stop the AI selloff (20 Nov)",
-        "url": "https://www.axios.com/2026/11/20/anthropic-ipo-nvidia-ai-tech-selloff"
+        "title": "Bloomberg: Wall Street regulator probes Nvidia accounting (20 Nov)",
+        "url": "https://www.bloomberg.com/news/articles/2026-11-20/wall-street-regulator-probing-nvidia-s-accounting-reuters-says"
+      },
+      {
+        "title": "Newsquawk weekly economic calendar 23-27 Nov 2026",
+        "url": "https://www.newsquawk.com/headlines/newsquawk-weekly-economic-calendar---23rd-27th-november-2026"
       }
     ]
   },
@@ -103,26 +108,33 @@
   "week": {
     "weekOf": "2026-11-23",
     "happened": [
-      "Week of 16 Nov, AI unwind: S&P 500 -8.6% to 6,910, Nasdaq Composite -10.0%, VIX 19.3 to 35.9.",
-      "Nvidia beat on Tue 17 Nov (revenue $115.8bn, up 103%; Q4 guide $130bn against about $125bn expected) yet fell 23% on the week, 14% of it on Friday on the reported SEC probe. The Anthropic IPO jumped on its first day (19 Nov) and did not stop the selloff.",
-      "Treasuries rallied (US 10-year 4.91%, -24bp), the dollar index edged up to 103.8, gold fell 9.5% to a one-year low, WTI crude -5% to $84, Bitcoin about -9% to $59k.",
-      "FX on the week: JPY strongest (+1.1% against the other seven), USD next (+1.0%), AUD weakest (-1.6%); AUDJPY -2.3%.",
-      "Positioning (CFTC, 17 Nov): USD long crowded on both groups (asset managers 85, leveraged funds 92 of 100 in three years); EUR at three-year lows for both, though asset managers are still net long."
+      "Week of 16 Nov: S&P 500 -8.6% to 6,910, Nasdaq Composite -10.0%, VIX +16.6pt to 35.9.",
+      "Nvidia reported Q3 on Tue 17 Nov, then fell more than 20% on the week amid the reported SEC inquiry and turmoil after Jensen Huang left as CEO; the board has ruled out his return. The Anthropic IPO had a volatile debut and did not stop the selloff.",
+      "US 10-year yield 4.91% (-24bp), dollar index 103.81 (+0.4%), gold -9.5% to 3,515, WTI crude -5.8% to 83.41, Bitcoin -6.6% to 61,007.",
+      "FX on the week: JPY strongest (+1.1% against the other seven), USD next (+1.0%), AUD weakest (-1.6%); AUDJPY -2.3%."
     ],
     "ahead": [
-      "Mon 23 Nov: flash PMIs (euro area, Germany, UK, US).",
-      "Wed 25 Nov, the heavy US day: October PCE prices (core PCE is the one), Q3 GDP second estimate (first estimate 3.4% annualised), durable goods, new home sales, the Fed Beige Book. Australian CPI the same day.",
-      "Thu 26 Nov: US markets shut for Thanksgiving. Fri 27 Nov: early US close (13:00 New York); thin liquidity can exaggerate moves.",
-      "RBNZ: no confirmed decision date found for this week; check the RBNZ calendar. Exact release times: Market Context calendar."
+      "Mon 23 Nov: November flash PMIs (US, euro area, Germany, France, UK, Japan, Australia).",
+      "Wed 25 Nov: US October PCE prices (headline and core) and the Q3 GDP second estimate (first estimate 3.4% annualised); Australian October CPI the same day, the last CPI before the RBA December meeting.",
+      "Thu 26 Nov: US markets shut for Thanksgiving. Fri 27 Nov: shortened US session, no major US data scheduled.",
+      "Central banks: no decision confirmed this week for the eight majors. RBNZ next Monetary Policy Statement is 9 Dec (RBNZ schedule). Exact release times: Market Context calendar."
     ],
     "sources": [
       {
-        "title": "NVIDIA: Q3 fiscal 2027 results",
-        "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/default.aspx"
+        "title": "Newsquawk: week in focus 23-27 Nov (US PCE, flash PMIs, Aussie CPI)",
+        "url": "https://www.newsquawk.com/headlines/week-in-focus--november-23rd-27th-highlights-include-us-pce-flash-pmis-aussie-cpi-and-ecb-minutes"
       },
       {
-        "title": "FinancialJuice: week ahead 23-27 Nov",
-        "url": "https://features.financialjuice.com/2026/11/20/week-ahead-economic-indicators-23rd-27th-november-us/"
+        "title": "RBNZ: monetary policy and FSR dates Aug 2026 to Feb 2027",
+        "url": "https://www.rbnz.govt.nz/news-and-events/news/2025/10/monetary-policy-and-financial-stability-report-dates-august-2026-to-february-2027"
+      },
+      {
+        "title": "NST: Nvidia faces SEC probe after Huang resignation",
+        "url": "https://nst.com.my/amp/world/world/2026/11/1582860/nvidia-faces-sec-probe-amid-turmoil-following-huangs-resignation"
+      },
+      {
+        "title": "Journalarta: stocks to watch this week (22 Nov)",
+        "url": "https://journalarta.com/en/2026/11/22/stocks-to-watch-this-week-nvidia-workday-deere-and-thanksgiving-pce-data/"
       }
     ]
   }
