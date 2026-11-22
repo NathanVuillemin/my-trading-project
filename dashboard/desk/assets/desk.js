@@ -324,8 +324,20 @@ const DAILY_QUESTIONS = [
 
 render.hub = async (main) => {
   const today = ymd(), target = scMonday();
-  const [index, ks, lv, notes, news] = await Promise.all([loadLive('scorecard-index', true), loadLive('killswitches', true), loadLive('levels', true), loadLive('daily-notes', true), loadLive('news', true).catch(() => null), loadPrices()]);
-  let attrKey = 'wtdPct';
+  const [index, ks, lv, notes, news, drv] = await Promise.all([loadLive('scorecard-index', true), loadLive('killswitches', true), loadLive('levels', true), loadLive('daily-notes', true), loadLive('news', true).catch(() => null), loadLive('drivers', true).catch(() => null), loadPrices()]);
+  let attrKey = 'wtdPct', moveKey = 'z5d';
+  // Unusual moves (Alfie's vol-adjusted ranking): each market's move against its own normal day, biggest first.
+  const movesHtml = (k) => {
+    const mv = drv?.moves;
+    if (!mv?.rows?.length) return '<div class="empty small">No move data yet.</div>';
+    const rows = [...mv.rows].sort((a, b) => Math.abs(b[k]) - Math.abs(a[k])), cap = 4;
+    const row = (r) => { const z = r[k], m = k === 'z1d' ? r.move1d : r.move5d, w = Math.min(Math.abs(z), cap) / cap * 50;
+      return `<div class="mv-row ${Math.abs(z) >= 2 ? 'hot' : ''}"><span class="mv-name">${esc(r.name)} <span class="faint small">${esc(r.group)}</span></span>
+        <span class="mv-track"><span class="mv-fill ${z >= 0 ? 'up' : 'down'}" style="${z >= 0 ? 'left:50%' : `left:${50 - w}%`};width:${w}%"></span></span>
+        <span class="num small ${m > 0 ? 'up' : m < 0 ? 'down' : 'muted'}">${m > 0 ? '+' : ''}${m}${r.unit === 'bp' ? 'bp' : '%'}</span><span class="num small mv-z" title="times its normal move">${Math.abs(z).toFixed(1)}×</span></div>`; };
+    return `${rows.slice(0, 6).map(row).join('')}<details class="mv-all"><summary class="small">All ${rows.length} markets</summary>${rows.slice(6).map(row).join('')}</details>
+      <p class="small faint">Bar and × = the move divided by that market's typical ${k === 'z1d' ? 'day' : 'week'} over the last three months; 2× or more (amber edge) happens about one ${k === 'z1d' ? 'day' : 'week'} in twenty. Last close ${esc(fmtDate(mv.asOf))}.</p>`;
+  };
   // News stays where it is published: links out, plus a short written brief (data/news.json) of what happened and
   // what to look for. No feed on the desk.
   const newsHtml = () => {
@@ -434,6 +446,9 @@ render.hub = async (main) => {
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Whose story is it? Each currency against each other</h2>
         <span>${[['dayPct', 'Today'], ['wtdPct', 'This week'], ['m1Pct', '1 month']].map(([k, l]) => `<button class="chip ${attrKey === k ? 'on' : ''}" data-act="attr" data-k="${k}">${l}</button>`).join('')}</span></div>
         <div id="hub-attr">${attributionHtml(attrKey)}</div></section>
+      <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Unusual moves: what moved more than it normally does</h2>
+        <span>${[['z1d', 'Last day'], ['z5d', '5 days']].map(([k, l]) => `<button class="chip ${moveKey === k ? 'on' : ''}" data-act="moves" data-k="${k}">${l}</button>`).join('')}</span></div>
+        <div id="hub-moves">${movesHtml(moveKey)}</div></section>
       ${panel('News: summary and where to read it', newsHtml())}`;
     main.querySelectorAll('.tv[data-symbol]').forEach((el) => tvMini(el, el.dataset.symbol));
   };
@@ -453,6 +468,10 @@ render.hub = async (main) => {
       attrKey = b.dataset.k;
       b.parentElement.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b));
       $('#hub-attr').innerHTML = attributionHtml(attrKey);
+    } else if (b.dataset.act === 'moves') {
+      moveKey = b.dataset.k;
+      b.parentElement.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b));
+      $('#hub-moves').innerHTML = movesHtml(moveKey);
     } else if (b.dataset.act === 'save-links') {
       links.set({ ...links.get(), marketsDesk: $('#ln-md').value.trim() });
       Object.assign(note, { story: $('#dn-story').value, ifThen: $('#dn-ifthen').value, biasCheck: $('#dn-bias').value, done: [...main.querySelectorAll('[data-q]:checked')].map((x) => Number(x.dataset.q)) });
@@ -1619,11 +1638,30 @@ render.drivers = async (main) => {
       ${mats.map((m, i) => `<text x="${X(i)}" y="${H - 3}" text-anchor="middle" class="g-axis">${m}</text><text x="${X(i)}" y="${Y(cv.yields[m].now) - 6}" text-anchor="middle" class="g-num" fill="var(--accent)">${cv.yields[m].now}</text>`).join('')}</svg>
       <div class="pos-legend"><span class="pos-key" style="color:var(--accent)">— now</span><span class="pos-key" style="color:var(--pos-fast)">-- 1 month ago</span><span class="pos-key">-- 3 months ago</span></div>`;
   };
-  const rgTone = (t) => (/bull/.test(t) ? 'bull' : /bear/.test(t) ? 'bear' : 'flat');
-  const curvePanel = !cv ? '' : panel('US yield curve: the four moves', `<div class="drv-2"><div>${curveShape()}</div>
-    <div class="table-wrap"><table><thead><tr><th>Curve</th><th>Spread</th><th>1 week</th><th>1 month</th><th>Spread, 1 year</th></tr></thead><tbody>${cv.pairs.map((p) => `<tr><td><b>${p.front}-${p.back}</b></td><td class="num">${p.spreadBp}bp</td>
-      <td><span class="pill ${rgTone(p.w1.tag)}">${esc(p.w1.tag)}</span></td><td><span class="pill ${rgTone(p.m1.tag)}">${esc(p.m1.tag)}</span></td><td>${lineSvg(p.history, { h: 36, w: 140, hlines: [{ v: 0 }] })}</td></tr>`).join('')}</tbody></table></div></div>
-    <p class="small faint">Modules 03 and 03.1. Bull = yields fell, bear = yields rose; steepener = the long end rose relative to the short end. Different parts of the curve in different regimes at the same time is information.</p>`);
+  const rgTone = (t) => (/twist/.test(t) ? 'warn' : /bull/.test(t) ? 'bull' : /bear/.test(t) ? 'bear' : 'flat');
+  const rgCell = (r) => `<span class="pill ${rgTone(r.tag)}" title="${esc(r.read || '')}">${esc(r.tag)}</span>${r.frontBp != null ? `<div class="small faint" title="short end / long end, bp">${r.frontBp > 0 ? '+' : ''}${r.frontBp} / ${r.backBp > 0 ? '+' : ''}${r.backBp}bp</div>` : ''}`;
+  const curvePanel = !cv ? '' : panel('US yield curve: the four moves and the twists', `<div class="drv-2"><div>${curveShape()}</div>
+    <div><div class="table-wrap"><table><thead><tr><th>Curve</th><th>Spread</th><th>1 week</th><th>1 month</th><th>Spread, 1 year</th></tr></thead><tbody>${cv.pairs.map((p) => `<tr><td><b>${p.front}-${p.back}</b></td><td class="num">${p.spreadBp}bp</td>
+      <td>${rgCell(p.w1)}</td><td>${rgCell(p.m1)}</td><td>${lineSvg(p.history, { h: 36, w: 140, hlines: [{ v: 0 }] })}</td></tr>`).join('')}</tbody></table></div>
+      <ul class="list small" style="margin-top:8px">${[...new Set(cv.pairs.map((p) => p.m1.tag))].map((t) => { const r = cv.pairs.find((p) => p.m1.tag === t).m1; return `<li><span class="pill ${rgTone(t)}">${esc(t)}</span><span class="grow">${esc(r.read || '')} <span class="faint">(${cv.pairs.filter((p) => p.m1.tag === t).map((p) => `${p.front}-${p.back}`).join(', ')}, 1 month)</span></span></li>`; }).join('')}</ul></div></div>
+    <p class="small faint">Modules 03 and 03.1. Bull = yields fell, bear = yields rose; steepener = the long end rose relative to the short end. Under each tag: short end / long end move in bp. Twist (amber) = the two ends moved in opposite directions, 2bp or more each: the level label would hide it. Reads follow Alfie's MMH terminal. Different parts of the curve in different regimes at the same time is information.</p>`);
+
+  const cc = d.commodityCurves;
+  const ccSvg = (c) => {
+    const W = 220, H = 70, vals = c.points.flatMap((p) => [p.now, p.m1]).filter((v) => v != null), lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * 0.1 || hi * 0.01;
+    const X = (i) => 6 + (i * (W - 12)) / (c.points.length - 1), Y = (v) => H - 14 - ((v - lo + pad) / (hi - lo + 2 * pad)) * (H - 22);
+    const line = (k, col, dash = '') => `<polyline fill="none" stroke="${col}" stroke-width="2" ${dash ? `stroke-dasharray="${dash}"` : ''} points="${c.points.map((p, i) => (p[k] == null ? null : `${X(i)},${Y(p[k])}`)).filter(Boolean).join(' ')}"/>`;
+    return `<svg class="line-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.name)} futures curve now and a month ago">${line('m1', 'var(--faint)', '4 3')}${line('now', c.shape === 'backwardation' ? 'var(--warn)' : 'var(--accent)')}
+      <text x="4" y="${H - 2}" class="g-axis">${esc(c.points[0].month)}</text><text x="${W - 4}" y="${H - 2}" text-anchor="end" class="g-axis">${esc(c.points.at(-1).month)}</text></svg>`;
+  };
+  const gs = cc?.goldSilver;
+  const ccPanel = !cc ? '' : panel('Commodity curves: is supply tight now?', `<div class="stack">${cc.curves.map((c) => `<div class="stack-row cc-row"><div class="stack-name"><b>${esc(c.name)}</b><div class="small faint">for <span class="ccy">${esc(c.ccy)}</span></div></div>
+      <div><span class="pill ${c.shape === 'backwardation' ? 'warn' : c.shape === 'contango' ? 'flat' : 'flat'}">${esc(c.shape)}</span><div class="small">${esc(c.front)} vs ${esc(c.far)}: <span class="num">${c.spreadPct > 0 ? '+' : ''}${c.spreadPct}%</span></div>
+        <div class="small faint">a month ago ${c.spreadPct1m > 0 ? '+' : ''}${c.spreadPct1m ?? '—'}% · ${c.spreadPct1m == null ? '' : c.spreadPct > c.spreadPct1m ? 'tightening' : 'loosening'}</div></div>
+      <div>${ccSvg(c)}</div><div class="small muted">${esc(c.why)}</div></div>`).join('')}
+      ${gs ? `<div class="stack-row cc-row"><div class="stack-name"><b>Gold / silver ratio</b><div class="small faint">${esc(fmtDate(gs.asOf))}</div></div><div><span class="num big">${gs.value}</span><div class="small">1 month ${gs.chg1m > 0 ? '+' : ''}${gs.chg1m}</div></div>
+        <div>${lineSvg(gs.history, { h: 50, w: 220, label: 'Gold/silver ratio' })}</div><div>${pctileBar(gs.pctile1y)}<div class="small muted">A rising ratio = gold beating silver: defensive demand over industrial.</div></div></div>` : ''}</div>
+    <p class="small faint">Front futures month against the 7th listed month (solid now, dashed the same contracts a month ago). Backwardation (amber, front dearer) = supply tight now; contango = supply ample. From Alfie's MMH terminal. ${esc(cc.method)}</p>`);
 
   const gr = d.growth, GROUP = { leading: 'Leading: turns first', coincident: 'Coincident: the pulse now', lagging: 'Lagging: confirms after' };
   const disagree = gr && gr.breadth.leading.weaker > gr.breadth.leading.stronger && gr.breadth.coincident.stronger >= gr.breadth.coincident.weaker;
@@ -1672,7 +1710,7 @@ render.drivers = async (main) => {
   main.innerHTML = head('Drivers', 'What is driving each market, and when it stops: the market regime, each currency\'s real-world drivers and correlations against their normal, then the cross-asset readings Market Context does not carry (liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, every pair\'s trend regime). Updated daily.') +
     ((d.warns || []).length ? `<div class="note small">Data warnings: ${d.warns.map(esc).join(' · ')}</div>` : '') +
     regimeBanner(corr?.regime) + whoIsDriving(corr, card) +
-    liqPanel + goldPanel + curvePanel + growthPanel + infPanel + bouncePanel + sbPanel + pairsPanel;
+    liqPanel + goldPanel + curvePanel + ccPanel + growthPanel + infPanel + bouncePanel + sbPanel + pairsPanel;
 
   const toggle = (row) => {
     const id = row.dataset.link, box = main.querySelector(`[data-dive="${CSS.escape(id)}"]`);

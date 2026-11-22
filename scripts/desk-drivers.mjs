@@ -94,11 +94,27 @@ out.curve = await safe('curve', async () => {
   const dates = s['10Y'].map((x) => x.d), dLast = dates[dates.length - 1];
   const ago = (n) => dates[Math.max(0, dates.length - 1 - n)];
   // Bull = yields fell, bear = yields rose; steepener = back end higher relative to front, flattener = the reverse.
+  // Twist = the two legs moved in opposite directions by 2bp or more each (Alfie's MMH terminal): the level label
+  // would hide that one end rallied while the other sold off. Reads follow the same terminal.
+  const READ = {
+    'bull steepener': 'short end leads lower: easing priced in · growth up, inflation down',
+    'bear steepener': 'long end leads higher: term premium, reflation · growth up, inflation up',
+    'bear flattener': 'short end leads higher: hikes priced in · growth down, inflation up',
+    'bull flattener': 'long end leads lower: growth scare · growth down, inflation down',
+    'steepener twist': 'short end down, long end up: easing with inflation worry',
+    'flattener twist': 'short end up, long end down: tightening that markets think will slow growth',
+    unchanged: 'no meaningful move',
+  };
   const regime = (front, back, from) => {
     const df = at(s[front], dLast) - at(s[front], from), db = at(s[back], dLast) - at(s[back], from);
     const level = (df + db) / 2, slope = db - df;
-    if (Math.abs(slope) < 0.03 && Math.abs(level) < 0.03) return { tag: 'unchanged', level: r2(level), slope: r2(slope) };
-    return { tag: `${level < 0 ? 'bull' : 'bear'} ${slope > 0 ? 'steepener' : 'flattener'}`, level: r2(level), slope: r2(slope) };
+    const base = { level: r2(level), slope: r2(slope), frontBp: Math.round(df * 100), backBp: Math.round(db * 100) };
+    let tag;
+    if (Math.abs(slope) < 0.03 && Math.abs(level) < 0.03) tag = 'unchanged';
+    else if (df <= -0.02 && db >= 0.02) tag = 'steepener twist';
+    else if (df >= 0.02 && db <= -0.02) tag = 'flattener twist';
+    else tag = `${level < 0 ? 'bull' : 'bear'} ${slope > 0 ? 'steepener' : 'flattener'}`;
+    return { tag, read: READ[tag], ...base };
   };
   const PAIRS = [['3M', '2Y'], ['2Y', '5Y'], ['2Y', '10Y'], ['5Y', '30Y'], ['10Y', '30Y']];
   return {
@@ -245,6 +261,73 @@ out.pairs = await safe('pairs', async () => {
     res[b + q] = { trend, vol, regime: `${trend === 'up' ? 'rising' : 'falling'}, ${vol} volatility`, vsEmaPct: r2((px[n - 1] / emas[n - 1] - 1) * 100), volRatio: r2(volNow / volMed) };
   }
   return { asOf: dates[dates.length - 1], method: 'Trend: close vs 50-day EMA. Volatility: 20-day average absolute daily move vs its 1-year median.', pairs: res };
+});
+
+// ---------- unusual moves (Alfie's vol-adjusted z ranking) ----------
+// Each market's last-day and 5-day move divided by its own typical move: the standard deviation of daily moves over
+// the 60 sessions before. |z| of 2 or more is a move it makes about one day in twenty. Yields move in bp, not %.
+out.moves = await safe('moves', async () => {
+  const LIST = [
+    ['DXY', 'DX-Y.NYB', 'FX'], ['EURUSD', 'EURUSD=X', 'FX'], ['GBPUSD', 'GBPUSD=X', 'FX'], ['USDJPY', 'JPY=X', 'FX'], ['AUDUSD', 'AUDUSD=X', 'FX'],
+    ['NZDUSD', 'NZDUSD=X', 'FX'], ['USDCAD', 'CAD=X', 'FX'], ['USDCHF', 'CHF=X', 'FX'], ['AUDJPY', 'AUDJPY=X', 'FX'],
+    ['Gold', 'GC=F', 'Commodity'], ['Silver', 'SI=F', 'Commodity'], ['WTI oil', 'CL=F', 'Commodity'], ['Brent oil', 'BZ=F', 'Commodity'], ['Copper', 'HG=F', 'Commodity'], ['Natural gas', 'NG=F', 'Commodity'],
+    ['S&P 500', '^GSPC', 'Equity'], ['Nasdaq 100', '^NDX', 'Equity'], ['Euro Stoxx 50', '^STOXX50E', 'Equity'], ['Nikkei 225', '^N225', 'Equity'],
+    ['VIX', '^VIX', 'Risk'], ['US 10Y yield', '^TNX', 'Rates', 'bp'], ['US 3M yield', '^IRX', 'Rates', 'bp'], ['Bitcoin', 'BTC-USD', 'Crypto'],
+  ];
+  const rows = [];
+  for (const [name, sym, group, unit = '%'] of LIST) {
+    const s = await safe(`moves ${name}`, () => yahoo(sym, '6mo'));
+    if (!s || s.length < 70) continue;
+    const ch = (a, b) => (unit === 'bp' ? (a - b) * 100 : (a / b - 1) * 100);
+    const d = s.map((x, i) => (i ? ch(x.v, s[i - 1].v) : null)).slice(1), n = d.length;
+    const win = d.slice(n - 66, n - 6), mean = win.reduce((a, b) => a + b, 0) / win.length;
+    const sd = Math.sqrt(win.reduce((a, b) => a + (b - mean) ** 2, 0) / (win.length - 1));
+    const m1 = d[n - 1], m5 = ch(s[s.length - 1].v, s[s.length - 6].v);
+    rows.push({ name, group, unit, asOf: s[s.length - 1].d, move1d: r2(m1), move5d: r2(m5), z1d: r2(m1 / sd, 1), z5d: r2(m5 / (sd * Math.sqrt(5)), 1), typical: r2(sd), spark: s.slice(-30).map((x) => r2(x.v, 4)) });
+  }
+  if (rows.length < 10) throw new Error(`only ${rows.length} markets`);
+  // The date most markets share (Bitcoin trades at weekends and would otherwise date the whole list).
+  const counts = rows.reduce((m, r) => ({ ...m, [r.asOf]: (m[r.asOf] || 0) + 1 }), {});
+  return { asOf: Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0], method: 'Move divided by the standard deviation of daily moves over the 60 sessions before the last 5; the 5-day z uses that times √5.', rows };
+});
+
+// ---------- commodity curve shape ----------
+// Front futures month against the months after it (Yahoo carries each contract). Front above later months =
+// backwardation: supply tight now. Front below = contango: supply ample, storage paid for. Compared with the same
+// contracts a month ago, so the change is the curve itself, not a roll.
+out.commodityCurves = await safe('commodityCurves', async () => {
+  const CODES = 'FGHJKMNQUVXZ';
+  const months = (k) => { const d = new Date(); return Array.from({ length: k }, (_, i) => { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + i, 1)); return { code: CODES[t.getUTCMonth()] + String(t.getUTCFullYear()).slice(2), label: t.toLocaleString('en', { month: 'short', year: '2-digit', timeZone: 'UTC' }) }; }); };
+  const LIST = [
+    { key: 'WTI', name: 'WTI crude oil', root: 'CL', ex: 'NYM', ccy: 'CAD', why: 'Canada exports oil; Japan imports it.' },
+    { key: 'BRENT', name: 'Brent crude oil', root: 'BZ', ex: 'NYM', ccy: 'CAD', why: 'The world oil price; Europe and Japan import it.' },
+    { key: 'NG', name: 'US natural gas', root: 'NG', ex: 'NYM', ccy: 'EUR', why: 'Gas costs weigh on Europe\'s industry and trade balance. Seasonal: winter months always trade higher, so compare with a month ago, not with zero.' },
+    { key: 'HG', name: 'Copper', root: 'HG', ex: 'CMX', ccy: 'AUD', why: 'China\'s building and grid demand; Australia and Chile export it.' },
+    { key: 'GC', name: 'Gold', root: 'GC', ex: 'CMX', ccy: 'CHF', why: 'Gold is normally in contango (carry); backwardation means physical is scarce.' },
+  ];
+  const res = [];
+  for (const c of LIST) {
+    const pts = [];
+    for (const m of months(14)) {
+      const s = await yahoo(`${c.root}${m.code}.${c.ex}`, '3mo').catch(() => null); // expired months answer 404: expected, not a warning
+      if (!s || s.length < 5 || s[s.length - 1].d < daysAgo(6)) continue; // expired or untraded contract
+      pts.push({ month: m.label, now: r2(s[s.length - 1].v, 3), m1: r2(at(s, daysAgo(30)), 3) });
+      if (pts.length >= 7) break;
+    }
+    if (pts.length < 4) { warns.push(`commodityCurves ${c.key}: only ${pts.length} months`); continue; }
+    const far = pts[Math.min(6, pts.length - 1)];
+    const spread = (k) => (pts[0][k] && far[k] ? r2((pts[0][k] / far[k] - 1) * 100) : null);
+    const now = spread('now'), ago = spread('m1');
+    res.push({ ...c, front: pts[0].month, far: far.month, spreadPct: now, spreadPct1m: ago, shape: now > 0.5 ? 'backwardation' : now < -0.5 ? 'contango' : 'flat', points: pts });
+  }
+  const [gc, si] = await Promise.all([yahoo('GC=F', '2y'), yahoo('SI=F', '2y')]);
+  const ratio = gc.filter((x) => at(si, x.d)).map((x) => ({ d: x.d, v: x.v / at(si, x.d) }));
+  const win = ratio.slice(-252).map((x) => x.v), nowR = last(ratio).v;
+  return {
+    asOf: daysAgo(0), method: 'Spread = front month vs the 7th listed month (or the furthest found), in %. Above +0.5% backwardation, below -0.5% contango.',
+    curves: res,
+    goldSilver: { asOf: last(ratio).d, value: r2(nowR, 1), chg1m: r2(nowR - ratio[Math.max(0, ratio.length - 22)].v, 1), pctile1y: pctile(win, nowR), history: weekly(ratio) },
+  };
 });
 
 out.warns = warns;

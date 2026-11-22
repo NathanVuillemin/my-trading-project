@@ -502,3 +502,21 @@ tr.rg-now td { background: rgba(106, 168, 255, 0.08); }
   .hd-track { display: none; }
   .hd-head span:nth-child(2) { grid-column: 2; } .hd-head span:nth-child(3) { grid-column: 3; }
 }
+
+/* ---------- unusual moves (Today) and commodity curves (Drivers) ---------- */
+.mv-row { display: grid; grid-template-columns: minmax(8em, 13em) minmax(0, 1fr) 5.5em 3.5em; gap: 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.mv-row.hot { box-shadow: inset 3px 0 0 var(--warn); padding-left: 8px; }
+.mv-track { position: relative; height: 10px; background: var(--panel-2); border-radius: 4px; }
+.mv-track::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--faint); }
+.mv-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.mv-fill.up { background: var(--bull); }
+.mv-fill.down { background: var(--bear); }
+.mv-z { text-align: right; color: var(--muted); }
+.mv-row .num.small { text-align: right; }
+.mv-all summary { cursor: pointer; color: var(--accent); margin: 6px 0; }
+.cc-row { grid-template-columns: minmax(120px, 1fr) minmax(130px, 1fr) minmax(160px, 1.3fr) minmax(140px, 1.4fr); }
+@media (max-width: 760px) {
+  .mv-row { grid-template-columns: minmax(0, 1fr) 5em 3em; }
+  .mv-track { display: none; }
+  .cc-row { grid-template-columns: 1fr 1fr; }
+}
