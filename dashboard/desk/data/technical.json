@@ -1,0 +1,132 @@
+{
+  "updated": "2026-11-22",
+  "note": "How I enter a trade once the macro work has picked the pair and the direction. Four confluences, one pattern, one order type: a limit order placed into liquidity, never into a zone.",
+  "source": {
+    "title": "Once you master this strategy, trading becomes EASY",
+    "by": "The Trading Academy",
+    "url": "https://www.youtube.com/watch?v=4D_qeupvNWM",
+    "example": "AUDCHF daily, bullish and bearish legs"
+  },
+  "pattern": {
+    "intro": "Every setup is the same five moves. The fake out and the liquidation are what trap the traders who bought the breakout or the retest; the continuation is the trade.",
+    "steps": [
+      ["Push", "Impulse breaks structure (a new high in an uptrend)."],
+      ["Pullback", "Price comes back towards the broken level."],
+      ["Fake out", "A bounce at the breakout area. Traders go long on the retest, stops under the low they think is strong."],
+      ["Liquidation", "Price sweeps the low that broke the high and stops those traders out. Some flip short here."],
+      ["Continuation", "The real move in the trend's direction. Both the stopped longs and the new shorts are fuel."]
+    ]
+  },
+  "confluences": [
+    {
+      "n": 1,
+      "name": "Market structure",
+      "check": "Trend is clear on the daily, and the impulse is drawn from a strong low to the high that broke structure.",
+      "detail": [
+        "Read momentum first: is price making higher highs (bullish) or lower lows (bearish)?",
+        "Draw the impulse: from the swing low to the high that broke structure.",
+        "The swing low only counts as a strong low if it swept liquidity to its left before the push. A low that took nothing out is weak and will likely be taken.",
+        "Stops go beyond the strong low. Nowhere else."
+      ]
+    },
+    {
+      "n": 2,
+      "name": "Liquidity",
+      "check": "A liquidity low inside the impulse, ideally on the daily, has been marked as the entry.",
+      "detail": [
+        "Liquidity lives inside the impulse only: the small pullbacks within the leg that broke structure.",
+        "Spot them on the daily as bearish candles sitting on top of a bullish leg. On a lower timeframe those are pullback lows, with demand and stop losses just underneath.",
+        "Never trade from the demand zone itself. Most demand zones get swept, which is where everyone's stop sits. Enter where the stops are, not where the buyers are.",
+        "Daily liquidity is stronger than 4H, 1H or 15m. Drop to 4H only to see the pullback lows more clearly."
+      ]
+    },
+    {
+      "n": 3,
+      "name": "Premium and discount",
+      "check": "The entry sits at or below the 0.5 of the impulse (longs), at or above it (shorts).",
+      "detail": [
+        "Fibonacci at 0, 0.5 and 1 only, anchored on the strong low and the impulse high.",
+        "A healthy pullback reaches about 0.5. Below it is discount: where longs belong.",
+        "If the fib is anchored on a weak low, the whole read is wrong. Anchor on the strong low."
+      ]
+    },
+    {
+      "n": 4,
+      "name": "Order flow or an open",
+      "check": "The liquidity low lines up with order flow, or with a monthly, quarterly or six-monthly open.",
+      "detail": [
+        "Either a fractal structure break or an order-flow area confirms the level.",
+        "Or the opens indicator (daily, weekly, monthly opens by SBTNC on TradingView).",
+        "A liquidity low that sits on a monthly, quarterly or six-monthly open is the best case: the video calls it a golden opportunity."
+      ]
+    }
+  ],
+  "entry": [
+    ["Order", "Buy limit just under the liquidity low (sell limit just above the liquidity high). Price has to sweep the level to fill you."],
+    ["Option A", "Enter at the first liquidity low, stop under the second liquidity low. Tighter stop, more fills missed."],
+    ["Option B", "Enter at the second (deeper) liquidity low, stop under the strong low. Wider stop, safer."],
+    ["Stop", "Beyond a strong low: one that swept liquidity before the impulse. Never under a plain demand zone."],
+    ["Target", "A new higher high (lower low for shorts). The trend runs until price takes out the lowest point of the structure."],
+    ["Timeframe", "Daily for the map and the levels. 4H to see the pullback lows. No lower-timeframe trigger: the limit order is the entry."]
+  ],
+  "ltfRead": "On the 4H, a clean push, pullback, push, pullback with no liquidation means the lows are still sitting there: expect them to be taken before the real push. Once price has swept the pullback low, it is ready to continue.",
+  "missing": [
+    "Risk per trade and minimum reward to risk: not given. My AAA rule: 0.5 to 1% per trade, 1:3 minimum.",
+    "How long a limit order stays open, and when to cancel it if price runs without filling.",
+    "When to move the stop to break-even or take partials.",
+    "What counts as order flow in confluence 4 (separate video promised)."
+  ],
+  "vsAaa": [
+    {
+      "topic": "Where to enter",
+      "video": "Into liquidity: a limit just past the pullback low inside the impulse. Never from a demand zone.",
+      "aaa": "A valid untapped 4H/1H supply or demand zone is the point of interest (check 3).",
+      "tone": "bear",
+      "read": "Conflict. Settle by backtest: zone entry vs liquidity-low entry on the same impulses."
+    },
+    {
+      "topic": "Confirmation",
+      "video": "None on a lower timeframe. The limit fills on the sweep.",
+      "aaa": "Sweep, then a 15m to 1H fractal break before entering.",
+      "tone": "warn",
+      "read": "Video is earlier and catches more of the move; AAA waits and filters fakes. Try both."
+    },
+    {
+      "topic": "Timeframe",
+      "video": "Daily liquidity first.",
+      "aaa": "Daily and 4H bias, 1H zone, 15m trigger.",
+      "tone": "warn",
+      "read": "Video is a swing version, fewer and bigger trades. Suits an FX week driven by the Scorecard."
+    },
+    {
+      "topic": "Strong low",
+      "video": "A low that swept liquidity to its left before the impulse.",
+      "aaa": "A low confirmed by a fractal break after a sweep at the point of interest.",
+      "tone": "bull",
+      "read": "Same idea, seen from both sides. Stops behind it in both."
+    },
+    {
+      "topic": "Premium and discount",
+      "video": "0 / 0.5 / 1 fib from the strong low; about 0.5 is a healthy pullback.",
+      "aaa": "Longs only from discount of the active swing.",
+      "tone": "bull",
+      "read": "Agree."
+    },
+    {
+      "topic": "Opens",
+      "video": "Monthly, quarterly, six-monthly open plus a liquidity low = best setup.",
+      "aaa": "Not in the rulebook.",
+      "tone": "flat",
+      "read": "New confluence to add and test."
+    }
+  ],
+  "checklist": [
+    "Daily trend clear and on the side of my Scorecard pair",
+    "Impulse drawn from a strong low that swept liquidity first",
+    "Liquidity low marked inside the impulse (daily, or seen on 4H)",
+    "Entry at or past 0.5 of the impulse (discount for longs, premium for shorts)",
+    "Order flow, or a monthly / quarterly / six-monthly open, at the same level",
+    "Limit just past the liquidity, stop past the strong low",
+    "Target the next higher high / lower low, at least 1:3"
+  ]
+}

@@ -9,10 +9,12 @@ const PAGES = [
   { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard' },
   { id: 'countries', href: 'countries.html', label: 'Countries' },
   { id: 'playbook', href: 'playbook.html', label: 'Playbook' },
+  { id: 'technical', href: 'technical.html', label: 'Technical Setup' },
   { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
   { id: 'levels', href: 'levels.html', label: 'Key Levels' },
   { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
   { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
+  { id: 'holdings', href: 'holdings.html', label: 'Holdings' },
   { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
   { id: 'review', href: 'review.html', label: 'Review' },
 ];
@@ -1844,6 +1846,192 @@ render.playbook = async (main) => {
   main.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-layer]'); if (!b) return;
     layer = b.dataset.layer; const y = window.scrollY; draw(); window.scrollTo(0, y);
+  });
+  draw();
+};
+
+// ---------- technical setup (how I enter once the macro has picked the pair and direction) ----------
+// One bullish leg drawn as a path; the bearish one is the same drawing flipped top to bottom.
+function tsPattern(bull) {
+  const H = 230, fy = (y) => (bull ? y : H - y);
+  const pts = [[20, 200], [45, 160], [58, 172], [85, 115], [98, 128], [130, 60], [160, 108], [180, 90], [212, 140], [340, 18]];
+  const line = (y, x0, x1, cls, label) => `<line x1="${x0}" y1="${fy(y)}" x2="${x1}" y2="${fy(y)}" class="${cls}"/><text x="${x1 + 4}" y="${fy(y) + 4}" class="ts-lv ${cls}">${label}</text>`;
+  const tag = (x, y, t, up, anchor = 'middle') => `<text x="${x}" y="${fy(y) + ((up === bull) ? -8 : 16)}" text-anchor="${anchor}" class="ts-tag">${t}</text>`;
+  const low = bull ? 'low' : 'high';
+  return `<svg class="ts-svg" viewBox="0 0 400 ${H}" role="img" aria-label="${bull ? 'Bullish' : 'Bearish'} push, pullback, fake out, liquidation, continuation">
+    <rect x="20" y="${Math.min(fy(60), fy(200))}" width="120" height="140" class="ts-imp"/>
+    ${line(100, 0, 300, 'ts-old', bull ? 'old high' : 'old low')}
+    ${line(130, 0, 330, 'ts-fib', '0.5')}
+    ${line(133, 98, 250, 'ts-entry', bull ? 'buy limit' : 'sell limit')}
+    ${line(178, 58, 250, 'ts-stop', 'stop A')}
+    ${line(207, 20, 250, 'ts-stop', 'stop B')}
+    <polyline points="${pts.map(([x, y]) => `${x},${fy(y)}`).join(' ')}" class="ts-path ${bull ? 'bull' : 'bear'}"/>
+    ${[[58, 172], [98, 128]].map(([x, y]) => `<circle cx="${x}" cy="${fy(y)}" r="4" class="ts-liq"/>`).join('')}
+    <circle cx="20" cy="${fy(200)}" r="4" class="ts-strong"/>
+    ${tag(8, 200, `strong ${low}`, false, 'start')}${tag(35, 130, 'Push', true)}${tag(165, 108, 'Pullback', false)}${tag(180, 90, 'Fake out', true)}
+    ${tag(212, 140, 'Liquidation', false)}${tag(360, 60, 'Continuation', true)}${tag(98, 128, 'liq 1', false)}${tag(58, 172, 'liq 2', false)}
+  </svg>`;
+}
+
+render.technical = async (main) => {
+  const d = await load('technical');
+  const ticked = new Set();
+  const conf = (c) => `<div class="ts-conf"><div class="ts-conf-h"><span class="ts-n">${c.n}</span><b>${esc(c.name)}</b></div>
+    <div class="small">${esc(c.check)}</div><ul class="steps small muted">${c.detail.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  const checklist = () => `<ul class="checks">${d.checklist.map((c, i) => `<li><input type="checkbox" data-tick="${i}" ${ticked.has(i) ? 'checked' : ''}><span class="grow">${esc(c)}</span></li>`).join('')}</ul>
+    <div class="ts-score"><span class="pill ${ticked.size === d.checklist.length ? 'bull' : ticked.size ? 'warn' : 'flat'}">${ticked.size} of ${d.checklist.length}</span>
+    <span class="small muted">${ticked.size === d.checklist.length ? 'All pass: the setup is on.' : 'Take it only when every line passes. Ticks are not saved.'}</span></div>`;
+  main.innerHTML = head('Technical Setup', esc(d.note), `<a class="btn" href="${esc(d.source.url)}" target="_blank" rel="noopener">Source video →</a>`) +
+    panel('The pattern', `<p class="small muted">${esc(d.pattern.intro)}</p>
+      <div class="chain-row" style="margin-bottom:12px">${d.pattern.steps.map(([a, b], i) => `${i ? '<span class="chain-arrow" aria-hidden="true">→</span>' : ''}<div class="chain-step ${i === 4 ? '' : 'dark'}" title="${esc(b)}"><b>${esc(a)}</b></div>`).join('')}</div>
+      <div class="ts-pair"><figure>${tsPattern(true)}<figcaption class="small faint">Bullish</figcaption></figure><figure>${tsPattern(false)}<figcaption class="small faint">Bearish</figcaption></figure></div>
+      <ol class="steps small">${d.pattern.steps.map(([a, b]) => `<li><b>${esc(a)}</b>: ${esc(b)}</li>`).join('')}</ol>
+      <p class="small faint">Shaded box = the impulse. Dots = liquidity lows inside it. Example in the video: ${esc(d.source.example)}.</p>`) +
+    panel('Four confluences', `<div class="ts-confs">${d.confluences.map(conf).join('')}</div>`, null, 'ts-gap') +
+    panel('Entry, stop, target', `<div class="fact-grid">${d.entry.map(([k, v]) => `<div class="fact"><div class="fact-k">${esc(k)}</div><div>${esc(v)}</div></div>`).join('')}</div>
+      <p class="small muted" style="margin-top:10px">${esc(d.ltfRead)}</p>`, null, 'ts-gap') +
+    `<section class="panel ts-gap"><div class="panel-head"><h2>Pre-trade checklist</h2></div><div id="ts-check">${checklist()}</div></section>` +
+    panel('Against my AAA rulebook', `<div class="table-wrap"><table class="ts-table"><thead><tr><th>Topic</th><th>This video</th><th>AAA rulebook</th><th>Read</th></tr></thead><tbody>
+      ${d.vsAaa.map((r) => `<tr><td><b>${esc(r.topic)}</b></td><td>${esc(r.video)}</td><td class="muted">${esc(r.aaa)}</td><td><span class="pill ${esc(r.tone)}">${{ bull: 'agree', bear: 'conflict', warn: 'differs', flat: 'new' }[r.tone]}</span> <span class="small">${esc(r.read)}</span></td></tr>`).join('')}
+      </tbody></table></div>`, null, 'ts-gap') +
+    panel('Not in the video', `<ul class="steps small">${d.missing.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      <p class="small faint">Source: ${esc(d.source.by)}, "${esc(d.source.title)}". Summarised in my own words. Updated ${fmtDate(d.updated)}.</p>`, null, 'ts-gap');
+  main.addEventListener('change', (ev) => {
+    const i = ev.target.dataset?.tick; if (i == null) return;
+    ev.target.checked ? ticked.add(+i) : ticked.delete(+i);
+    $('#ts-check', main).innerHTML = checklist();
+  });
+};
+
+// ---------- yields & holdings (pair yield check, who holds Treasuries, gold, reserve shares) ----------
+// Data: data/holdings.json, written daily by scripts/desk-holdings.mjs. Simple view first; each row opens for more.
+const YC_KEY = 'desk.yieldPairs';
+const YC_RULE = 10; // bp over a month: the Macro Tracker's "yields confirm" threshold
+// Value of a dated series on a day: the last point on or before it.
+const asOf = (s, day) => { let v = null; for (let i = 0; i < s.dates.length && s.dates[i] <= day; i++) v = s.values[i]; return v; };
+const dayMinus = (iso, n) => new Date(Date.parse(iso + 'T12:00:00Z') - n * 864e5).toISOString().slice(0, 10);
+// Pair yield gap = base 2Y minus quote 2Y, in bp, on the dates of the sparser leg.
+function ycGap(y, pair) {
+  const a = y[pair.slice(0, 3)], b = y[pair.slice(3)];
+  const why = [a, b].find((s) => s?.missing)?.missing;
+  if (!a?.dates || !b?.dates) return { pair, missing: why || 'no yield data' };
+  const lead = a.dates.length <= b.dates.length ? a : b, monthly = a.freq === 'monthly' || b.freq === 'monthly';
+  const pts = lead.dates.map((d) => { const va = asOf(a, d), vb = asOf(b, d); return va == null || vb == null ? null : [d, Math.round((va - vb) * 100)]; }).filter(Boolean);
+  const last = pts.at(-1), at = (n) => { const d = dayMinus(last[0], n); const p = pts.filter(([x]) => x <= d).at(-1); return p ? last[1] - p[1] : null; };
+  return { pair, a, b, monthly, pts, last, d1w: monthly ? null : at(7), d1m: at(monthly ? 31 : 30), d3m: at(91) };
+}
+const bp = (n) => (n == null ? '<span class="faint">—</span>' : `<span class="num ${n > 0 ? 'up' : n < 0 ? 'down' : 'muted'}">${n > 0 ? '+' : ''}${n} bp</span>`);
+const usd = (n) => (n == null ? '—' : `$${Math.round(n).toLocaleString()}bn`);
+const tn = (n) => (n == null ? '—' : `${Math.round(n).toLocaleString()} t`);
+const chg = (n, unit) => (n == null ? '<span class="faint">—</span>' : `<span class="num ${n > 0 ? 'up' : n < 0 ? 'down' : 'muted'}">${n > 0 ? '+' : ''}${Math.round(n).toLocaleString()}${unit}</span>`);
+const monthName = (ym) => (ym ? new Date(ym + '-15T12:00:00Z').toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : '—');
+// TIC names to IMF codes, so a country lookup shows Treasuries and gold together.
+const TIC_CODE = { Japan: 'JPN', 'United Kingdom': 'GBR', 'China, Mainland': 'CHN', Belgium: 'BEL', 'Cayman Islands': 'CYM', Canada: 'CAN', Luxembourg: 'LUX', Ireland: 'IRL', France: 'FRA', Taiwan: 'TWN', Switzerland: 'CHE', Singapore: 'SGP', 'Hong Kong': 'HKG', India: 'IND', Norway: 'NOR', Brazil: 'BRA', 'Korea, South': 'KOR', 'Saudi Arabia': 'SAU', Bermuda: 'BMU', 'United Arab Emirates': 'ARE', Germany: 'DEU', Mexico: 'MEX', Israel: 'ISR', Thailand: 'THA', Philippines: 'PHL', Australia: 'AUS', Sweden: 'SWE', Netherlands: 'NLD', Kuwait: 'KWT', Colombia: 'COL', Poland: 'POL', Turkey: 'TUR', Spain: 'ESP', Italy: 'ITA', Chile: 'CHL', Peru: 'PER', Vietnam: 'VNM' };
+
+render.holdings = async (main) => {
+  const [h, index] = await Promise.all([loadLive('holdings'), loadLive('scorecard-index', true).catch(() => null)]);
+  const y = h.yields || {}, tic = h.tic, gold = h.gold, cofer = h.cofer;
+  const myCalls = Object.fromEntries((index?.weeks || []).find((w) => (w.pairs || []).length)?.pairs.map((p) => [p.pair, p.dir]) || []);
+  let pairs;
+  try { pairs = JSON.parse(localStorage.getItem(YC_KEY)); } catch { pairs = null; }
+  if (!Array.isArray(pairs) || !pairs.length) pairs = Object.keys(myCalls).length ? Object.keys(myCalls) : ['EURUSD', 'USDJPY'];
+  const savePairs = () => { try { localStorage.setItem(YC_KEY, JSON.stringify(pairs)); } catch { /* per-device convenience only */ } };
+
+  const ycCard = (pair) => {
+    const g = ycGap(y, pair), call = myCalls[pair];
+    const rm = `<button class="link-btn small" data-rm="${pair}" title="Remove">✕</button>`;
+    if (g.missing) return `<div class="yc-card"><div class="yc-h"><b>${pair}</b>${rm}</div><div class="small faint">${esc(g.missing)}</div></div>`;
+    const sig = g.d1m == null ? 0 : g.d1m >= YC_RULE ? 1 : g.d1m <= -YC_RULE ? -1 : 0;
+    const sigPill = sig ? `<span class="pill ${sig > 0 ? 'bull' : 'bear'}">yields back ${sig > 0 ? 'LONG' : 'SHORT'}</span>` : '<span class="pill flat">no yield signal</span>';
+    const callTxt = call ? `<div class="small">My call: <b>${esc(call)}</b> · ${!sig ? '<span class="muted">yields neutral</span>' : (sig > 0) === (call === 'LONG') ? '<span class="num up">yields agree</span>' : '<span class="num down">yields against</span>'}</div>` : '';
+    const leg = (c, s) => `<dt>${c} 2Y</dt><dd><span class="num">${s.values.at(-1).toFixed(2)}%</span> <span class="faint small">${esc(s.source)}, ${fmtDate(s.dates.at(-1))}${s.freq === 'monthly' ? ' (monthly)' : ''}</span></dd>`;
+    return `<div class="yc-card"><div class="yc-h"><b>${pair}</b>${sigPill}${rm}</div>
+      <div class="yc-big"><span class="num big">${g.last[1] > 0 ? '+' : ''}${g.last[1]} bp</span><span class="small muted">${pair.slice(0, 3)} 2Y minus ${pair.slice(3)} 2Y</span></div>
+      <div class="small">1 month ${bp(g.d1m)}</div>${callTxt}
+      ${(() => { const s = g.pts.slice(g.monthly ? -13 : -260), v = s.map((p) => p[1]); return lineSvg(s, { w: 300, h: 60, hlines: Math.min(...v) < 0 && Math.max(...v) > 0 ? [{ v: 0 }] : [], label: `${pair} 2Y gap` }); })()}
+      <details><summary>More</summary><dl>${leg(pair.slice(0, 3), g.a)}${leg(pair.slice(3), g.b)}
+        <dt>Change</dt><dd>1 week ${bp(g.d1w)} · 1 month ${bp(g.d1m)} · 3 months ${bp(g.d3m)}</dd></dl>
+        <p class="small faint">A gap widening ${YC_RULE}bp or more over a month in the base currency's favour backs a LONG; narrowing as much backs a SHORT.${g.monthly ? ' CHF is a monthly average, so this pair moves a month at a time and has no 1-week change.' : ''}</p></details></div>`;
+  };
+  const ycPanel = () => `<div class="filters"><label class="small muted" for="yc-add">Add a pair</label>
+      <select id="yc-add"><option value="">choose…</option>${ALL_PAIRS.filter((p) => !pairs.includes(p)).map((p) => `<option>${p}</option>`).join('')}</select>
+      ${Object.keys(myCalls).length ? `<button class="chip" data-mine>This week's pairs</button>` : ''}</div>
+    <div class="yc-grid">${pairs.map(ycCard).join('') || '<div class="empty">No pairs chosen.</div>'}</div>`;
+
+  // Country lookup: Treasuries (TIC) and gold (IMF) side by side.
+  const goldBy = Object.fromEntries((gold?.countries || []).map((c) => [c.code, c]));
+  const ticBy = Object.fromEntries((tic?.holders || []).filter((r) => TIC_CODE[r.country]).map((r) => [TIC_CODE[r.country], r]));
+  const lookup = [...new Set([...Object.keys(ticBy), ...(gold?.countries || []).slice(0, 60).map((c) => c.code)])]
+    .map((code) => ({ code, name: goldBy[code]?.name || ticBy[code]?.country || code })).sort((a, b) => a.name.localeCompare(b.name));
+  let country = 'CHN';
+  const ticSeries = (r) => tic.months.map((m, i) => [m, r.values[i]]).reverse();
+  const countryCard = () => {
+    const g = goldBy[country], t = ticBy[country];
+    const gN = g?.tonnes.length || 0;
+    const tBlock = t ? `<div><div class="fact-k">US Treasuries held</div><div class="num big">${usd(t.values[0])}</div>
+        <div class="small">1 month ${chg(t.values[0] - t.values[1], 'bn')} · 12 months ${chg(t.values[0] - t.values[12], 'bn')}</div>${lineSvg(ticSeries(t), { w: 300, h: 56, label: 'Treasuries held' })}<div class="small faint">${monthName(tic.asOf)}</div></div>`
+      : '<div><div class="fact-k">US Treasuries held</div><div class="small faint">Not among the Treasury\'s listed major holders.</div></div>';
+    const gBlock = g ? `<div><div class="fact-k">Central-bank gold</div><div class="num big">${tn(g.tonnes[gN - 1])}</div>
+        <div class="small">1 month ${chg(gN > 1 ? g.tonnes[gN - 1] - g.tonnes[gN - 2] : null, ' t')} · 12 months ${chg(gN > 12 ? g.tonnes[gN - 1] - g.tonnes[gN - 13] : null, ' t')}</div>${lineSvg(g.months.map((m, i) => [m, g.tonnes[i]]), { w: 300, h: 56, color: 'var(--warn)', label: 'Gold held' })}<div class="small faint">${monthName(g.months[gN - 1])}${g.months[gN - 1] < gold.asOf ? ': this country reports late' : ''}</div></div>`
+      : '<div><div class="fact-k">Central-bank gold</div><div class="small faint">Not reported to the IMF.</div></div>';
+    return `<div class="hd-country">${tBlock}${gBlock}</div>`;
+  };
+
+  const bars = (rows, max, cls) => rows.map((r) => `<details class="hd-row"><summary><span class="hd-name">${esc(r.name)}</span><span class="hd-track"><span class="hd-fill ${cls}" style="width:${Math.max(1, (Math.abs(r.v) / max) * 100)}%"></span></span><span class="hd-v">${r.label}</span><span class="hd-c">${r.chg}</span></summary>${r.more}</details>`).join('');
+  const ticPanel = () => {
+    if (!tic) return '<div class="empty">Treasury data unavailable today.</div>';
+    const ctry = tic.holders.filter((r) => TIC_CODE[r.country]).slice(0, 10), total = tic.holders.find((r) => r.country === 'Grand Total'), off = tic.holders.find((r) => r.country === 'Of Which: Foreign Official');
+    return `<div class="kpis" style="margin-bottom:10px"><div><label>All foreign holders</label><span class="num big">${usd(total?.values[0])}</span><div class="small">12 months ${chg(total ? total.values[0] - total.values[12] : null, 'bn')}</div></div>
+        <div><label>Of which governments and central banks</label><span class="num big">${usd(off?.values[0])}</span><div class="small">12 months ${chg(off ? off.values[0] - off.values[12] : null, 'bn')}</div></div></div>
+      <div class="hd-head small faint"><span>Top 10 holders</span><span>held</span><span>12 months</span></div>
+      ${bars(ctry.map((r) => ({ name: r.country, v: r.values[0], label: usd(r.values[0]), chg: chg(r.values[0] - r.values[12], 'bn'), more: `<div class="hd-more">${lineSvg(ticSeries(r), { w: 320, h: 70, label: r.country })}<div class="small">1 month ${chg(r.values[0] - r.values[1], 'bn')} · 3 months ${chg(r.values[0] - r.values[3], 'bn')}</div></div>` })), ctry[0].values[0], 'acc')}
+      <p class="small faint">US Treasury TIC, holdings at the end of ${monthName(tic.asOf)}, published about six weeks later. Custody centres (UK, Belgium, Luxembourg, Cayman) hold for others: they show where bonds are kept, not who owns them.</p>`;
+  };
+  const goldPanel = () => {
+    if (!gold) return '<div class="empty">Gold data unavailable today.</div>';
+    const row = (c) => { const n = c.tonnes.length; return { name: c.name, v: c.tonnes[n - 1], d12: n > 12 ? c.tonnes[n - 1] - c.tonnes[n - 13] : null, c }; };
+    const all = gold.countries.map(row), top = all.slice(0, 10), movers = all.filter((r) => r.d12 != null && Math.abs(r.d12) >= 1).sort((a, b) => b.d12 - a.d12);
+    const buyers = movers.slice(0, 8), sellers = movers.filter((r) => r.d12 < 0).slice(-5).reverse();
+    const more = (r) => `<div class="hd-more">${lineSvg(r.c.months.map((m, i) => [m, r.c.tonnes[i]]), { w: 320, h: 70, color: 'var(--warn)', label: r.name })}<div class="small faint">Last report ${monthName(r.c.months.at(-1))}</div></div>`;
+    const maxMove = Math.max(...movers.map((r) => Math.abs(r.d12)), 1);
+    return `<div class="hd-head small faint"><span>Biggest holders</span><span>held</span><span>12 months</span></div>
+      ${bars(top.map((r) => ({ name: r.name, v: r.v, label: tn(r.v), chg: chg(r.d12, ' t'), more: more(r) })), top[0].v, 'gold')}
+      <div class="hd-head small faint" style="margin-top:14px"><span>Biggest buyers, last 12 months</span><span>bought</span><span>now holds</span></div>
+      ${bars(buyers.map((r) => ({ name: r.name, v: r.d12, label: chg(r.d12, ' t'), chg: tn(r.v), more: more(r) })), maxMove, 'bull')}
+      <div class="hd-head small faint" style="margin-top:14px"><span>Biggest sellers, last 12 months</span><span>sold</span><span>now holds</span></div>
+      ${bars(sellers.map((r) => ({ name: r.name, v: r.d12, label: chg(r.d12, ' t'), chg: tn(r.v), more: more(r) })), maxMove, 'bear')}
+      <p class="small faint">IMF International Liquidity, gold in fine troy ounces converted to tonnes, to ${monthName(gold.asOf)}. Some countries report months late (shown when you open a row). Not every buyer reports to the IMF, so the World Gold Council's estimates of total central-bank buying run higher.</p>`;
+  };
+  const coferPanel = () => {
+    if (!cofer) return '<div class="empty">Reserve data unavailable today.</div>';
+    const NAME = { USD: 'US dollar', EUR: 'Euro', JPY: 'Japanese yen', GBP: 'Pound sterling', CNY: 'Chinese renminbi', CAD: 'Canadian dollar', AUD: 'Australian dollar', CHF: 'Swiss franc', OTHC: 'Other currencies' };
+    const qn = cofer.quarters.length, rows = Object.entries(cofer.shares).filter(([c]) => NAME[c]).map(([c, s]) => ({ c, now: s[qn - 1], yr: s[qn - 5], s })).sort((a, b) => b.now - a.now);
+    return `<div class="hd-head small faint"><span>Share of the world's FX reserves</span><span>${esc(cofer.asOf)}</span><span>1 year</span></div>
+      ${bars(rows.map((r) => ({ name: NAME[r.c], v: r.now, label: `${r.now.toFixed(1)}%`, chg: r.yr == null ? '—' : `<span class="num ${r.now - r.yr > 0 ? 'up' : 'down'}">${r.now - r.yr > 0 ? '+' : ''}${(r.now - r.yr).toFixed(2)} pts</span>`, more: `<div class="hd-more">${lineSvg(cofer.quarters.map((q, i) => [q, r.s[i]]), { w: 320, h: 70, label: NAME[r.c] })}</div>` })), rows[0].now, 'acc')}
+      <p class="small faint">IMF COFER, quarterly, world total. Countries do not publish their own currency mix here, so this is the world's, not one country's.</p>`;
+  };
+
+  const draw = () => {
+    main.innerHTML = head('Yields & Holdings', 'Does the yield gap back my pairs, and who holds what. The holdings change slowly: read them monthly.', '<a class="btn" href="drivers.html">Drivers →</a>') +
+      panel('Yield check', `<div id="yc">${ycPanel()}</div>`) +
+      `<section class="panel ts-gap"><div class="panel-head"><h2>Who holds what: by country</h2></div>
+        <div class="filters"><label class="small muted" for="hd-c">Country</label><select id="hd-c">${lookup.map((c) => `<option value="${c.code}" ${c.code === country ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div>
+        <div id="hd-card">${countryCard()}</div></section>` +
+      panel('Foreign holders of US Treasuries', ticPanel(), null, 'ts-gap') +
+      panel('Central-bank gold', goldPanel(), null, 'ts-gap') +
+      panel('Reserve-currency shares', coferPanel(), null, 'ts-gap') +
+      (h.warns?.length ? `<p class="small faint">Not refreshed today: ${esc(h.warns.join('; '))}. Showing the last good copy.</p>` : '') +
+      `<p class="small faint">Updated ${fmtDate(h.generatedAt.slice(0, 10))}. ${esc(h.sources)}</p>`;
+  };
+  const redrawYc = () => { $('#yc', main).innerHTML = ycPanel(); };
+  main.addEventListener('change', (ev) => {
+    if (ev.target.id === 'yc-add' && ev.target.value) { pairs = [...pairs, ev.target.value]; savePairs(); redrawYc(); }
+    if (ev.target.id === 'hd-c') { country = ev.target.value; $('#hd-card', main).innerHTML = countryCard(); }
+  });
+  main.addEventListener('click', (ev) => {
+    const rm = ev.target.closest('[data-rm]');
+    if (rm) { pairs = pairs.filter((p) => p !== rm.dataset.rm); savePairs(); redrawYc(); }
+    if (ev.target.closest('[data-mine]')) { pairs = Object.keys(myCalls); savePairs(); redrawYc(); }
   });
   draw();
 };

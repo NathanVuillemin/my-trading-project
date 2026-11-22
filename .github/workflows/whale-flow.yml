@@ -2,7 +2,7 @@ name: Daily desk
 
 # Runs in GitHub's cloud so the laptop doesn't have to be on. File name kept from when this job
 # only collected whale flow.
-# Every run: the Trading Desk's feeds (COT positioning, drivers, who-is-driving correlations, reference
+# Every run: the Trading Desk's feeds (COT positioning, drivers, who-is-driving correlations, yields and holdings, reference
 # closes) -> rebuild the static dashboard -> commit the snapshots -> publish dashboard/ (desk included) to Pages.
 #
 # The old dashboard's other collectors (whale flow, smart money, trust, portfolio, insiders, macro
@@ -127,6 +127,11 @@ jobs:
         continue-on-error: true
         run: node scripts/desk-drivers.mjs
 
+      - name: Yields and holdings for the desk (2Y yields, TIC, IMF gold and COFER)
+        id: holdings
+        continue-on-error: true
+        run: node scripts/desk-holdings.mjs
+
       - name: Build dashboard
         run: node scripts/build-dashboard.mjs
 
@@ -150,6 +155,7 @@ jobs:
             echo "| correlations | ${{ steps.corr.outcome }} |"
             echo "| positioning | ${{ steps.positioning.outcome }} |"
             echo "| drivers | ${{ steps.drivers.outcome }} |"
+            echo "| holdings | ${{ steps.holdings.outcome }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       # A step succeeding does not mean its data is usable. Feeds degrade without failing —
