@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-26T03:59:50.953Z",
+ "generatedAt": "2026-11-27T03:58:14.261Z",
  "lookbackYears": 3,
  "cotDate": "2026-11-17",
  "currencies": {
@@ -2651,19 +2651,18 @@
  ],
  "jpyFlows": {
   "source": "Japan Ministry of Finance, weekly, designated major investors",
-  "weekEnding": "2026-11-14",
+  "weekEnding": "2026-11-21",
   "unit": "JPY bn, net",
   "lines": [
    {
     "key": "outBonds",
     "label": "Japanese buying foreign bonds",
     "jpy": -1,
-    "week": -441,
-    "prevWeek": -534,
-    "sum4w": 255,
-    "index": 48,
+    "week": 424,
+    "prevWeek": -437,
+    "sum4w": 765,
+    "index": 60,
     "spark": [
-     -824,
      119,
      1091,
      -1905,
@@ -2674,19 +2673,19 @@
      -82,
      1312,
      -534,
-     -441
+     -437,
+     424
     ]
    },
    {
     "key": "outStocks",
     "label": "Japanese buying foreign stocks",
     "jpy": -1,
-    "week": 363,
-    "prevWeek": -658,
-    "sum4w": 1073,
-    "index": 76,
+    "week": -351,
+    "prevWeek": 363,
+    "sum4w": 433,
+    "index": 60,
     "spark": [
-     36,
      -479,
      156,
      44,
@@ -2696,20 +2695,20 @@
      129,
      290,
      1078,
-     -658,
-     363
+     -657,
+     363,
+     -351
     ]
    },
    {
     "key": "inStocks",
     "label": "Foreigners buying Japanese stocks",
     "jpy": 1,
-    "week": -224,
-    "prevWeek": -102,
-    "sum4w": 1985,
-    "index": 74,
+    "week": -572,
+    "prevWeek": -238,
+    "sum4w": 217,
+    "index": 41,
     "spark": [
-     36,
      690,
      -1520,
      -4942,
@@ -2720,19 +2719,19 @@
      1182,
      1129,
      -102,
-     -224
+     -238,
+     -572
     ]
    },
    {
     "key": "inBonds",
     "label": "Foreigners buying Japanese bonds",
     "jpy": 1,
-    "week": 650,
-    "prevWeek": 1371,
-    "sum4w": 3549,
-    "index": 94,
+    "week": 209,
+    "prevWeek": 650,
+    "sum4w": 3710,
+    "index": 95,
     "spark": [
-     509,
      444,
      2240,
      -84,
@@ -2742,8 +2741,9 @@
      1454,
      46,
      1482,
-     1371,
-     650
+     1370,
+     650,
+     209
     ]
    }
   ]
