@@ -556,3 +556,18 @@ tr.rg-now td { background: rgba(106, 168, 255, 0.08); }
 .rq-here { margin-bottom: 8px; }
 .rq-k { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 10px; }
 @media (max-width: 760px) { .rq-wrap { grid-template-columns: minmax(0, 1fr); } }
+
+/* regime: eight scenarios, rate families, volatility gauges */
+.gil-grid { display: grid; grid-template-columns: 9em repeat(4, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+.gil-h { color: var(--muted); padding: 2px 4px; }
+.gil-r { display: flex; align-items: center; }
+.gil-c { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.gil-c.on { border-color: var(--accent); background: rgba(106, 168, 255, 0.12); }
+.rf-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.list li.rf-row { display: grid; grid-template-columns: minmax(0, 1fr) 4.2em 3.6em 90px; gap: 6px; align-items: center; }
+.vg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.vg { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.vg-v { display: flex; align-items: baseline; gap: 8px; }
+.vg .line-svg { height: 34px; }
+@media (max-width: 960px) { .rf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .vg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .gil-grid { grid-template-columns: 6em repeat(4, minmax(0, 1fr)); font-size: 11px; } .rf-grid, .vg-grid { grid-template-columns: minmax(0, 1fr); } }

@@ -228,3 +228,23 @@ test('quadrantRead: changes over a window, trail points, box and near-line flag'
   const flat = quadrantRead(new Map(dates.map((d) => [d, 1])), ys, { w: 63, lags: [], band: 5 });
   assert.equal(flat.xSide, 'line');
 });
+
+const dseq = (n) => Array.from({ length: n }, (_, i) => new Date(Date.UTC(2024, 0, 1) + i * 864e5).toISOString().slice(0, 10));
+test('realisedVol: alternating ±1% daily moves annualise to about 16.2% (sample sd)', async () => {
+  const { realisedVol } = await import('./corr-math.mjs');
+  const d = dseq(30); let p = 100;
+  const m = new Map(d.map((x, i) => { if (i) p *= i % 2 ? 1.01 : 1 / 1.01; return [x, p]; }));
+  const rv = realisedVol(m, 20);
+  assert.ok(Math.abs(rv - 16.2) < 0.1, String(rv));
+  assert.equal(realisedVol(new Map([[d[0], 1]]), 20), null);
+});
+test('levelRead: last value, bp changes, 1-year percentile', async () => {
+  const { levelRead } = await import('./corr-math.mjs');
+  const d = dseq(300), m = new Map(d.map((x, i) => [x, 1 + i * 0.01]));
+  const r = levelRead(m);
+  assert.equal(r.asOf, d.at(-1));
+  assert.ok(Math.abs(r.value - 3.99) < 1e-9);
+  assert.equal(r.chg21bp, 21); assert.equal(r.chg63bp, 63);
+  assert.equal(r.pctile1y, 100);
+  assert.ok(r.spark.length > 10);
+});

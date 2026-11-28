@@ -1795,8 +1795,95 @@ const bpTxt = (v) => `${v > 0 ? '+' : ''}${Math.round(v)}bp`;
 const quadOf = (xSide, ySide) => (xSide === 'line' || ySide === 'line' ? null : `${ySide === 'up' ? 't' : 'b'}${xSide === 'up' ? 'r' : 'l'}`);
 const toneCls = (t) => (t === 'bull' ? 'rg-on' : t === 'bear' ? 'bear' : t === 'warn' ? 'warn' : 'flat');
 
+// ---------- regime, part 2: GIL scenarios (MMH 08), the four rate families (03.1), options and volatility (09, 20) ----------
+// Growth x inflation x liquidity: eight scenarios. MMH 08 lays them out and gives the logic (a correlation needs a
+// shared input: inflation as the shared input pushes stocks and bonds the same way, growth pushes them apart;
+// 2020 and 2022 are the two cases). The expected sign per box is that logic applied, then checked against the
+// measured 60-day stock-bond correlation (the module's "test").
+function gilPanel(d) {
+  const gr = d?.growth, inf = d?.inflation?.core, liq = d?.liquidity, sb = d?.stockBond;
+  if (!gr || !inf || !liq) return '';
+  const st = (gr.breadth.leading?.stronger || 0) + (gr.breadth.coincident?.stronger || 0), wk = (gr.breadth.leading?.weaker || 0) + (gr.breadth.coincident?.weaker || 0);
+  const g = st >= wk ? 'up' : 'down', i = inf.ann3m > inf.yoy ? 'up' : 'down', l = liq.chg13wBn > 0 ? 'up' : 'down';
+  const expect = (ii, ll) => (ii === 'up' ? (ll === 'down' ? { s: 1, t: 'Both fall together: bonds stop hedging (2022)' } : { s: 1, t: 'Inflation leads both: bonds a weak hedge' })
+    : { s: -1, t: ll === 'up' ? 'Growth leads: bonds hedge stocks' : 'Bonds the hedge (2020)' });
+  const cols = [['up', 'up'], ['up', 'down'], ['down', 'up'], ['down', 'down']];
+  const cell = (gg, [ii, ll]) => { const on = gg === g && ii === i && ll === l, e = expect(ii, ll);
+    return `<div class="gil-c ${on ? 'on' : ''}"><div class="small"><b>${e.s > 0 ? 'Positive' : 'Negative'}</b> stock-bond correlation</div><div class="small muted">${esc(e.t)}</div>${on ? '<span class="pill rg-on">now</span>' : ''}</div>`; };
+  const head = cols.map(([ii, ll]) => `<div class="gil-h small">Inflation ${ii === 'up' ? 'rising' : 'falling'}<br>liquidity ${ll === 'up' ? 'expanding' : 'contracting'}</div>`).join('');
+  const now = expect(i, l), measured = sb?.corr60d;
+  const agreeTxt = measured == null ? '' : (Math.sign(measured) === now.s && Math.abs(measured) >= 0.2)
+    ? `<span class="pill rg-on">agrees</span> the measured 60-day correlation is ${sgn(measured)}: the shared input looks like the one this box names.`
+    : Math.abs(measured) < 0.2 ? `<span class="pill flat">unclear</span> the measured 60-day correlation is ${sgn(measured)}, too weak to name a shared input.`
+    : `<span class="pill warn">disagrees</span> the measured 60-day correlation is ${sgn(measured)}: another input is in charge, or the box is mid-change. Dig into it rather than trust either.`;
+  return panel('Growth × inflation × liquidity: the eight scenarios', `<div class="gil-grid"><div></div>${head}
+      <div class="gil-r small"><b>Growth expanding</b></div>${cols.map((c) => cell('up', c)).join('')}
+      <div class="gil-r small"><b>Growth contracting</b></div>${cols.map((c) => cell('down', c)).join('')}</div>
+    <div class="kpis rq-k" style="margin-top:12px"><div><label>Growth</label><b>${g === 'up' ? 'expanding' : 'contracting'}</b><div class="small muted">${st} US series stronger, ${wk} weaker (leading and coincident, 3 months)</div></div>
+      <div><label>Inflation</label><b>${i === 'up' ? 'rising' : 'falling'}</b><div class="small muted">core CPI pace ${inf.ann3m}% (3 months, annualised) vs ${inf.yoy}% a year</div></div>
+      <div><label>Liquidity</label><b>${l === 'up' ? 'expanding' : 'contracting'}</b><div class="small muted">US net liquidity ${sgn(liq.chg13wBn, 0)}bn in 13 weeks</div></div></div>
+    ${measured != null ? `<p class="small">${agreeTxt}</p>` : ''}
+    <p class="small faint">MMH 08: growth, inflation and liquidity, each expanding or contracting, give eight scenarios, and the one in force sets the stock-bond correlation. You estimate the configuration, you do not solve it. Inflation counts as rising when its 3-month pace runs above its yearly rate (the impulse, MMH FX IV). The expected sign in each box applies the module's rule (inflation as the shared input moves stocks and bonds together, growth moves them apart); the course does not give a per-box table.</p>`, null, '', [gr.series.map((x) => x.asOf), inf.asOf, liq.asOf, sb?.asOf]);
+}
+
+// The four rate families (MMH 03.1): track nominal, real, breakevens and forwards, outrights and curves. Divergences
+// between them are information. Plus the course's own example model (FX V): three bond-regime checks that stack.
+function ratesPanel(r, d) {
+  if (!r?.nominal) return '';
+  const row = (label, x, unit = '%') => !x ? `<li><span class="grow small">${label}</span><span class="small faint">no data</span></li>`
+    : `<li class="rf-row"><span class="small">${label}</span><span class="num">${x.value.toFixed(2)}${unit}</span><span class="small">${x.chg63bp == null ? '' : `${x.chg63bp > 0 ? '+' : ''}${Math.round(x.chg63bp)}bp`}</span><span>${lineSvg(x.spark, { h: 22, w: 90 })}</span></li>`;
+  const fam = (title, rows) => `<div><div class="pc-h">${title}</div><ul class="list rf-list">${rows.join('')}</ul></div>`;
+  const n = r.nominal, re = r.real, be = r.breakeven, fw = r.forward;
+  const split = n.y10 && re.y10 && be.y10 && n.y10.chg63bp != null ? (() => { const realPart = re.y10.chg63bp, bePart = be.y10.chg63bp;
+    return `<p class="small">US 10Y ${sgn(n.y10.chg63bp, 0)}bp in 3 months: real yield ${sgn(realPart, 0)}bp, inflation expectations ${sgn(bePart, 0)}bp. <b>${Math.abs(realPart) >= Math.abs(bePart) ? 'Real-rate driven' : 'Inflation-expectations driven'}</b>${Math.sign(realPart) !== Math.sign(bePart) && Math.abs(bePart) >= 5 ? ': the two moved in opposite directions, a divergence worth knowing the reason for' : ''}.</p>`; })() : '';
+  const core = d?.inflation?.core;
+  const checks = [
+    ['Core CPI accelerating (3-month pace above the yearly rate)', core ? core.ann3m > core.yoy : null, core ? `${core.ann3m}% vs ${core.yoy}%` : ''],
+    ['Front end pricing more tightening (US 2Y up more than 25bp in 3 months)', n.y2?.chg63bp != null ? n.y2.chg63bp > 25 : null, n.y2 ? `${sgn(n.y2.chg63bp, 0)}bp` : ''],
+    ['Breakeven curve sloping up (10Y above 5Y)', be.s5s10 ? be.s5s10.value > 0 : null, be.s5s10 ? `${sgn(be.s5s10.value * 100, 0)}bp` : ''],
+  ];
+  const yes = checks.filter((c) => c[1] === true).length;
+  return panel('Rates: the four families', `<div class="rf-grid">
+      ${fam('Nominal', [row('US 2Y', n.y2), row('US 10Y', n.y10), row('US 30Y', n.y30), row('2s10s curve', n.s2s10)])}
+      ${fam('Real', [row('5Y real', re.y5), row('10Y real', re.y10), row('30Y real', re.y30), row('5s10s real curve', re.s5s10)])}
+      ${fam('Breakevens', [row('5Y breakeven', be.y5), row('10Y breakeven', be.y10), row('10Y minus 5Y', be.s5s10)])}
+      ${fam('Forwards', [row('5y5y forward inflation', fw.be5y5y)])}</div>
+    ${split}
+    <div class="pc-h" style="margin-top:10px">The course's example model: is this a bearish bond regime?</div>
+    <ul class="list">${checks.map(([t, ok, v]) => `<li><span class="pill ${ok === true ? 'bear' : ok === false ? 'flat' : 'flat'}">${ok === true ? 'yes' : ok === false ? 'no' : '—'}</span><span class="grow small">${esc(t)}</span><span class="num small">${esc(v)}</span></li>`).join('')}</ul>
+    <p class="small"><b>${yes} of 3</b> point to a bearish bond regime.${yes === 3 ? ' All three agree: in the course\'s example this is when an execution rule (a moving-average cross, a 3-standard-deviation stop) would take over.' : ' The checks stack, they do not average: the example acts only when all three agree.'}</p>
+    <p class="small faint">MMH 03.1: track four families across outrights and curves; divergences between them are information. MMH FX V: a model is stacked if/then checks leading to an action. "Pricing more tightening" uses the 2Y as a proxy for the forward curve (no free OIS path). Changes are 3 months. FRED: DGS2/10/30, DFII5/10/30, T5YIE, T10YIE, T5YIFR.</p>`, null, '', Object.values(r).flatMap((f) => Object.values(f).map((x) => x?.asOf)));
+}
+
+// Options and volatility (MMH 09 Options Signals, 20 Volatility Products): positioning where real money is at risk.
+function volPanel(v) {
+  if (!v?.gauges?.length) return '';
+  const g = Object.fromEntries(v.gauges.map((x) => [x.key, x]));
+  const card = (x) => `<div class="vg"><div class="small"><b>${esc(x.label)}</b> <span class="faint">${esc(x.market)}</span></div>
+      <div class="vg-v"><span class="num big">${x.value.toFixed(x.value > 50 ? 1 : 2)}</span><span class="small">${x.chg21bp == null ? '' : `${x.chg21bp > 0 ? '+' : ''}${x.chg21bp.toFixed(1)} in 1 month`}</span></div>
+      ${lineSvg(x.spark, { h: 34, w: 200, label: x.label })}
+      <div class="small">${pctileBar(x.pctile1y)} <span class="faint">of its last year</span></div>
+      ${x.rv20 != null ? `<div class="small">realised ${x.rv20.toFixed(1)} · <span class="${x.premium >= 0 ? '' : 'warn-t'}">${x.premium >= 0 ? 'premium' : 'discount'} ${Math.abs(x.premium).toFixed(1)}</span></div>` : ''}</div>`;
+  const prem = v.gauges.filter((x) => x.premium != null);
+  const premTxt = prem.map((x) => `${x.label} ${x.premium >= 0 ? 'above' : 'below'} what ${x.key === 'vix' ? 'the S&P' : x.key === 'ovx' ? 'oil' : 'gold'} has moved`).join(', ');
+  const tr = v.term?.vixOverVix3m, t9 = v.term?.vix9dOverVix;
+  const termTxt = !tr ? '' : tr.value > 1.02 ? `<span class="pill bear">inverted</span> VIX above 3-month VIX (${tr.value.toFixed(2)}): fear is priced for now, not later. Stress in progress.`
+    : tr.value < 0.9 ? `<span class="pill rg-on">steep</span> VIX well below 3-month VIX (${tr.value.toFixed(2)}): calm now, risk priced further out. The normal shape.`
+    : `<span class="pill warn">flat</span> VIX close to 3-month VIX (${tr.value.toFixed(2)}): near-term worry about level with the longer view.`;
+  const ev = t9 && t9.value > 1.03 ? ` The 9-day VIX sits above the 30-day (${t9.value.toFixed(2)}): something in the next days is being hedged.` : '';
+  const lead = ['vix', 'move', 'ovx', 'gvz'].map((k) => g[k]).filter(Boolean).sort((a, b) => b.pctile1y - a.pctile1y)[0];
+  return panel('Options and volatility: where the money is at risk', `<div class="vg-grid">${v.gauges.map(card).join('')}</div>
+    <div class="pc-h" style="margin-top:12px">What it says</div>
+    <ul class="list small">
+      ${lead ? `<li><span class="grow">Stress sits highest in <b>${esc(lead.market)}</b> (${esc(lead.label)} at ${lead.pctile1y} of 100 in its year). The gauge that moves first shows which market carries the macro risk.</span></li>` : ''}
+      ${termTxt ? `<li><span class="grow">${termTxt}${ev}</span></li>` : ''}
+      ${prem.length ? `<li><span class="grow">Implied against realised: ${esc(premTxt)}. A premium means hedgers are paying up for protection; a discount means the market is moving more than options price, so realised stress is running ahead.</span></li>` : ''}
+    </ul>
+    <p class="small faint">MMH 09: no dollars, no signal: options premiums show real supply and demand for exposure, which is why the course reads positioning here rather than in surveys or COT. MMH 20: read VIX (stocks), MOVE (bonds) and FX vol together; divergence locates the stress. Realised = 20-day, annualised. Not here: FX implied vol and risk reversals, skew and open interest by strike (no free feed); CME CVOL and broker platforms carry them. Yahoo: ^VIX, ^VIX3M, ^VIX9D, ^MOVE, ^OVX, ^GVZ, ^VVIX, ^SKEW.</p>`, null, '', v.gauges.map((x) => x.asOf));
+}
+
 render.regime = async (main) => {
-  const [c, pb] = await Promise.all([loadLive('correlations', true).catch(() => null), load('playbook', true).catch(() => null)]);
+  const [c, pb, drv] = await Promise.all([loadLive('correlations', true).catch(() => null), load('playbook', true).catch(() => null), loadLive('drivers', true).catch(() => null)]);
   const sec = (id) => pb?.sections?.find((s) => s.id === id);
   const pol = c?.maps?.policy, cre = c?.maps?.credit, ig = c?.maps?.ig;
 
@@ -1829,8 +1916,8 @@ render.regime = async (main) => {
         <p class="small faint">${esc(cg.intro)} Placed from the 1-month change of the US 10Y yield (FRED DGS10) and the high-yield spread (ICE BofA, FRED BAMLH0A0HYM2); investment grade alongside as a check: when it widens too, the stress is broad. A move under ${cre.band}bp counts as on the line. Trail: 1 week, 1 month and 3 months ago. <a href="playbook.html#pb-credit-grid">Playbook →</a></p></div></div>`, null, '', [cre.asOf, ig?.asOf]);
   }
 
-  main.innerHTML = head('Regime', 'Which regime are we in? Risk appetite first, then where policy and bonds place us on the Playbook\'s maps. Each box names what the tide tends to favour: a default, not a law.', '<a class="btn" href="drivers.html">Drivers →</a>') +
-    (c ? regimeBanner(c.regime) + policyPanel + creditPanel : '<section class="panel"><div class="empty">No regime data yet: it is written nightly by scripts/correlations.mjs.</div></section>');
+  main.innerHTML = head('Regime', 'Which regime are we in? In the course\'s order: risk appetite, then growth, inflation and liquidity, then where policy and bonds place us, and options as the timing layer on top. Each box names what the tide tends to favour: a default, not a law.', '<a class="btn" href="drivers.html">Drivers →</a>') +
+    (c ? regimeBanner(c.regime) + gilPanel(drv) + policyPanel + ratesPanel(c.rates, drv) + creditPanel + volPanel(c.vol) : '<section class="panel"><div class="empty">No regime data yet: it is written nightly by scripts/correlations.mjs.</div></section>');
 };
 
 // ---------- countries (layer 1: the slow structural profile behind each currency) ----------
