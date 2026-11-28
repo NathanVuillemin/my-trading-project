@@ -13,6 +13,7 @@ const SECTIONS = [
 ];
 const PAGES = [
   { id: 'hub', href: 'index.html', label: 'Today', section: 'today' },
+  { id: 'regime', href: 'regime.html', label: 'Regime', section: 'markets' },
   { id: 'drivers', href: 'drivers.html', label: 'Drivers', section: 'markets' },
   { id: 'positioning', href: 'positioning.html', label: 'Positioning', section: 'markets' },
   { id: 'holdings', href: 'holdings.html', label: 'Holdings', section: 'markets' },
@@ -1749,7 +1750,7 @@ render.drivers = async (main) => {
 
   main.innerHTML = head('Drivers', 'What is driving each market, and when it stops: the market regime, each currency\'s real-world drivers and correlations against their normal, then the cross-asset readings Market Context does not carry (liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, every pair\'s trend regime). Updated daily.') +
     ((d.warns || []).length ? `<div class="note small">Data warnings: ${d.warns.map(esc).join(' · ')}</div>` : '') +
-    regimeBanner(corr?.regime) + whoIsDriving(corr, card) +
+    `<div class="note small">The market regime (risk-on or risk-off, the policy-regime map, duration × credit) is on <a href="regime.html">Regime →</a></div>` + whoIsDriving(corr, card) +
     liqPanel + goldPanel + curvePanel + ccPanel + growthPanel + infPanel + bouncePanel + sbPanel + pairsPanel;
 
   const toggle = (row) => {
@@ -1761,6 +1762,75 @@ render.drivers = async (main) => {
   };
   main.addEventListener('click', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && !ev.target.closest('a')) toggle(row); });
   main.addEventListener('keydown', (ev) => { const row = ev.target.closest('.lk[data-link]'); if (row && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); toggle(row); } });
+};
+
+// ---------- regime (which regime are we in: risk read, policy-regime map, duration x credit) ----------
+// Places today on the Playbook's two maps from free FRED series (scripts/correlations.mjs, `maps`), with a trail
+// of where it was. The boxes and their asset lists are the Playbook's own (data/playbook.json).
+// cfg: { xLabels:[left,right], yLabels:[bottom,top], boxes:{tl,tr,bl,br:{name,tone}}, here, x, y, trail, band, aria }
+function quadrantMap(cfg) {
+  const W = 360, H = 300, M = 34, cx = W / 2, cy = H / 2;
+  const vals = [cfg.x, cfg.y, ...cfg.trail.flatMap((t) => [t.x, t.y])].map(Math.abs);
+  const lim = Math.max(20, ...vals) * 1.2, X = (v) => cx + (v / lim) * (cx - M), Y = (v) => cy - (v / lim) * (cy - M);
+  const box = (pos, x0, y0) => {
+    const b = cfg.boxes[pos] || {}, on = cfg.here === pos, left = pos[1] === 'l', top = pos[0] === 't';
+    return `<rect x="${x0}" y="${y0}" width="${cx - M}" height="${cy - M}" fill="${on ? 'rgba(106,168,255,0.14)' : 'var(--panel-2)'}" stroke="${on ? 'var(--accent)' : 'var(--line)'}" stroke-width="${on ? 1.5 : 1}"/>
+      <text x="${left ? x0 + 8 : x0 + cx - M - 8}" y="${top ? y0 + 16 : y0 + cy - M - 8}" text-anchor="${left ? 'start' : 'end'}" class="rq-name" fill="${on ? 'var(--text)' : 'var(--muted)'}">${esc(b.name || '')}</text>`;
+  };
+  const band = cfg.band ? `<rect x="${X(-cfg.band)}" y="${M}" width="${X(cfg.band) - X(-cfg.band)}" height="${H - 2 * M}" fill="var(--flat-bg)"/><rect x="${M}" y="${Y(cfg.band)}" width="${W - 2 * M}" height="${Y(-cfg.band) - Y(cfg.band)}" fill="var(--flat-bg)"/>` : '';
+  const pts = [...[...cfg.trail].sort((a, b) => b.lag - a.lag), { x: cfg.x, y: cfg.y, now: true }];
+  const trail = `<polyline fill="none" stroke="var(--faint)" stroke-dasharray="3 3" points="${pts.map((p) => `${X(p.x)},${Y(p.y)}`).join(' ')}"/>` +
+    pts.map((p) => (p.now
+      ? `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="7" fill="var(--accent)" stroke="var(--bg)" stroke-width="2"/><text x="${X(p.x)}" y="${Y(p.y) - 11}" text-anchor="middle" class="g-num" fill="var(--accent)">now</text>`
+      : `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="3.5" fill="var(--faint)"/><text x="${X(p.x) + 6}" y="${Y(p.y) + 3}" class="g-axis">${esc(p.label)}</text>`)).join('');
+  return `<svg class="rq-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(cfg.aria)}">
+    ${box('tl', M, M)}${box('tr', cx, M)}${box('bl', M, cy)}${box('br', cx, cy)}${band}
+    <line x1="${cx}" x2="${cx}" y1="${M}" y2="${H - M}" stroke="var(--line)"/><line x1="${M}" x2="${W - M}" y1="${cy}" y2="${cy}" stroke="var(--line)"/>${trail}
+    <text x="${M}" y="${H - 12}" class="g-axis">← ${esc(cfg.xLabels[0])}</text><text x="${W - M}" y="${H - 12}" text-anchor="end" class="g-axis">${esc(cfg.xLabels[1])} →</text>
+    <text x="${M}" y="${M - 10}" class="g-axis">↑ ${esc(cfg.yLabels[1])}</text>
+    <text x="12" y="${cy}" class="g-axis" transform="rotate(-90 12 ${cy})" text-anchor="middle">${esc(cfg.yLabels[0])} ↓</text></svg>`;
+}
+const LAG_LABEL = { 5: '1w ago', 21: '1m ago', 63: '3m ago', 126: '6m ago' };
+const bpTxt = (v) => `${v > 0 ? '+' : ''}${Math.round(v)}bp`;
+const quadOf = (xSide, ySide) => (xSide === 'line' || ySide === 'line' ? null : `${ySide === 'up' ? 't' : 'b'}${xSide === 'up' ? 'r' : 'l'}`);
+const toneCls = (t) => (t === 'bull' ? 'rg-on' : t === 'bear' ? 'bear' : t === 'warn' ? 'warn' : 'flat');
+
+render.regime = async (main) => {
+  const [c, pb] = await Promise.all([loadLive('correlations', true).catch(() => null), load('playbook', true).catch(() => null)]);
+  const sec = (id) => pb?.sections?.find((s) => s.id === id);
+  const pol = c?.maps?.policy, cre = c?.maps?.credit, ig = c?.maps?.ig;
+
+  let policyPanel = '';
+  const qd = sec('quadrant');
+  if (pol && qd) {
+    const boxes = Object.fromEntries(qd.boxes.map((b) => [b.pos, b])), here = quadOf(pol.xSide, pol.ySide), b = boxes[here];
+    const nearest = boxes[`${pol.y >= 0 ? 't' : 'b'}${pol.x >= 0 ? 'r' : 'l'}`];
+    const near = here ? '' : `<div class="note small">On the line: ${pol.xSide === 'line' ? 'real yields' : 'inflation expectations'} moved less than ${pol.band}bp in 3 months, so no box is clear yet. Nearest: ${esc(nearest.name)}.</div>`;
+    policyPanel = panel('Policy-regime map: where we are', `<div class="rq-wrap"><div>${quadrantMap({ xLabels: qd.xAxis, yLabels: qd.yAxis, boxes, here, x: pol.x, y: pol.y, band: pol.band, trail: pol.trail.map((t) => ({ ...t, label: LAG_LABEL[t.lag] })), aria: 'Policy-regime map with today placed' })}</div>
+      <div>${near}${b ? `<div class="rq-here"><span class="pill ${toneCls(b.tone)}">${esc(b.name)}</span> <span class="small muted">${esc(b.why)}</span></div><ul class="list small">${b.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        <div class="kpis rq-k"><div><label>US 10Y real yield</label><span class="num big">${pol.xNow.toFixed(2)}%</span><div class="small">${bpTxt(pol.x)} in 3 months</div></div>
+          <div><label>5-year inflation expectations</label><span class="num big">${pol.yNow.toFixed(2)}%</span><div class="small">${bpTxt(pol.y)} in 3 months</div></div></div>
+        <p class="small faint">${esc(qd.intro)} Placed from the 3-month change of each (FRED DFII10 and T5YIE); a move under ${pol.band}bp counts as on the line. The trail shows the same reading 1, 3 and 6 months ago. <a href="playbook.html#pb-quadrant">Playbook →</a></p></div></div>`, null, '', pol.asOf);
+  }
+
+  let creditPanel = '';
+  const cg = sec('credit-grid');
+  if (cre && cg) {
+    // Playbook grid: rows = yields rising (top) / falling, columns = spreads calm (left) / widening (right).
+    const boxes = { tl: { name: cg.cells[0][0], tone: cg.tones[0][0] }, tr: { name: cg.cells[0][1], tone: cg.tones[0][1] }, bl: { name: cg.cells[1][0], tone: cg.tones[1][0] }, br: { name: cg.cells[1][1], tone: cg.tones[1][1] } };
+    const here = quadOf(cre.ySide, cre.xSide), b = boxes[here];
+    const nearest = boxes[`${cre.x >= 0 ? 't' : 'b'}${cre.y >= 0 ? 'r' : 'l'}`];
+    const near = here ? '' : `<div class="note small">On the line: ${cre.xSide === 'line' ? 'the 10Y yield' : 'credit spreads'} moved less than ${cre.band}bp in a month. Nearest: ${esc(nearest.name)}.</div>`;
+    creditPanel = panel('Bonds: duration × credit, where we are', `<div class="rq-wrap"><div>${quadrantMap({ xLabels: cg.cols, yLabels: [cg.rows[1], cg.rows[0]], boxes, here, x: cre.y, y: cre.x, band: cre.band, trail: cre.trail.map((t) => ({ lag: t.lag, x: t.y, y: t.x, label: LAG_LABEL[t.lag] })), aria: 'Duration by credit with today placed' })}</div>
+      <div>${near}${b ? `<div class="rq-here"><span class="pill ${toneCls(b.tone)}">${esc(b.name)}</span></div>` : ''}
+        <div class="kpis rq-k"><div><label>US 10Y yield</label><span class="num big">${cre.xNow.toFixed(2)}%</span><div class="small">${bpTxt(cre.x)} in 1 month</div></div>
+          <div><label>High-yield spread</label><span class="num big">${cre.yNow.toFixed(2)}%</span><div class="small">${bpTxt(cre.y)} in 1 month</div></div>
+          ${ig ? `<div><label>Investment-grade spread</label><span class="num big">${ig.yNow.toFixed(2)}%</span><div class="small">${bpTxt(ig.y)} in 1 month</div></div>` : ''}</div>
+        <p class="small faint">${esc(cg.intro)} Placed from the 1-month change of the US 10Y yield (FRED DGS10) and the high-yield spread (ICE BofA, FRED BAMLH0A0HYM2); investment grade alongside as a check: when it widens too, the stress is broad. A move under ${cre.band}bp counts as on the line. Trail: 1 week, 1 month and 3 months ago. <a href="playbook.html#pb-credit-grid">Playbook →</a></p></div></div>`, null, '', [cre.asOf, ig?.asOf]);
+  }
+
+  main.innerHTML = head('Regime', 'Which regime are we in? Risk appetite first, then where policy and bonds place us on the Playbook\'s maps. Each box names what the tide tends to favour: a default, not a law.', '<a class="btn" href="drivers.html">Drivers →</a>') +
+    (c ? regimeBanner(c.regime) + policyPanel + creditPanel : '<section class="panel"><div class="empty">No regime data yet: it is written nightly by scripts/correlations.mjs.</div></section>');
 };
 
 // ---------- countries (layer 1: the slow structural profile behind each currency) ----------

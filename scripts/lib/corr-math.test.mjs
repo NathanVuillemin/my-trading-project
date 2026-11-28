@@ -212,3 +212,19 @@ test('buildLink: too short a history says why', () => {
   assert.equal(l.status, 'no data');
   assert.match(l.reason, /history/);
 });
+
+test('quadrantRead: changes over a window, trail points, box and near-line flag', async () => {
+  const { quadrantRead } = await import('./corr-math.mjs');
+  const dates = Array.from({ length: 200 }, (_, i) => new Date(Date.UTC(2026, 0, 1) + i * 864e5).toISOString().slice(0, 10));
+  const xs = new Map(dates.map((d, i) => [d, 2 + i * 0.002]));   // rising 0.2bp/day
+  const ys = new Map(dates.map((d, i) => [d, 2.5 - i * 0.003])); // falling 0.3bp/day
+  const q = quadrantRead(xs, ys, { w: 63, lags: [21, 63], band: 5 });
+  assert.equal(q.asOf, dates.at(-1));
+  assert.ok(Math.abs(q.x - 12.6) < 0.01);   // 63 × 0.2bp
+  assert.ok(Math.abs(q.y + 18.9) < 0.01);   // 63 × -0.3bp
+  assert.equal(q.xSide, 'up'); assert.equal(q.ySide, 'down');
+  assert.equal(q.trail.length, 2);
+  assert.equal(q.trail[0].lag, 21);
+  const flat = quadrantRead(new Map(dates.map((d) => [d, 1])), ys, { w: 63, lags: [], band: 5 });
+  assert.equal(flat.xSide, 'line');
+});
