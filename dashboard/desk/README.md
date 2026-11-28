@@ -32,6 +32,8 @@ Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://
 
 All pages are thin shells (`<body data-page="…">`); `assets/desk.js` draws the nav and one renderer per page.
 
+**Data date in every box.** Each box that shows data carries, small in its bottom-right corner, the date of the newest data in it (DD/MM/YYYY; a month counts as its last day, a quarter as its last day), so its age reads at a glance; the box's own text still says what was measured when. `asOfStamp(...)` in `desk.js` takes any mix of dates and shows the latest; pass it as `panel()`'s fifth argument. Boxes that hold only Nathan's own entries (daily read, kill switches, levels legend, ideas, playbook, technical setup) carry none.
+
 ## Data
 Everything Nathan types is one JSON file per domain in `data/`, committed through the GitHub contents API.
 | File | Holds | Key fields |
