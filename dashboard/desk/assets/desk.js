@@ -290,8 +290,28 @@ function shell(page) {
 function head(title, blurb, right = '') {
   return `<div class="page-head"><div><h1>${esc(title)}</h1>${blurb ? `<p>${blurb}</p>` : ''}</div>${right}</div>`;
 }
-function panel(title, body, link, cls = '') {
-  return `<section class="panel ${cls}"><div class="panel-head"><h2>${esc(title)}</h2>${link ? `<a href="${link.href}">${esc(link.label)} →</a>` : ''}</div>${body}</section>`;
+// The date of the newest data in a box, shown small in its bottom-right corner (DD/MM/YYYY), so its age reads at a
+// glance; the box's own text still says what was measured when. Accepts any mix of 'YYYY-MM-DD' (or a full ISO
+// time), 'YYYY-MM' (month: its last day), 'YYYY-Qn' (quarter: its last day) and epoch milliseconds.
+function dataDay(x) {
+  if (x == null || x === '') return null;
+  if (typeof x === 'number') return Number.isFinite(x) ? ymd(new Date(x)) : null;
+  const s = String(x), q = s.match(/^(\d{4})-Q([1-4])$/), m = s.match(/^(\d{4})-(\d{2})$/);
+  if (q) return ymd(new Date(Date.UTC(+q[1], +q[2] * 3, 0, 12)));
+  if (m) return ymd(new Date(Date.UTC(+m[1], +m[2], 0, 12)));
+  return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : null;
+}
+function asOfStamp(...xs) {
+  const d = xs.flat(Infinity).map(dataDay).filter(Boolean).sort().at(-1);
+  if (!d) return '';
+  const [y, mo, da] = d.split('-');
+  return `<div class="asof" title="Newest data in this box">${da}/${mo}/${y}</div>`;
+}
+// Day of the prices on screen: the live quote's day, else the last reference close.
+const priceDay = () => (!prices ? null : prices.quoteTime && !prices.closed ? prices.quoteTime : prices.lastClose);
+function panel(title, body, link, cls = '', asOf = null) {
+  const stamp = asOf == null ? '' : asOfStamp(asOf);
+  return `<section class="panel ${cls}"><div class="panel-head"><h2>${esc(title)}</h2>${link ? `<a href="${link.href}">${esc(link.label)} →</a>` : ''}</div>${body}${stamp}</section>`;
 }
 
 function strengthBars(currencies) {
@@ -398,7 +418,7 @@ render.hub = async (main) => {
   const pairsHtml = () => (myPairs.length
     ? `<div class="grid sc-grid">${myPairs.map((p) => `<section class="panel pcard" data-pair="${esc(p.pair)}">
         <div class="panel-head"><h2><span class="ccy">${esc(p.pair)}</span> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span></h2><span class="small muted">gap ${esc(p.diff)}</span></div>
-        <div data-live>${pairLive(p)}</div><div class="tv" data-symbol="FX:${esc(p.pair)}"></div>${pairMine(p)}</section>`).join('')}</div>`
+        <div data-live>${pairLive(p)}</div><div class="tv" data-symbol="FX:${esc(p.pair)}"></div>${pairMine(p)}${asOfStamp(priceDay())}</section>`).join('')}</div>`
     : `<section class="panel"><div class="empty">${card ? 'No pairs confirmed on this week\'s scorecard.' : 'No scorecard yet.'} <a href="scorecard.html?week=${target}">Do the weekly build →</a></div></section>`);
 
   const callsHtml = () => {
@@ -439,17 +459,17 @@ render.hub = async (main) => {
       <div id="hub-pairs">${pairsHtml()}</div>
       <div class="grid sc-grid" style="margin-top:14px">
         ${panel('The daily read', readHtml())}
-        <div>${panel('My calls against price', `<div id="hub-calls">${callsHtml()}</div>`, { href: 'review.html', label: 'Review' })}
+        <div>${panel('My calls against price', `<div id="hub-calls">${callsHtml()}</div>`, { href: 'review.html', label: 'Review' }, '', priceDay())}
           <div style="height:14px"></div>
           ${panel('Kill switches fired or near', `<ul class="list">${hot.map((x) => `<li><span class="ccy">${esc(x.currency)}</span><span class="grow">${esc(x.condition)}<div class="small faint">${esc(x.now || '')}</div></span>${trigPill(x.status)}</li>`).join('') || `<div class="empty">None. ${kills.length} armed.</div>`}</ul>`, { href: 'kill-switches.html', label: 'Kill switches' })}</div>
       </div>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Whose story is it? Each currency against each other</h2>
         <span>${[['dayPct', 'Today'], ['wtdPct', 'This week'], ['m1Pct', '1 month']].map(([k, l]) => `<button class="chip ${attrKey === k ? 'on' : ''}" data-act="attr" data-k="${k}">${l}</button>`).join('')}</span></div>
-        <div id="hub-attr">${attributionHtml(attrKey)}</div></section>
+        <div id="hub-attr">${attributionHtml(attrKey)}</div>${asOfStamp(priceDay())}</section>
       <section class="panel" style="margin-top:14px"><div class="panel-head"><h2>Unusual moves: what moved more than it normally does</h2>
         <span>${[['z1d', 'Last day'], ['z5d', '5 days']].map(([k, l]) => `<button class="chip ${moveKey === k ? 'on' : ''}" data-act="moves" data-k="${k}">${l}</button>`).join('')}</span></div>
-        <div id="hub-moves">${movesHtml(moveKey)}</div></section>
-      ${panel('News: summary and where to read it', newsHtml())}`;
+        <div id="hub-moves">${movesHtml(moveKey)}</div>${asOfStamp(drv?.moves?.asOf)}</section>
+      ${panel('News: summary and where to read it', newsHtml(), null, '', news?.brief?.date || '')}`;
     main.querySelectorAll('.tv[data-symbol]').forEach((el) => tvMini(el, el.dataset.symbol));
   };
   // Live parts only: the forms and the charts are left alone.
@@ -619,7 +639,7 @@ render.scorecard = async (main) => {
   const cotBlock = (code) => (PC[code] ? `<div class="sc-cot">${posGauge(PC[code], { compact: true })}<div class="pos-legend">${posLegend(PC[code])}</div>${posSqueeze(PC[code])}</div>` : '');
   const posMap = () => (!pos ? '' : `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Positioning · COT of ${fmtDate(pos.cotDate)}</h2><a href="positioning.html">Positioning →</a></div>
     <div class="pos-map">${CCYS.filter((c) => PC[c]).sort((a, b) => (posGrp(PC[b], 'slow')?.index ?? 0) - (posGrp(PC[a], 'slow')?.index ?? 0)).map((c) => `<div class="pos-map-row ${card.active.includes(c) ? '' : 'dim'}"><span class="ccy">${c}</span>${posGauge(PC[c], { compact: true })}</div>`).join('')}</div>
-    <p class="small faint" style="margin:6px 0 0">● asset managers (slow) · ◆ leveraged funds (fast) · hollow = 4 weeks ago · shaded ends = crowded. "COT crowded my way" in each currency fills itself from this once I make a call; ticking it myself overrides.</p></section>`);
+    <p class="small faint" style="margin:6px 0 0">● asset managers (slow) · ◆ leveraged funds (fast) · hollow = 4 weeks ago · shaded ends = crowded. "COT crowded my way" in each currency fills itself from this once I make a call; ticking it myself overrides.</p>${asOfStamp(pos.cotDate)}</section>`);
   dirty = applyCot() || dirty;
 
   // The course's five layers against my call for this currency. Each layer reads one thing already on the card:
@@ -679,7 +699,7 @@ render.scorecard = async (main) => {
         <label class="check"><input type="checkbox" data-f="strong" ${r.strong ? 'checked' : ''}> Strong</label>
         <label class="check"><input type="checkbox" data-f="crowded" ${r.crowded ? 'checked' : ''}> COT crowded my way</label>
         <div class="full" data-cothint>${cotHint(code)}</div>
-      </div></section>`;
+      </div>${asOfStamp(r.auto?.readAt, PC[code] ? pos?.cotDate : null, liveRank(code) != null ? priceDay() : null)}</section>`;
   };
 
   // Regime dial (MMH 04/05): every currency placed from its own fields on this card. Dimmed = not in this build.
@@ -696,7 +716,7 @@ render.scorecard = async (main) => {
         <ul class="small muted rd-keys"><li><b>Goldilocks</b>: equities and credit lead, duration fine, volatility sold</li><li><b>Reflation / overheat</b>: commodities and commodity FX lead, bonds suffer</li><li><b>Stagflation</b>: gold and energy hold, stocks and bonds both struggle</li><li><b>Deflationary slowdown</b>: long bonds and havens lead</li></ul></div>
       <div><div class="small muted">Inflation level × direction</div>${level}
         <ul class="small muted rd-keys"><li><b>Disinflation from a peak</b>: duration rallies, quality equities lead (2023)</li><li><b>Overheat</b>: commodities and cash lead, stock-bond hedge fails (2022)</li><li><b>Deflation scare</b>: long bonds and gold lead (2008, 2020)</li><li><b>Reflation</b>: cyclicals, value, commodity FX lead</li></ul></div></div>
-      <p class="small faint">Placed from this card's growth and inflation fields (steady sits on the middle line). Tendencies from the course, not laws. Dimmed currencies are not in this build.</p></section>`;
+      <p class="small faint">Placed from this card's growth and inflation fields (steady sits on the middle line). Tendencies from the course, not laws. Dimmed currencies are not in this build.</p>${asOfStamp(card.autoFill?.readAt)}</section>`;
   };
   // Pages in the book (MMH 10): independent reasons for a pair. One page is a guess, five a book.
   const dataLean = (c) => { const r = card.currencies[c]; return (DIRV[r.growth.dir] || 0) + (DIRV[r.inflation.dir] || 0) - (DIRV[r.labour.dir] || 0); };
@@ -913,7 +933,7 @@ render.levels = async (main) => {
       `<div class="filters tabs" id="lv-fams">${[['all', 'All'], ...Object.entries(fams)].map(([k, v]) => `<a class="chip" data-fam="${k}" href="#${k === 'all' ? '' : k}">${esc(v)}</a>`).join('')}<span class="grow"></span><span id="lv-age"></span></div>
       <section class="panel"><div class="table-wrap"><table>
         <thead><tr><th>Pair</th><th>Level</th><th>Price now</th><th>Distance</th><th>Type</th><th>Side</th><th>Who / evidence</th><th>Status</th><th>Last touch</th><th></th></tr></thead>
-        <tbody id="lv-rows"></tbody></table></div></section>
+        <tbody id="lv-rows"></tbody></table></div>${asOfStamp(priceDay())}</section>
       <div class="grid hub-grid" style="margin-top:14px">
         ${Object.entries(fams).map(([f, label]) => panel(label, `<ul class="list">${Object.entries(data.types).filter(([, t]) => t.family === f).map(([k, t]) => `<li><span class="pill flat">${esc(k)}</span><span class="grow small muted">${esc(t.desc)}</span></li>`).join('')}</ul>`)).join('')}
         ${data.statuses ? panel('Status', `<ul class="list">${Object.entries(data.statuses).map(([k, v]) => `<li><span class="pill ${stTone[k] || 'flat'}">${esc(k)}</span><span class="grow small muted">${esc(v)}</span></li>`).join('')}</ul>`) : ''}
@@ -1354,7 +1374,7 @@ render.positioning = async (main) => {
   const ccyRows = CCYS.filter((c) => C[c]).sort((a, b) => (grp(C[b], 'slow')?.index ?? 0) - (grp(C[a], 'slow')?.index ?? 0));
   const dealerLine = (x) => { const d = grp(x, 'hedging'); return d ? `<div class="small faint">Dealers ${d.index} (hedging, not a view)</div>` : ''; };
   const ccyPanel = panel('Currencies', `<div class="pos-grid">${ccyRows.map((c) => posCard(`<span class="ccy">${c}</span>`, C[c], C[c].derived ? 'derived from the seven' : '').replace(/<\/div>$/, `${dealerLine(C[c])}</div>`)).join('')}</div>
-    <p class="small faint">● asset managers (slow, real money) · ◆ leveraged funds (fast money). Hollow marker: 4 weeks ago. Shaded ends: crowded. USD has no futures contract of its own in the COT data: its line is the dollar side of the seven currency futures, converted to dollars at each week's close.</p>`);
+    <p class="small faint">● asset managers (slow, real money) · ◆ leveraged funds (fast money). Hollow marker: 4 weeks ago. Shaded ends: crowded. USD has no futures contract of its own in the COT data: its line is the dollar side of the seven currency futures, converted to dollars at each week's close.</p>`, null, '', pos.cotDate);
 
   // ---- JPY flows: diverging bars, last 4 weeks, coloured by what they do to the yen ----
   const jf = pos.jpyFlows;
@@ -1371,22 +1391,22 @@ render.positioning = async (main) => {
     }).join('');
   };
   const jpyPanel = !jf ? '' : panel(`JPY: Japan's real-money flows, 4 weeks to ${fmtDate(jf.weekEnding)}`, `${jpyBars()}
-    <p class="small faint">${esc(jf.source)}. ${esc(jf.unit)}. Bars left of the line are net selling, right net buying. Published Thursdays. Japanese buying abroad sells yen unless hedged; foreigners buying Japan buys yen unless hedged.</p>`);
+    <p class="small faint">${esc(jf.source)}. ${esc(jf.unit)}. Bars left of the line are net selling, right net buying. Published Thursdays. Japanese buying abroad sells yen unless hedged; foreigners buying Japan buys yen unless hedged.</p>`, null, '', jf.weekEnding);
 
   // ---- ideas: a card per linked market and currency ----
   const openIdeas = (ideas?.ideas || []).filter((i) => i.status !== 'dropped').sort((a, b) => (a.date < b.date ? 1 : -1));
   const ideaBlock = (i) => `<details class="research pos-idea" open><summary>${esc(i.text.split('\n')[0].slice(0, 110))} <span class="faint small">${esc(fmtDate(i.date))} · ${esc(i.status)}</span></summary>${posIdeaCards(pos, i)}</details>`;
-  const ideasPanel = panel('My ideas', openIdeas.map(ideaBlock).join('') || '<div class="empty">No open ideas.</div>', { href: 'ideas.html', label: 'Ideas' });
+  const ideasPanel = panel('My ideas', openIdeas.map(ideaBlock).join('') || '<div class="empty">No open ideas.</div>', { href: 'ideas.html', label: 'Ideas' }, '', openIdeas.length ? pos.cotDate : null);
 
   // ---- all pairs: tug-of-war bars ----
   const allPairs = ALL_PAIRS.map((p) => ({ p, s: pairRead(p, 'slow'), f: pairRead(p, 'fast') })).filter((r) => r.s).sort((a, b) => Math.abs(b.s.gap) - Math.abs(a.s.gap));
   const allPanel = panel('All 28 pairs', `<details class="research"><summary>Sorted by how far apart asset managers are on the two legs. Bar right of the line: that group favours the base currency.</summary><div class="table-wrap"><table>
       <thead><tr><th>Pair</th><th>Base vs quote</th><th>Asset managers</th><th>Leveraged funds</th><th>Squeeze risk on a leg</th></tr></thead>
-      <tbody>${allPairs.map((r) => `<tr><td><b>${r.p}</b></td><td>${posPairBar(C, r.p)}</td>${gapCell(r.s)}${gapCell(r.f)}<td class="small">${[r.p.slice(0, 3), r.p.slice(3)].filter((c) => C[c]?.squeeze).map((c) => `${c}: ${esc(C[c].squeeze)}`).join('<br>') || '<span class="faint">none</span>'}</td></tr>`).join('')}</tbody></table></div></details>`);
+      <tbody>${allPairs.map((r) => `<tr><td><b>${r.p}</b></td><td>${posPairBar(C, r.p)}</td>${gapCell(r.s)}${gapCell(r.f)}<td class="small">${[r.p.slice(0, 3), r.p.slice(3)].filter((c) => C[c]?.squeeze).map((c) => `${c}: ${esc(C[c].squeeze)}`).join('<br>') || '<span class="faint">none</span>'}</td></tr>`).join('')}</tbody></table></div></details>`, null, '', pos.cotDate);
 
   // ---- all markets: cards grouped by kind ----
   const kinds = [...new Set((pos.markets || []).map((m) => m.group))];
-  const marketsPanel = panel('Markets', kinds.map((k) => `<div class="small muted pos-kind">${esc(k)}</div><div class="pos-grid">${(pos.markets || []).filter((m) => m.group === k).map((m) => posCard(esc(m.label), m, m.report === 'disagg' ? 'managed money only: commodities have no asset-manager split' : '')).join('')}</div>`).join(''));
+  const marketsPanel = panel('Markets', kinds.map((k) => `<div class="small muted pos-kind">${esc(k)}</div><div class="pos-grid">${(pos.markets || []).filter((m) => m.group === k).map((m) => posCard(esc(m.label), m, m.report === 'disagg' ? 'managed money only: commodities have no asset-manager split' : '')).join('')}</div>`).join(''), null, '', (pos.markets || []).map((m) => m.date));
 
   main.innerHTML = head('Positioning', `How capital is positioned in my currencies, my pairs and the markets my ideas touch. CFTC report of ${esc(fmtDate(pos.cotDate))} (Tuesday snapshot, released the Friday after). Each number is where that group's net position sits in its own ${pos.lookbackYears}-year range: 0 is the shortest it has been, 100 the longest.`,
       `<span class="pill ${ageDays > 11 ? 'warn' : 'flat'}">COT ${ageDays} days old</span>`) +
@@ -1533,7 +1553,7 @@ function regimeBanner(rg) {
       <div><label class="rg-k">US rates</label><b>${esc(rg.rates.split || '—')}</b><div class="small muted">2Y ${sgn(rg.rates.chg63bp, 0)}bp in 3 months</div></div>
       <div><label class="rg-k">Dollar</label><b>${esc(rg.dollar.split || '—')}</b><div class="small muted">DXY ${sgn(rg.dollar.chg63pct, 1)}% in 3 months</div></div></div>
     <div class="rg-gauges">${gauges}</div>
-    <p class="small faint">Your Macro Tracker method: VIX below 18 with the S&amp;P above its 200-day = risk-on, above 30 = risk-off, else caution. The barometer counts five gauges on their 20-day change and needs a lead of two. As of ${esc(fmtDate(rg.asOf))}.</p>`);
+    <p class="small faint">Your Macro Tracker method: VIX below 18 with the S&amp;P above its 200-day = risk-on, above 30 = risk-off, else caution. The barometer counts five gauges on their 20-day change and needs a lead of two. As of ${esc(fmtDate(rg.asOf))}.</p>`, null, '', rg.asOf);
 }
 
 function linkRow(l) {
@@ -1596,7 +1616,7 @@ function whoIsDriving(c, card) {
   return panel('Who is driving', `<div class="pos-legend"><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--flat-bg)" stroke="var(--faint)" stroke-dasharray="2 2"/></svg>its normal range</span><span class="pos-key"><svg width="22" height="10"><rect x="1" y="2" width="20" height="6" rx="3" fill="var(--accent)" fill-opacity="0.25"/></svg>in-control zone</span><span class="pos-key">Click a link for its history and how it behaves by market.</span></div>
     ${groups}
     ${warn.length ? `<p class="small faint">Missing: ${warn.map(esc).join(' · ')}.</p>` : ''}
-    <p class="small faint">${esc(c.method)} Updated ${esc(fmtDate(c.asOf))}.</p>`);
+    <p class="small faint">${esc(c.method)} Updated ${esc(fmtDate(c.asOf))}.</p>`, null, '', c.links.map((l) => [l.asOfT, l.asOfD, l.level?.asOf]));
 }
 
 render.drivers = async (main) => {
@@ -1613,7 +1633,7 @@ render.drivers = async (main) => {
       <div class="small muted">Fed assets $${liq.parts.fedBn}bn − Treasury account $${liq.parts.tgaBn}bn − reverse repo $${liq.parts.rrpBn}bn · week of ${esc(fmtDate(liq.asOf))}</div>
       <p class="small">${liq.chg13wBn > 0 ? '<span class="pill bull">tide coming in</span> the far end of the risk curve feels it first' : '<span class="pill bear">tide going out</span> the far end of the risk curve feels it first'}</p></div>
     <div>${lineSvg(liq.history, { label: 'Net liquidity, 2 years', h: 110 })}</div></div>
-    <p class="small faint">Module 06: QE and QT are the famous tap, but the Treasury account and reverse repo move the water level too.</p>`);
+    <p class="small faint">Module 06: QE and QT are the famous tap, but the Treasury account and reverse repo move the water level too.</p>`, null, '', liq.asOf);
 
   const g = d.gold, mm = pos?.markets?.find((m) => m.key === 'GOLD'), mmg = mm ? posGrp(mm, 'fast') : null;
   const goldRow = (n, name, blk, unit, readFn) => !blk ? '' : `<div class="stack-row"><span class="stack-n">${n}</span><div class="stack-name"><b>${name}</b><div class="small faint">${esc(fmtDate(blk.asOf))}</div></div>
@@ -1627,7 +1647,7 @@ render.drivers = async (main) => {
       ${goldRow(5, 'Stress: VIX', g.vix, '', (b) => `<span class="pill ${b.value > 20 ? 'warn' : 'flat'}">${b.value > 20 ? 'above 20: risk-off' : 'calm'}</span>`)}
       ${goldRow('5b', 'Stress: high-yield spread', g.hySpread, '%', (b) => `<span class="pill ${b.chg3m > 0 ? 'warn' : 'flat'}">${b.chg3m > 0 ? 'widening' : 'tightening'}</span>`)}
       ${goldRow('', 'Gold futures', g.goldFutures, '', () => '')}
-    </div><p class="small faint">Module 23: real rates anchor the trend, flows set the tempo, stress events bend the curve. Central-bank buying can override the real-yield link (2022-24).</p>`);
+    </div><p class="small faint">Module 23: real rates anchor the trend, flows set the tempo, stress events bend the curve. Central-bank buying can override the real-yield link (2022-24).</p>`, null, '', [Object.values(g).map((b) => b?.asOf), liq?.asOf, mm?.date]);
 
   const cv = d.curve, mats = ['3M', '2Y', '5Y', '10Y', '30Y'];
   const curveShape = () => {
@@ -1644,7 +1664,7 @@ render.drivers = async (main) => {
     <div><div class="table-wrap"><table><thead><tr><th>Curve</th><th>Spread</th><th>1 week</th><th>1 month</th><th>Spread, 1 year</th></tr></thead><tbody>${cv.pairs.map((p) => `<tr><td><b>${p.front}-${p.back}</b></td><td class="num">${p.spreadBp}bp</td>
       <td>${rgCell(p.w1)}</td><td>${rgCell(p.m1)}</td><td>${lineSvg(p.history, { h: 36, w: 140, hlines: [{ v: 0 }] })}</td></tr>`).join('')}</tbody></table></div>
       <ul class="list small" style="margin-top:8px">${[...new Set(cv.pairs.map((p) => p.m1.tag))].map((t) => { const r = cv.pairs.find((p) => p.m1.tag === t).m1; return `<li><span class="pill ${rgTone(t)}">${esc(t)}</span><span class="grow">${esc(r.read || '')} <span class="faint">(${cv.pairs.filter((p) => p.m1.tag === t).map((p) => `${p.front}-${p.back}`).join(', ')}, 1 month)</span></span></li>`; }).join('')}</ul></div></div>
-    <p class="small faint">Modules 03 and 03.1. Bull = yields fell, bear = yields rose; steepener = the long end rose relative to the short end. Under each tag: short end / long end move in bp. Twist (amber) = the two ends moved in opposite directions, 2bp or more each: the level label would hide it. Reads follow Alfie's MMH terminal. Different parts of the curve in different regimes at the same time is information.</p>`);
+    <p class="small faint">Modules 03 and 03.1. Bull = yields fell, bear = yields rose; steepener = the long end rose relative to the short end. Under each tag: short end / long end move in bp. Twist (amber) = the two ends moved in opposite directions, 2bp or more each: the level label would hide it. Reads follow Alfie's MMH terminal. Different parts of the curve in different regimes at the same time is information.</p>`, null, '', cv.asOf);
 
   const cc = d.commodityCurves;
   const ccSvg = (c) => {
@@ -1661,7 +1681,7 @@ render.drivers = async (main) => {
       <div>${ccSvg(c)}</div><div class="small muted">${esc(c.why)}</div></div>`).join('')}
       ${gs ? `<div class="stack-row cc-row"><div class="stack-name"><b>Gold / silver ratio</b><div class="small faint">${esc(fmtDate(gs.asOf))}</div></div><div><span class="num big">${gs.value}</span><div class="small">1 month ${gs.chg1m > 0 ? '+' : ''}${gs.chg1m}</div></div>
         <div>${lineSvg(gs.history, { h: 50, w: 220, label: 'Gold/silver ratio' })}</div><div>${pctileBar(gs.pctile1y)}<div class="small muted">A rising ratio = gold beating silver: defensive demand over industrial.</div></div></div>` : ''}</div>
-    <p class="small faint">Front futures month against the 7th listed month (solid now, dashed the same contracts a month ago). Backwardation (amber, front dearer) = supply tight now; contango = supply ample. From Alfie's MMH terminal. ${esc(cc.method)}</p>`);
+    <p class="small faint">Front futures month against the 7th listed month (solid now, dashed the same contracts a month ago). Backwardation (amber, front dearer) = supply tight now; contango = supply ample. From Alfie's MMH terminal. ${esc(cc.method)}</p>`, null, '', cc.asOf);
 
   const gr = d.growth, GROUP = { leading: 'Leading: turns first', coincident: 'Coincident: the pulse now', lagging: 'Lagging: confirms after' };
   const disagree = gr && gr.breadth.leading.weaker > gr.breadth.leading.stronger && gr.breadth.coincident.stronger >= gr.breadth.coincident.weaker;
@@ -1669,7 +1689,7 @@ render.drivers = async (main) => {
     <div class="gr-grid">${Object.entries(GROUP).map(([k, title]) => { const b = gr.breadth[k]; return `<div><div class="pc-h">${title}</div>
       <div class="breadth"><span class="bar-up" style="flex:${b.stronger || 0.001}"></span><span class="bar-dn" style="flex:${b.weaker || 0.001}"></span></div><div class="small muted">${b.stronger} stronger · ${b.weaker} weaker of ${b.n}</div>
       <ul class="list">${gr.series.filter((s) => s.group === k).map((s) => `<li class="gr-row"><div><b class="small">${esc(s.label)}</b><div class="small faint">${s.value}${s.unit ? ' ' + s.unit : ''} · ${sgn(s.chg3m, 2)}${s.chg3mUnit} in 3 months · ${esc(fmtDate(s.asOf))}</div></div><div class="gr-right">${lineSvg(s.history, { h: 30, w: 110 })}<div><span class="pill ${s.read === 'stronger' ? 'bull' : s.read === 'weaker' ? 'bear' : 'flat'}">${s.read}</span> <span class="small faint" title="Is the 3-month change better than the 3 months before?">${s.turning}</span></div></div></li>`).join('')}</ul></div>`; }).join('')}</div>
-    <p class="small faint">Module 04: trade the turn, not the level. "Accelerating / decelerating" is the second derivative: bad to less bad is where risk assets historically do best.</p>`);
+    <p class="small faint">Module 04: trade the turn, not the level. "Accelerating / decelerating" is the second derivative: bad to less bad is where risk assets historically do best.</p>`, null, '', gr.series.map((s) => s.asOf));
 
   const inf = d.inflation;
   const glide = (blk) => {
@@ -1680,18 +1700,18 @@ render.drivers = async (main) => {
       <div class="pos-legend">${labels.map((k, i) => `<span class="pos-key"><svg width="14" height="6"><line x1="0" x2="14" y1="3" y2="3" stroke="${cols[i]}" stroke-width="2" stroke-dasharray="4 3"/></svg>${esc(k)}: ${blk.paths[k][5]}%</span>`).join('')}</div>`;
   };
   const infPanel = !inf ? '' : panel('US inflation: the pace, and where it leads', `<div class="drv-2">${[inf.core, inf.headline].map((b) => `<div><div class="kpis"><div><label>${esc(b.label)} y/y${b.yoyAsOf && b.yoyAsOf !== b.asOf ? `, ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(b.yoyAsOf)} (no ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(new Date(Date.parse(b.asOf + "T12:00:00Z") - 365 * 864e5).toISOString().slice(0, 7) + "-01")} print to compare ${((d) => new Date(d + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", year: "numeric" }))(b.asOf)} with)` : ""}</label><span class="num big">${b.yoy ?? "n/a"}%</span></div><div><label>3-month pace</label><span class="num big ${b.ann3m > b.yoy ? 'warn-t' : ''}">${b.ann3m}%</span><div class="small faint">annualised</div></div><div><label>6-month pace</label><span class="num">${b.ann6m}%</span></div><div><label>Last month</label><span class="num">${sgn(b.lastMoM)}%</span></div></div>${glide(b)}</div>`).join('')}</div>
-    <p class="small faint">Modules 05 and FX II. Year on year is where inflation has been; the 3-month annualised pace is where it is now. The dashed paths hold today's monthly pace, double it, halve it or stop it, and show where year on year lands over six months: pricing that no path reaches is the one to fade. As of ${esc(fmtDate(inf.core.asOf))}.</p>`);
+    <p class="small faint">Modules 05 and FX II. Year on year is where inflation has been; the 3-month annualised pace is where it is now. The dashed paths hold today's monthly pace, double it, halve it or stop it, and show where year on year lands over six months: pricing that no path reaches is the one to fade. As of ${esc(fmtDate(inf.core.asOf))}.</p>`, null, '', [inf.core.asOf, inf.headline.asOf, inf.breakeven5y?.asOf]);
 
   const bc = d.bounce;
   const bouncePanel = !bc ? '' : panel('Bounce check: positioning or durable?', `<div class="kpis"><div><label>S&P 5 days</label>${chg(bc.spy5d, '%', 1)}</div><div><label>S&P 20 days</label>${chg(bc.spy20d, '%', 1)}</div><div><label>Durable tells</label><span class="num big">${bc.durable} of ${bc.n}</span></div></div>
     <div class="dots-row">${bc.checks.map((c) => `<span class="page ${c.read === 'durable' ? 'on' : 'bad'}" title="${esc(c.why)}">${esc(c.key)}</span>`).join('')}</div>
     <ul class="list">${bc.checks.map((c) => `<li><span class="grow"><b class="small">${esc(c.label)}</b><div class="small faint">${esc(c.why)}</div></span><span class="num small">${esc(c.value)}</span><span class="pill ${c.read === 'durable' ? 'bull' : 'warn'}">${c.read}</span></li>`).join('')}</ul>
-    <p class="small faint">Alfie's test and module 00.4: did a macro constraint change, or only the price of exposure? Skew and leveraged-ETF flows are part of the test but have no free source, so they are not here. As of ${esc(fmtDate(bc.asOf))}.</p>`);
+    <p class="small faint">Alfie's test and module 00.4: did a macro constraint change, or only the price of exposure? Skew and leveraged-ETF flows are part of the test but have no free source, so they are not here. As of ${esc(fmtDate(bc.asOf))}.</p>`, null, '', bc.asOf);
 
   const sb = d.stockBond;
   const sbPanel = !sb ? '' : panel('Stock-bond correlation', `<div class="drv-2"><div><div class="kpis"><div><label>60-day correlation, S&P vs long Treasuries</label><span class="num big">${sb.corr60d}</span></div></div><p class="small">${esc(sb.read)}</p></div>
     <div>${lineSvg(sb.history, { h: 100, min: -1, max: 1, hlines: [{ v: 0 }], bands: [{ from: 0.2, to: 1, fill: 'var(--bear-bg)' }, { from: -1, to: -0.2, fill: 'var(--bull-bg)' }], label: 'Rolling stock-bond correlation' })}</div></div>
-    <p class="small faint">Module 08: the mix of growth, inflation and liquidity sets the correlation. Positive (red zone) = bonds stop hedging stocks, as in 2022.</p>`);
+    <p class="small faint">Module 08: the mix of growth, inflation and liquidity sets the correlation. Positive (red zone) = bonds stop hedging stocks, as in 2022.</p>`, null, '', sb.asOf);
 
   const pr = d.pairs;
   const pairMap = () => {
@@ -1705,7 +1725,7 @@ render.drivers = async (main) => {
       ${ps.map(([k, p]) => `<g><circle cx="${X(p.vsEmaPct)}" cy="${Y(p.volRatio)}" r="3.5" fill="${p.trend === 'up' ? 'var(--bull)' : 'var(--bear)'}"/><text x="${X(p.vsEmaPct) + 5}" y="${Y(p.volRatio) + 3}" class="g-axis" fill="var(--muted)">${k}</text><title>${k}: ${p.vsEmaPct}% from 50-day EMA, volatility ${p.volRatio}x its 1-year median</title></g>`).join('')}
       <text x="${W / 2}" y="${H - 8}" text-anchor="middle" class="g-axis">% from 50-day EMA →</text><text x="8" y="${H / 2}" class="g-axis" transform="rotate(-90 8 ${H / 2})" text-anchor="middle">volatility vs 1-year median →</text></svg>`;
   };
-  const pairsPanel = !pr ? '' : panel('The 28 pairs: trend × volatility', `${pairMap()}<p class="small faint">Module 00.9: trend state × volatility state = four regimes with different behaviour. Continuation setups tend to suit calm trends; reversals suit high volatility. ${esc(pr.method)} As of ${esc(fmtDate(pr.asOf))}.</p>`);
+  const pairsPanel = !pr ? '' : panel('The 28 pairs: trend × volatility', `${pairMap()}<p class="small faint">Module 00.9: trend state × volatility state = four regimes with different behaviour. Continuation setups tend to suit calm trends; reversals suit high volatility. ${esc(pr.method)} As of ${esc(fmtDate(pr.asOf))}.</p>`, null, '', pr.asOf);
 
   main.innerHTML = head('Drivers', 'What is driving each market, and when it stops: the market regime, each currency\'s real-world drivers and correlations against their normal, then the cross-asset readings Market Context does not carry (liquidity, gold\'s drivers, the US curve, growth breadth, the inflation pace, equity bounce quality, the stock-bond link, every pair\'s trend regime). Updated daily.') +
     ((d.warns || []).length ? `<div class="note small">Data warnings: ${d.warns.map(esc).join(' · ')}</div>` : '') +
@@ -1805,13 +1825,13 @@ render.countries = async (main) => {
         <div><div class="pc-h">What to watch</div><ul class="list">${c.watch.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
       </div>
       ${pc ? `<div class="pc-h" style="margin-top:12px">Positioning now <a class="small" href="positioning.html">all →</a></div><div class="pos-grid">${posCard(`<span class="ccy">${c.code}</span>`, pc, `COT of ${esc(fmtDate(pos.cotDate))}`)}</div>` : ''}
-    </section>`;
+    ${asOfStamp(data.updated, pc ? pos.cotDate : null)}</section>`;
   };
 
   const draw = () => {
     main.innerHTML = head('Countries', 'Layer 1: who each economy is. The slow structure behind the currency: the seven-part country profile from the course, quantified. It changes over years, so read it to understand the character. My read, at the top of each country, is my current view of the economy; it shows on the Scorecard.') +
       `<div class="filters"><span class="small muted">Country</span>${list.map((c) => `<button class="chip ${c.code === sel ? 'on' : ''}" data-ccy="${c.code}">${c.code} · ${esc(c.name)}</button>`).join('')}</div>` +
-      myRead(sel) + panel('Side by side', compare) + panel('Long or short each commodity', heat) +
+      myRead(sel) + panel('Side by side', compare, null, '', data.updated) + panel('Long or short each commodity', heat, null, '', data.updated) +
       detail(list.find((c) => c.code === sel)) +
       `<p class="small faint">${esc(data.note)} Updated ${esc(fmtDate(data.updated))}. Sources: ${(data.sources || []).map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a>`).join(" · ")}</p>`;
   };
@@ -1994,7 +2014,7 @@ render.holdings = async (main) => {
   const ycPanel = () => `<div class="filters"><label class="small muted" for="yc-add">Add a pair</label>
       <select id="yc-add"><option value="">choose…</option>${ALL_PAIRS.filter((p) => !pairs.includes(p)).map((p) => `<option>${p}</option>`).join('')}</select>
       ${Object.keys(myCalls).length ? `<button class="chip" data-mine>This week's pairs</button>` : ''}</div>
-    <div class="yc-grid">${pairs.map(ycCard).join('') || '<div class="empty">No pairs chosen.</div>'}</div>`;
+    <div class="yc-grid">${pairs.map(ycCard).join('') || '<div class="empty">No pairs chosen.</div>'}</div>${asOfStamp(pairs.flatMap((p) => [y[p.slice(0, 3)]?.dates?.at(-1), y[p.slice(3)]?.dates?.at(-1)]))}`;
 
   // Country lookup: Treasuries (TIC) and gold (IMF) side by side.
   const goldBy = Object.fromEntries((gold?.countries || []).map((c) => [c.code, c]));
@@ -2012,7 +2032,7 @@ render.holdings = async (main) => {
     const gBlock = g ? `<div><div class="fact-k">Central-bank gold</div><div class="num big">${tn(g.tonnes[gN - 1])}</div>
         <div class="small">1 month ${chg(gN > 1 ? g.tonnes[gN - 1] - g.tonnes[gN - 2] : null, ' t')} · 12 months ${chg(gN > 12 ? g.tonnes[gN - 1] - g.tonnes[gN - 13] : null, ' t')}</div>${lineSvg(g.months.map((m, i) => [m, g.tonnes[i]]), { w: 300, h: 56, color: 'var(--warn)', label: 'Gold held' })}<div class="small faint">${monthName(g.months[gN - 1])}${g.months[gN - 1] < gold.asOf ? ': this country reports late' : ''}</div></div>`
       : '<div><div class="fact-k">Central-bank gold</div><div class="small faint">Not reported to the IMF.</div></div>';
-    return `<div class="hd-country">${tBlock}${gBlock}</div>`;
+    return `<div class="hd-country">${tBlock}${gBlock}</div>${asOfStamp(t ? tic.asOf : null, g ? g.months[gN - 1] : null)}`;
   };
 
   const bars = (rows, max, cls) => rows.map((r) => `<details class="hd-row"><summary><span class="hd-name">${esc(r.name)}</span><span class="hd-track"><span class="hd-fill ${cls}" style="width:${Math.max(1, (Math.abs(r.v) / max) * 100)}%"></span></span><span class="hd-v">${r.label}</span><span class="hd-c">${r.chg}</span></summary>${r.more}</details>`).join('');
@@ -2055,9 +2075,9 @@ render.holdings = async (main) => {
       `<section class="panel ts-gap"><div class="panel-head"><h2>Who holds what: by country</h2></div>
         <div class="filters"><label class="small muted" for="hd-c">Country</label><select id="hd-c">${lookup.map((c) => `<option value="${c.code}" ${c.code === country ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div>
         <div id="hd-card">${countryCard()}</div></section>` +
-      panel('Foreign holders of US Treasuries', ticPanel(), null, 'ts-gap') +
-      panel('Central-bank gold', goldPanel(), null, 'ts-gap') +
-      panel('Reserve-currency shares', coferPanel(), null, 'ts-gap') +
+      panel('Foreign holders of US Treasuries', ticPanel(), null, 'ts-gap', tic?.asOf ?? '') +
+      panel('Central-bank gold', goldPanel(), null, 'ts-gap', gold?.asOf ?? '') +
+      panel('Reserve-currency shares', coferPanel(), null, 'ts-gap', cofer?.quarters?.at(-1) ?? '') +
       (h.warns?.length ? `<p class="small faint">Not refreshed today: ${esc(h.warns.join('; '))}. Showing the last good copy.</p>` : '') +
       `<p class="small faint">Updated ${fmtDate(h.generatedAt.slice(0, 10))}. ${esc(h.sources)}</p>`;
   };
@@ -2115,19 +2135,19 @@ render.review = async (main) => {
       return `<div class="mx-c ${tone}"><b class="num">${xs.length}</b> event${xs.length === 1 ? '' : 's'}${avg != null ? `<div class="small">next 3 days ${avg >= 0 ? 'continued' : 'reversed'} ${Math.abs(avg).toFixed(2)}% on average</div>` : ''}</div>`; }).join('')}`).join('')}</div>`;
   const rxPanel = `<section class="panel" style="margin-bottom:14px"><div class="panel-head"><h2>Release to reaction</h2><a href="playbook.html#pb-matrix">Matrix →</a></div>
     ${logged.length ? rxGrid + `<ul class="list" style="margin-top:10px">${logged.sort((a, b) => (a.e.date < b.e.date ? 1 : -1)).slice(0, 12).map(({ e, r }) => `<li><span class="small nowrap muted">${fmtDate(e.date)}</span><span class="grow"><b>${esc(e.event)}</b> <span class="ccy">${esc(e.currency)}</span> · ${RX_PRINT[e.reaction.print]} ${rxCell(r)}<div>${rxMove(r)}</div></span></li>`).join('')}</ul>`
-      : '<div class="empty">Nothing logged yet. On the Scorecard, once an event has printed, pick beat / in line / miss and the desk reads the price reaction. After about 30 the grid shows which contradictions led to multi-day moves.</div>'}</section>`;
+      : '<div class="empty">Nothing logged yet. On the Scorecard, once an event has printed, pick beat / in line / miss and the desk reads the price reaction. After about 30 the grid shows which contradictions led to multi-day moves.</div>'}${logged.length ? asOfStamp(priceDay()) : ''}</section>`;
   const stat = (label, t) => `<div><label>${label}</label><span class="num big">${t.n ? `${t.right} of ${t.n}` : '—'}</span><div class="small faint">${t.n ? `${t.wrong} wrong, ${t.n - t.right - t.wrong} flat` : 'no closed week yet'}</div></div>`;
 
   main.innerHTML = head('Review', 'Were my calls right? Each saved week is graded from prices: pairs by their move in my direction, currency calls by the currency against the other seven.', `<span>${priceAge()}</span>`) +
     `<section class="panel" style="margin-bottom:14px"><div class="kpis">${stat('Pairs right, closed weeks', tp)}${stat('Currency calls right, closed weeks', tc)}
-      <div><label>Weeks saved</label><span class="num big">${weeks.length}</span></div></div></section>` + rxPanel +
+      <div><label>Weeks saved</label><span class="num big">${weeks.length}</span></div></div>${tp.n || tc.n ? asOfStamp(priceDay()) : ''}</section>` + rxPanel +
     (graded.map(({ w, g }) => `<section class="panel" style="margin-bottom:14px">
       <div class="panel-head"><h2>Week of ${fmtDate(w.monday)}</h2><span><span class="pill ${g.state === 'running' ? 'warn' : 'flat'}">${esc(g.state)}</span> <a href="scorecard.html?week=${w.monday}">Scorecard →</a></span></div>
       ${g.from ? `<p class="small faint" style="margin:0 0 8px">Measured from the close of ${fmtDate(g.from)} to ${g.state === 'running' ? 'now' : `the close of ${fmtDate(g.to)}`}.</p>` : ''}
       <div class="grid sc-grid">
         <div><div class="small muted" style="margin-bottom:4px">Pairs</div><ul class="list">${g.pairs.map((p) => `<li><b>${esc(p.pair)}</b> <span class="pill ${p.dir === 'LONG' ? 'bull' : 'bear'}">${esc(p.dir)}</span><span class="grow small muted">pair moved ${pctHtml(p.move)}</span>${hitPill(p.mine)}</li>`).join('') || `<li class="small faint">${(w.pairs || []).length ? 'Not measurable yet.' : 'No pairs confirmed that week.'}</li>`}</ul></div>
         <div><div class="small muted" style="margin-bottom:4px">Currency calls</div><ul class="list">${g.calls.map((c) => `<li><span class="ccy">${esc(c.c)}</span> ${scoreChip(c.s)}<span class="grow small muted">vs the other seven ${pctHtml(c.move)}</span>${hitPill(c.mine)}</li>`).join('') || `<li class="small faint">${Object.keys(w.scores || {}).length ? 'Not measurable yet, or all calls were "about right".' : 'No calls that week.'}</li>`}</ul></div>
-      </div></section>`).join('') || '<section class="panel"><div class="empty">No scorecard saved yet. This page fills itself once a week has been saved. <a href="scorecard.html">Do the weekly build →</a></div></section>') +
+      </div>${g.from ? asOfStamp(g.state === 'running' ? priceDay() : g.to) : ''}</section>`).join('') || '<section class="panel"><div class="empty">No scorecard saved yet. This page fills itself once a week has been saved. <a href="scorecard.html">Do the weekly build →</a></div></section>') +
     `<p class="small faint">A call counts as right when price moved more than 0.05% its way over the week. This grades direction only, not entries or exits. My own verdict per call and the monthly review come next.</p>`;
 };
 

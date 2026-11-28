@@ -520,3 +520,7 @@ tr.rg-now td { background: rgba(106, 168, 255, 0.08); }
   .mv-track { display: none; }
   .cc-row { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------- data date: newest data in a box, bottom-right ---------- */
+.panel:has(.asof) { position: relative; padding-bottom: 24px; }
+.asof { position: absolute; right: 12px; bottom: 6px; font: 10px var(--mono); color: var(--faint); letter-spacing: 0.3px; pointer-events: none; }
