@@ -15,6 +15,8 @@ Live: `/my-trading-project/desk/`. Preview locally: `npm run desk`, then http://
 (daily, or a manual run; a push alone does not publish).
 
 ## Pages
+Three sections in the top bar (2026-11-28): **Today** (the brief, `index.html`), **Markets** (what the data says, to back an idea: Drivers, Positioning, Holdings, Countries) and **My Book** (what I do with it: Scorecard, Ideas, Kill Switches, Key Levels, Technical Setup, Review, Playbook). Markets and My Book open their row of pages under the bar without leaving the page; the row of the section you are on shows from the start. The grouping is `SECTIONS` and each page's `section` in `PAGES` (`assets/desk.js`).
+
 | Page | File | Holds |
 |---|---|---|
 | Today | `index.html` | Also: "whose story is it?" attribution heatmap (each currency against each other, today / week / month), **Unusual moves** (23 markets ranked by move ÷ their own typical move, last day or 5 days; top 6, the rest folded; 2× or more gets an amber edge; from Alfie's MMH terminal) and the News panel (summary, what to look for, links out). Original: | This week's confirmed pairs against live prices (last, today, week, 1 month, with or against his call, a live TradingView mini chart, his events, levels and kill switches for the pair); every currency's score against its move; the seven-question daily read with links; the three-line daily note |
