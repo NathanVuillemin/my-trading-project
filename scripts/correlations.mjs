@@ -18,7 +18,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { yahooDaily, yahooHourly, fred, cb2y, gdt } from './lib/corr-sources.mjs';
-import { buildRegime, buildLink } from './lib/corr-math.mjs';
+import { buildRegime, buildLink, quadrantRead } from './lib/corr-math.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const has = (n) => process.argv.includes(`--${n}`);
@@ -33,6 +33,7 @@ const DAILY = {
   VIX: { y: '^VIX' }, BTC: { y: 'BTC-USD', label: 'Bitcoin' }, XLY: { y: 'XLY' }, XLP: { y: 'XLP' }, TLT: { y: 'TLT' },
   US2Y: { fred: 'DGS2', kind: 'yield', label: 'US 2Y yield' }, US10Y: { fred: 'DGS10', kind: 'yield', label: 'US 10Y yield' },
   REAL10Y: { fred: 'DFII10', kind: 'yield', label: 'US 10Y real yield' }, HY: { fred: 'BAMLH0A0HYM2', kind: 'yield', label: 'US high-yield spread' },
+  BE5Y: { fred: 'T5YIE', kind: 'yield', label: 'US 5-year inflation expectations (breakeven)' }, IG: { fred: 'BAMLC0A0CM', kind: 'yield', label: 'US investment-grade spread' },
 };
 // Hourly series (2 years): same keys where a daily key has an hourly twin.
 const HOURLY = {
@@ -107,6 +108,16 @@ async function main() {
     gold: daily.GOLD, hy: daily.HY, xly: daily.XLY, xlp: daily.XLP, usdjpy: daily.USDJPY, usdchf: daily.USDCHF, tlt: daily.TLT,
   });
 
+  // Where we sit on the Playbook's two maps (Regime page). Policy-regime map: US 10Y real yield vs 5-year
+  // inflation expectations, 3-month changes. Duration x credit: US 10Y yield vs the high-yield spread, 1-month
+  // changes, with the investment-grade spread alongside.
+  const q = (x, y, o) => { try { return x && y ? quadrantRead(x, y, o) : null; } catch { return null; } };
+  const maps = {
+    policy: q(daily.REAL10Y, daily.BE5Y, { w: 63, lags: [21, 63, 126], band: 5 }),
+    credit: q(daily.US10Y, daily.HY, { w: 21, lags: [5, 21, 63], band: 5 }),
+    ig: q(daily.US10Y, daily.IG, { w: 21, lags: [], band: 5 }),
+  };
+
   const r2 = (x, d = 2) => (x == null ? null : Number(x.toFixed(d)));
   const links = LINKS.map((cfg) => {
     const base = { ...cfg, labelT: label(cfg.target), labelD: label(cfg.driver), kindT: kindOf(cfg.target), kindD: kindOf(cfg.driver) };
@@ -129,6 +140,7 @@ async function main() {
     sources: 'Yahoo Finance (daily, hourly); FRED (DGS2, DGS10, DFII10, BAMLH0A0HYM2); 2Y yields: Bank of Canada, Bank of England, RBA, Japan Ministry of Finance, Bundesbank; Global Dairy Trade.',
     missing, errors,
     regime: regime.now ? { ...regime.now, history: regime.history } : null,
+    maps,
     links,
   };
   if (has('json')) { console.log(JSON.stringify(out, null, 2)); return; }

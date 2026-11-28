@@ -293,3 +293,21 @@ export function buildLink(cfg, daily, hourly, regimeByDate) {
     byRegime: tbl,
   };
 }
+
+// ---------- where we sit on a 2x2 map (policy-regime map, duration x credit) ----------
+// x and y are Maps of daily levels in percent (yields, breakevens, spreads). Each axis reads its change over
+// `w` shared days in bp; `band` bp either side of zero counts as "on the line". Trail = the same reading
+// `lag` days earlier, so the page can draw where we came from.
+export function quadrantRead(xs, ys, { w, lags = [], band = 5 }) {
+  const dates = [...xs.keys()].filter((d) => ys.has(d)).sort();
+  const at = (i) => (i - w < 0 ? null : { date: dates[i], x: (xs.get(dates[i]) - xs.get(dates[i - w])) * 100, y: (ys.get(dates[i]) - ys.get(dates[i - w])) * 100 });
+  const L = dates.length - 1, now = at(L);
+  if (!now) return null;
+  const side = (v) => (Math.abs(v) <= band ? 'line' : v > 0 ? 'up' : 'down');
+  const r1 = (v) => Math.round(v * 10) / 10;
+  return {
+    asOf: now.date, x: r1(now.x), y: r1(now.y), xSide: side(now.x), ySide: side(now.y),
+    xNow: xs.get(dates[L]), yNow: ys.get(dates[L]), w, band,
+    trail: lags.map((lag) => { const p = at(L - lag); return p ? { lag, date: p.date, x: r1(p.x), y: r1(p.y) } : null; }).filter(Boolean),
+  };
+}

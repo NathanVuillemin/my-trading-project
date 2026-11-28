@@ -548,3 +548,11 @@ tr.rg-now td { background: rgba(106, 168, 255, 0.08); }
   .topbar-inner { gap: 10px; }
   .nav a, .nav button { padding: 7px 8px; }
 }
+
+/* ---------- regime: today placed on the Playbook's maps ---------- */
+.rq-wrap { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.rq-svg { width: 100%; height: auto; display: block; }
+.rq-name { font: 600 11px -apple-system, "Segoe UI", sans-serif; }
+.rq-here { margin-bottom: 8px; }
+.rq-k { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 10px; }
+@media (max-width: 760px) { .rq-wrap { grid-template-columns: minmax(0, 1fr); } }
