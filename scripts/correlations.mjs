@@ -18,7 +18,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { yahooDaily, yahooHourly, fred, cb2y, gdt } from './lib/corr-sources.mjs';
-import { buildRegime, buildLink, quadrantRead } from './lib/corr-math.mjs';
+import { buildRegime, buildLink, quadrantRead, realisedVol, levelRead } from './lib/corr-math.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const has = (n) => process.argv.includes(`--${n}`);
@@ -33,7 +33,11 @@ const DAILY = {
   VIX: { y: '^VIX' }, BTC: { y: 'BTC-USD', label: 'Bitcoin' }, XLY: { y: 'XLY' }, XLP: { y: 'XLP' }, TLT: { y: 'TLT' },
   US2Y: { fred: 'DGS2', kind: 'yield', label: 'US 2Y yield' }, US10Y: { fred: 'DGS10', kind: 'yield', label: 'US 10Y yield' },
   REAL10Y: { fred: 'DFII10', kind: 'yield', label: 'US 10Y real yield' }, HY: { fred: 'BAMLH0A0HYM2', kind: 'yield', label: 'US high-yield spread' },
-  BE5Y: { fred: 'T5YIE', kind: 'yield', label: 'US 5-year inflation expectations (breakeven)' }, IG: { fred: 'BAMLC0A0CM', kind: 'yield', label: 'US investment-grade spread' },
+  BE5Y: { fred: 'T5YIE', kind: 'yield', label: 'US 5-year inflation expectations (breakeven)' },
+  // Regime page: volatility gauges (Yahoo) and the four rate families (FRED).
+  VIX3M: { y: '^VIX3M' }, VIX9D: { y: '^VIX9D' }, MOVE: { y: '^MOVE' }, OVX: { y: '^OVX' }, GVZ: { y: '^GVZ' }, SKEW: { y: '^SKEW' }, VVIX: { y: '^VVIX' },
+  US30Y: { fred: 'DGS30', kind: 'yield' }, REAL5Y: { fred: 'DFII5', kind: 'yield' }, REAL30Y: { fred: 'DFII30', kind: 'yield' },
+  BE10Y: { fred: 'T10YIE', kind: 'yield' }, FWD5Y5Y: { fred: 'T5YIFR', kind: 'yield' }, IG: { fred: 'BAMLC0A0CM', kind: 'yield', label: 'US investment-grade spread' },
 };
 // Hourly series (2 years): same keys where a daily key has an hourly twin.
 const HOURLY = {
@@ -118,6 +122,37 @@ async function main() {
     ig: q(daily.US10Y, daily.IG, { w: 21, lags: [], band: 5 }),
   };
 
+  // Options and volatility (MMH 09, 20): where money is actually at risk. Implied vol against what the market has
+  // really moved (20-day realised), the VIX term structure, and the three asset-class gauges side by side.
+  const lr = (m, o) => { try { return m ? levelRead(m, o) : null; } catch { return null; } };
+  const rv = (m) => { try { return m ? realisedVol(m, 20) : null; } catch { return null; } };
+  const gauge = (key, label, market, ivKey, pxKey) => {
+    const g = lr(daily[ivKey], { bp: false });
+    if (!g) return null;
+    const real = pxKey ? rv(daily[pxKey]) : null;
+    return { key, label, market, ...g, rv20: real, premium: real == null ? null : Math.round((g.value - real) * 10) / 10 };
+  };
+  const ratio = (a, b) => { if (!a || !b) return null; const m = new Map(); for (const [d, v] of a) if (b.has(d) && b.get(d)) m.set(d, v / b.get(d)); return m; };
+  const diff = (a, b) => { if (!a || !b) return null; const m = new Map(); for (const [d, v] of a) if (b.has(d)) m.set(d, v - b.get(d)); return m; };
+  const vol = {
+    gauges: [
+      gauge('vix', 'VIX', 'US stocks (S&P 500, 30 days)', 'VIX', 'SPX'),
+      gauge('move', 'MOVE', 'US Treasuries', 'MOVE', null),
+      gauge('ovx', 'OVX', 'Oil', 'OVX', 'WTI'),
+      gauge('gvz', 'GVZ', 'Gold', 'GVZ', 'GOLD'),
+      gauge('vvix', 'VVIX', 'Volatility of the VIX', 'VVIX', null),
+      gauge('skew', 'SKEW', 'S&P tail-risk demand', 'SKEW', null),
+    ].filter(Boolean),
+    term: (() => { const r = lr(ratio(daily.VIX, daily.VIX3M), { bp: false }), s = lr(ratio(daily.VIX9D, daily.VIX), { bp: false }); return r ? { vixOverVix3m: r, vix9dOverVix: s } : null; })(),
+  };
+  // The four rate families (MMH 03.1): nominal, real, breakevens, forwards, each with its curve.
+  const rates = {
+    nominal: { y2: lr(daily.US2Y), y10: lr(daily.US10Y), y30: lr(daily.US30Y), s2s10: lr(diff(daily.US10Y, daily.US2Y)) },
+    real: { y5: lr(daily.REAL5Y), y10: lr(daily.REAL10Y), y30: lr(daily.REAL30Y), s5s10: lr(diff(daily.REAL10Y, daily.REAL5Y)) },
+    breakeven: { y5: lr(daily.BE5Y), y10: lr(daily.BE10Y), s5s10: lr(diff(daily.BE10Y, daily.BE5Y)) },
+    forward: { be5y5y: lr(daily.FWD5Y5Y) },
+  };
+
   const r2 = (x, d = 2) => (x == null ? null : Number(x.toFixed(d)));
   const links = LINKS.map((cfg) => {
     const base = { ...cfg, labelT: label(cfg.target), labelD: label(cfg.driver), kindT: kindOf(cfg.target), kindD: kindOf(cfg.driver) };
@@ -140,7 +175,7 @@ async function main() {
     sources: 'Yahoo Finance (daily, hourly); FRED (DGS2, DGS10, DFII10, BAMLH0A0HYM2); 2Y yields: Bank of Canada, Bank of England, RBA, Japan Ministry of Finance, Bundesbank; Global Dairy Trade.',
     missing, errors,
     regime: regime.now ? { ...regime.now, history: regime.history } : null,
-    maps,
+    maps, vol, rates,
     links,
   };
   if (has('json')) { console.log(JSON.stringify(out, null, 2)); return; }

@@ -311,3 +311,28 @@ export function quadrantRead(xs, ys, { w, lags = [], band = 5 }) {
     trail: lags.map((lag) => { const p = at(L - lag); return p ? { lag, date: p.date, x: r1(p.x), y: r1(p.y) } : null; }).filter(Boolean),
   };
 }
+
+// ---------- volatility gauges and rate levels (Regime page) ----------
+// Annualised realised volatility (%) of the last `w` daily log returns.
+export function realisedVol(prices, w = 20) {
+  const v = [...prices.keys()].sort().map((d) => prices.get(d));
+  if (v.length < w + 1) return null;
+  const r = v.slice(-(w + 1)).map((x, i, a) => (i ? Math.log(x / a[i - 1]) : null)).slice(1);
+  const m = r.reduce((s, x) => s + x, 0) / r.length;
+  const sd = Math.sqrt(r.reduce((s, x) => s + (x - m) ** 2, 0) / (r.length - 1));
+  return Math.round(sd * Math.sqrt(252) * 10000) / 100;
+}
+// A level series (percent or index): last value, changes over 1 and 3 months (in bp for percent series, else
+// in points), where it sits in its last year (0-100) and a weekly sparkline of the last year.
+export function levelRead(m, { bp = true } = {}) {
+  const d = [...m.keys()].sort();
+  if (d.length < 2) return null;
+  const v = d.map((x) => m.get(x)), L = v.length - 1, k = bp ? 100 : 1;
+  const chg = (n) => (L - n >= 0 ? Math.round((v[L] - v[L - n]) * k * 10) / 10 : null);
+  const yr = v.slice(-252), lo = Math.min(...yr), hi = Math.max(...yr);
+  return {
+    asOf: d[L], value: Math.round(v[L] * 1000) / 1000, chg21bp: chg(21), chg63bp: chg(63),
+    pctile1y: hi > lo ? Math.round(((v[L] - lo) / (hi - lo)) * 100) : 50,
+    spark: d.slice(-252).filter((_, i, a) => (a.length - 1 - i) % 5 === 0).map((x) => [x, Math.round(m.get(x) * 1000) / 1000]),
+  };
+}
