@@ -4,19 +4,26 @@
 // ideas) is saved to ./data/ through GitHub; the one thing it reads is a small live price file, used
 // to hold his entries against the market. It shows no data he is already sent elsewhere.
 
+// Three sections: Today (the brief), Markets (what the data says, to back an idea) and My Book (what I do with
+// it). Markets and My Book open their row of pages in the bar; Today is one page.
+const SECTIONS = [
+  { id: 'today', label: 'Today' },
+  { id: 'markets', label: 'Markets' },
+  { id: 'book', label: 'My Book' },
+];
 const PAGES = [
-  { id: 'hub', href: 'index.html', label: 'Today' },
-  { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard' },
-  { id: 'countries', href: 'countries.html', label: 'Countries' },
-  { id: 'playbook', href: 'playbook.html', label: 'Playbook' },
-  { id: 'technical', href: 'technical.html', label: 'Technical Setup' },
-  { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches' },
-  { id: 'levels', href: 'levels.html', label: 'Key Levels' },
-  { id: 'positioning', href: 'positioning.html', label: 'Positioning' },
-  { id: 'drivers', href: 'drivers.html', label: 'Drivers' },
-  { id: 'holdings', href: 'holdings.html', label: 'Holdings' },
-  { id: 'ideas', href: 'ideas.html', label: 'Ideas' },
-  { id: 'review', href: 'review.html', label: 'Review' },
+  { id: 'hub', href: 'index.html', label: 'Today', section: 'today' },
+  { id: 'drivers', href: 'drivers.html', label: 'Drivers', section: 'markets' },
+  { id: 'positioning', href: 'positioning.html', label: 'Positioning', section: 'markets' },
+  { id: 'holdings', href: 'holdings.html', label: 'Holdings', section: 'markets' },
+  { id: 'countries', href: 'countries.html', label: 'Countries', section: 'markets' },
+  { id: 'scorecard', href: 'scorecard.html', label: 'Scorecard', section: 'book' },
+  { id: 'ideas', href: 'ideas.html', label: 'Ideas', section: 'book' },
+  { id: 'killswitches', href: 'kill-switches.html', label: 'Kill Switches', section: 'book' },
+  { id: 'levels', href: 'levels.html', label: 'Key Levels', section: 'book' },
+  { id: 'technical', href: 'technical.html', label: 'Technical Setup', section: 'book' },
+  { id: 'review', href: 'review.html', label: 'Review', section: 'book' },
+  { id: 'playbook', href: 'playbook.html', label: 'Playbook', section: 'book' },
 ];
 const CCYS = ['USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD'];
 // Market-convention order: the higher-priority currency is the base of the pair.
@@ -278,14 +285,27 @@ const fmtDate = (iso) => new Date(iso + (iso.length === 10 ? 'T12:00:00Z' : ''))
 
 // ---------- shell ----------
 function shell(page) {
-  const nav = PAGES.map((p) => `<a href="${p.href}" class="${p.id === page ? 'active' : ''}">${p.label}</a>`).join('');
+  const here = PAGES.find((p) => p.id === page)?.section || 'today';
+  // Top row: the three sections. Today is a link; Markets and My Book open their row of pages below without
+  // leaving the page. The row of the section you are in shows from the start.
+  const top = SECTIONS.map((s) => (s.id === 'today'
+    ? `<a href="index.html" class="${here === 'today' ? 'active' : ''}">${s.label}</a>`
+    : `<button type="button" data-sec="${s.id}" class="${here === s.id ? 'active' : ''}" aria-expanded="${here === s.id}">${s.label} <span class="nav-caret">▾</span></button>`)).join('');
+  const rows = SECTIONS.filter((s) => s.id !== 'today').map((s) => `<nav class="subnav" data-row="${s.id}" ${here === s.id ? '' : 'hidden'}>${PAGES.filter((p) => p.section === s.id).map((p) => `<a href="${p.href}" class="${p.id === page ? 'active' : ''}">${p.label}</a>`).join('')}</nav>`).join('');
   const mockBar = localMode() ? '<div class="mockbar">LOCAL TEST MODE: saves stay in this browser. Nothing is committed to GitHub.</div>' : '';
   document.body.insertAdjacentHTML('afterbegin', `
     <header class="topbar"><div class="topbar-inner">
       <a class="brand" href="index.html">Trading <span>Desk</span></a>
-      <nav class="nav">${nav}</nav>
-    </div></header>
+      <nav class="nav">${top}</nav>
+    </div><div class="subnav-wrap">${rows}</div></header>
     ${mockBar}`);
+  document.querySelector('.topbar .nav').addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-sec]'); if (!b) return;
+    const open = b.getAttribute('aria-expanded') !== 'true';
+    document.querySelectorAll('.topbar button[data-sec]').forEach((x) => x.setAttribute('aria-expanded', 'false'));
+    document.querySelectorAll('.subnav').forEach((r) => { r.hidden = true; });
+    if (open) { b.setAttribute('aria-expanded', 'true'); document.querySelector(`.subnav[data-row="${b.dataset.sec}"]`).hidden = false; }
+  });
 }
 function head(title, blurb, right = '') {
   return `<div class="page-head"><div><h1>${esc(title)}</h1>${blurb ? `<p>${blurb}</p>` : ''}</div>${right}</div>`;
